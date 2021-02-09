@@ -1,7 +1,7 @@
 import { Kruskal } from "./Kruskal";
 import { AdjacencyMatrix } from "../GraphStructure";
 
-test("CriticalPath", () => {
+test("Kruskal", () => {
   let mat = [
     [0, 15, 0, 40, 25],
     [15, 0, 30, 20, 30],
