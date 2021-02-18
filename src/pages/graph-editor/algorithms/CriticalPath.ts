@@ -23,13 +23,14 @@ class CriticalPath extends GraphAlgorithm {
       graph.nodes()[edge.target].datum.degree++;
     }
 
-    yield { graph };
-
     for (let t = 0; t < graph.nodes().length; t++) {
       for (let i = 0; i < graph.nodes().length; i++) {
         if (graph.nodes()[i].datum.topoSequence == -1 && graph.nodes()[i].datum.degree == 0) {
           graph.nodes()[i].datum.topoSequence = counter;
           topo[counter++] = i;
+
+          yield { graph };
+
           for (let j = 0; j < graph.nodes().length; j++) {
             if (mat[i][j] != undefined) {
               graph.nodes()[j].datum.degree--;
@@ -47,16 +48,16 @@ class CriticalPath extends GraphAlgorithm {
     }
 
     graph.edges().forEach(e => (e.datum.visited = false));
-
     yield { graph };
 
-    for (let i = 0; i < graph.nodes().length; i++) {
+    for (let i = 1; i < graph.nodes().length; i++) {
+      yield { graph };
       for (let j = 0; j < graph.nodes().length; j++) {
-        if (graph.nodes()[j].datum.dist < graph.nodes()[topo[i]].datum.dist + mat[topo[i]][j]) {
-          graph.nodes()[j].datum.dist = graph.nodes()[topo[i]].datum.dist + mat[topo[i]][j];
+        if (graph.nodes()[topo[i]].datum.dist < graph.nodes()[j].datum.dist + mat[j][topo[i]]) {
+          graph.nodes()[topo[i]].datum.dist = graph.nodes()[j].datum.dist + mat[j][topo[i]];
         }
         graph.edges().forEach(edge => {
-          if (edge.source == topo[i] && edge.target == j) {
+          if (edge.source == j && edge.target == topo[i]) {
             edge.datum.visited = true;
           }
         });

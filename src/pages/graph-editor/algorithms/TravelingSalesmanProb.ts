@@ -64,6 +64,8 @@ class SalesmanPath extends GraphAlgorithm {
       edges[i].datum = { dist: edges[i].datum, chosen: 0 };
     }
 
+    yield new SalesmanStep(graph, boundary);
+
     while (node >= 0) {
       //选择足够的边
       while (chosenCnt < 5) {
@@ -104,6 +106,7 @@ class SalesmanPath extends GraphAlgorithm {
             chosenCnt--;
           }
         }
+        yield new SalesmanStep(graph, boundary);
       }
 
       //继续深探
