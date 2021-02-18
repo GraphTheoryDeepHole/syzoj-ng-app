@@ -18,6 +18,8 @@ class Prim extends GraphAlgorithm {
 
     //Prim
     graph.nodes()[0].datum.visited = true;
+    yield { graph };
+
     for (let i = 0; i < graph.nodes().length - 1; i++) {
       let tarIdx = 0;
       let minl = Infinity;
@@ -32,6 +34,9 @@ class Prim extends GraphAlgorithm {
           minl = graph.edges()[i].datum.dist;
         }
       }
+
+      yield { graph };
+
       graph.nodes()[graph.edges()[tarIdx].source].datum.visited = true;
       graph.nodes()[graph.edges()[tarIdx].target].datum.visited = true;
       graph.edges()[tarIdx].datum.chosen = 1;
