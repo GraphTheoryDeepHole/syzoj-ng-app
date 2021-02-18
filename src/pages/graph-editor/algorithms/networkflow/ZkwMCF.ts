@@ -1,11 +1,39 @@
-import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
+import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
-import { NetworkFlowBase, min, max, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge } from "./Common";
 
 class ZkwMCF extends GraphAlgorithm {
-  constructor() {
-    super("ZkwMCF", "Zkw's algorithm for Minimum-Cost Network Flow");
+  // constructor() {
+  //   super("ZkwMCF", "Zkw's algorithm for Minimum-Cost Network Flow");
+  // }
+
+  id() {
+    return "zkw_mcf";
+  }
+
+  parameters(): ParameterDescriptor[] {
+    return [
+      {
+        name: "source_vertex",
+        parser: (text, graph) => parseRangedInt(text, 0, graph.nodes().length)
+      },
+      {
+        name: "target_vertex",
+        parser: (text, graph) => parseRangedInt(text, 0, graph.nodes().length)
+      },
+      {
+        name: "flow_limit",
+        parser: (text, _) => {
+          if (text === undefined || text === "") return undefined;
+          if (["inf", "infty", "infinity"].includes(text)) return Infinity;
+          let res = Number(text);
+          if (isNaN(res)) throw new Error(`parameter: Not a number`);
+          if (res < 0) throw new Error(`parameter: Out of Valid Range`);
+          return res;
+        }
+      }
+    ];
   }
 
   private que: Queue<number> = new Queue<number>();
@@ -36,13 +64,20 @@ class ZkwMCF extends GraphAlgorithm {
 
   report(): Graph {
     let rE = this.E.edges();
-    rE.forEach((e, i) =>
+    rE.forEach((e) =>
       Object.assign(e.datum, {
         valid: this.is_valid(e)
       })
     );
 
     return new EdgeList(this.n, rE, this.nodedatum);
+  }
+
+  getStep(lineId: number): Step {
+    return {
+      graph: this.report(),
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
   }
 
   spfa(): boolean {
@@ -78,8 +113,8 @@ class ZkwMCF extends GraphAlgorithm {
   *dfs(pos: number, lim: number) {
     this.vis[pos] = true;
     if (pos === this.T) {
-      // Yield before augment flow
-      yield { graph: this.report() };
+      // **for each** *augmenting path* ($\mathrm{P}_i$) in $\mathrm{SG}$ (using **DFS**)
+      yield this.getStep(4);
       return lim;
     }
     let e: _Edge, re: _Edge;
@@ -89,7 +124,7 @@ class ZkwMCF extends GraphAlgorithm {
       re = this.E.edge[i ^ 1];
       if (this._valid(pos, e)) {
         e.mark = true;
-        let tmp = yield* this.dfs(e.to, min(lim, e.flow));
+        let tmp = yield* this.dfs(e.to, Math.min(lim, e.flow));
         (e.flow -= tmp), (re.flow += tmp);
         (lim -= tmp), (res += tmp);
         e.mark = false;
@@ -104,23 +139,28 @@ class ZkwMCF extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
+    // initialize the *weighted network flow graph*
+    yield this.getStep(0);
 
     let flow = 0,
       cost = 0;
     while (limit > 0 && this.spfa()) {
+      // find the *SSSP graph* ($\mathrm{SG}$) using **SPFA**, get the *minimum cost* ($cost$) from $\mathrm{S}$ to $\mathrm{T}$
+      yield this.getStep(2);
       do {
         this.clear(this.vis, false);
         let delta = yield* this.dfs(this.S, limit);
         limit -= delta;
         flow += delta;
         cost += delta * this.dis[this.S];
-
-        // Yield after augment flow
-        yield { graph: this.report() };
+        // increase <u>*maxflow*</u> by $sumlimit$, increase <u>*mincost*</u> by $sumlimit\cdot cost$, decrease *flow_limit* by $sumlimit$
+        yield this.getStep(7);
       } while (this.vis[this.T]);
     }
 
-    console.log(`algo ZkwMCF : {flow: ${flow}, cost: ${cost}`);
+    //console.log(`algo ZkwMCF : {flow: ${flow}, cost: ${cost}`);
+    // **return** {<u>*maxflow*</u>, <u>*mincost*</u>}
+    yield this.getStep(8);
     return { flow, cost };
   }
 }

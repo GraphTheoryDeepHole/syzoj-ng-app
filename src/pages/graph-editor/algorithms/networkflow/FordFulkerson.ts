@@ -1,10 +1,27 @@
-import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor, parseRangedInt } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
-import { NetworkFlowBase, min, max, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge } from "./Common";
 
 class FordFulkerson extends GraphAlgorithm {
-  constructor() {
-    super("FordFulkerson", "Ford-Fulkerson algorithm for Maximum Network Flow");
+  // constructor() {
+  //   super("FordFulkerson", "Ford-Fulkerson algorithm for Maximum Network Flow");
+  // }
+
+  id() {
+    return "ff_mf";
+  }
+
+  parameters(): ParameterDescriptor[] {
+    return [
+      {
+        name: "source_vertex",
+        parser: (text, graph) => parseRangedInt(text, 0, graph.nodes().length)
+      },
+      {
+        name: "target_vertex",
+        parser: (text, graph) => parseRangedInt(text, 0, graph.nodes().length)
+      }
+    ];
   }
 
   private E: NetworkFlowBase;
@@ -19,11 +36,18 @@ class FordFulkerson extends GraphAlgorithm {
     for (let _ = 0; _ < cnt; ++_) buf[_] = val;
   }
 
+  getStep(lineId: number): Step {
+    return {
+      graph: new EdgeList(this.n, this.E.edges()),
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
+  }
+
   *dfs(pos: number, lim: number) {
     this.visit[pos] = true;
     if (pos === this.T) {
-      // Yield before augment flow
-      yield { graph: new EdgeList(this.n, this.E.edges()) };
+      // find an *augmenting path* ($\mathrm{P}$) using **DFS**
+      yield this.getStep(5);
       return lim;
     }
     let e: _Edge, re: _Edge;
@@ -31,7 +55,7 @@ class FordFulkerson extends GraphAlgorithm {
       (e = this.E.edge[i]), (re = this.E.edge[i ^ 1]);
       e.mark = true;
       if (!this.visit[e.to] && e.flow > 0) {
-        let res = yield* this.dfs(e.to, min(lim, e.flow));
+        let res = yield* this.dfs(e.to, Math.min(lim, e.flow));
         if (res > 0) {
           (e.flow -= res), (re.flow += res);
           return res;
@@ -47,6 +71,8 @@ class FordFulkerson extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
+    // initialize the *network flow graph*:
+    yield this.getStep(0);
 
     let flow = 0,
       delta = 0;
@@ -54,11 +80,13 @@ class FordFulkerson extends GraphAlgorithm {
       this.clear(this.visit, false);
       delta = yield* this.dfs(this.S, Infinity);
       flow += delta;
-      // Yield after augment flow
-      yield { graph: new EdgeList(this.n, this.E.edges()) };
+      // update the *capacity* of **each** *edge* in $\mathrm{P}$ by $limit$:
+      yield this.getStep(7);
     } while (delta > 0);
 
-    console.log(`algo FordFulkerson : {flow: ${flow}}`);
+    //console.log(`algo FordFulkerson : {flow: ${flow}}`);
+    // **return** {<u>*maxflow*</u>}
+    yield this.getStep(12);
     return { flow };
   }
 }

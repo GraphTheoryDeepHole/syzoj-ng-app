@@ -1,11 +1,43 @@
-import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
+import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
-import { NetworkFlowBase, min, max, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge } from "./Common";
 
 class MinCostFlow extends GraphAlgorithm {
-  constructor() {
-    super("MinCostFlow", "classic algorithm for Minimum-Cost Network Flow");
+  // constructor() {
+  //   super("MinCostFlow", "classic algorithm for Minimum-Cost Network Flow");
+  // }
+
+  id() {
+    return "classic_mcf";
+  }
+
+  parameters(): ParameterDescriptor[] {
+    return [
+      {
+        name: "source_vertex",
+        parser: (text, graph) => parseRangedInt(text, 0, graph.nodes().length)
+      },
+      {
+        name: "target_vertex",
+        parser: (text, graph) => parseRangedInt(text, 0, graph.nodes().length)
+      },
+      {
+        name: "flow_limit",
+        parser: (text, _) => {
+          if (text === undefined || text === "") return undefined;
+          if (["inf", "infty", "infinity"].includes(text)) return Infinity;
+          let res = Number(text);
+          if (isNaN(res)) throw new Error(`parameter: Not a number`);
+          if (res < 0) throw new Error(`parameter: Out of Valid Range`);
+          return res;
+        }
+      }
+    ];
+  }
+
+  requiredParameter(): string[] {
+    return ["source_vertex", "target_vertex", "flow_limit"];
   }
 
   private que: Queue<number> = new Queue<number>();
@@ -27,10 +59,6 @@ class MinCostFlow extends GraphAlgorithm {
 
   nodedatum = (i: number) => ({ dist: this.dis[i] });
 
-  _valid(pos: number, e: _Edge): boolean {
-    return this.dis[pos] + e.cost === this.dis[e.to] && e.flow > 0;
-  }
-
   is_valid(e: Edge, eid: number): number {
     if (this.dis[e.source] + this.E.edge[eid * 2].cost === this.dis[e.target]) return 1;
     return 0;
@@ -45,6 +73,13 @@ class MinCostFlow extends GraphAlgorithm {
     );
 
     return new EdgeList(this.n, rE, this.nodedatum);
+  }
+
+  getStep(lineId: number): Step {
+    return {
+      graph: this.report(),
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
   }
 
   spfa(): boolean {
@@ -84,6 +119,8 @@ class MinCostFlow extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
+    // initialize the *weighted network flow graph*:
+    yield this.getStep(0);
 
     let flow = 0,
       cost = 0;
@@ -92,12 +129,12 @@ class MinCostFlow extends GraphAlgorithm {
       let e: _Edge;
       for (let pos = this.T; pos !== this.S; pos = this.pre[pos]) {
         e = this.E.edge[this.eid[pos]];
-        delta = min(delta, e.flow);
+        delta = Math.min(delta, e.flow);
         e.mark = true;
       }
 
-      // Yield before augment flow
-      yield { graph: this.report() };
+      // find an *augmenting path* ($\mathrm{P}$) with *minimum total cost* ($cost$) using **SPFA**
+      yield this.getStep(5);
 
       limit -= delta;
       flow += delta;
@@ -107,11 +144,13 @@ class MinCostFlow extends GraphAlgorithm {
         this.E.edge[this.eid[pos] ^ 1].flow += delta;
       }
 
-      // Yield after augment flow
-      yield { graph: this.report() };
+      // update the *capacity* of **each** *edge* in $\mathrm{P}$ by $limit$
+      yield this.getStep(7);
     }
 
-    console.log(`algo MinCostFlow : {flow: ${flow}, cost: ${cost}`);
+    //console.log(`algo MinCostFlow : {flow: ${flow}, cost: ${cost}`);
+    // **return** {<u>*maxflow*</u>, <u>*mincost*</u>}
+    yield this.getStep(9);
     return { flow, cost };
   }
 }
