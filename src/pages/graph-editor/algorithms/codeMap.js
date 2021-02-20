@@ -157,23 +157,100 @@ module.exports = {
   dijkstra: {
     pseudo: [
       "令$\\bar{S}=\\{2,3,\\cdots ,n\\}, \\pi (1)=0, \\pi (i)=\\left\\{\\begin{array}{ll} w_i, i \\in \\Gamma^+_1 \\\\ \\infty, \\text{otherwise} \\\\ \\end{array} \\right.$",
-      ["在$\\bar{S}$中，令$\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，置$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$。若$\\bar{S}=\\Phi$，结束，否则转步骤3。",
-        ["对全部的$i\\in \\bar{S}\\cap\\Gamma^+_j$，置$\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$，转步骤2。"]]
+      [
+        "在$\\bar{S}$中，令$\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，置$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$。若$\\bar{S}=\\Phi$，结束，否则转步骤3。",
+        [
+          "对全部的$i\\in \\bar{S}\\cap\\Gamma^+_j$，置$\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$，转步骤2。"
+        ]
+      ]
     ],
     test: [
       "initialize the *network flow graph*:",
-      ["**for each** *edge* ($e=\\left(u,v\\right)$) in the *network flow graph*",
-        ["create its *reverse edge* ($\\bar{e}=\\left(v,u\\right)$)",
-          "set the *capacity* of $\\bar{e}$ to 0"]],
+      [
+        "**for each** *edge* ($e=\\left(u,v\\right)$) in the *network flow graph*",
+        ["create its *reverse edge* ($\\bar{e}=\\left(v,u\\right)$)", "set the *capacity* of $\\bar{e}$ to 0"]
+      ],
       "**while** *target vertex* ($\\mathrm{T}$)  is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph*",
-      ["find an *augmenting path* ($\\mathrm{P}$) using **DFS**",
+      [
+        "find an *augmenting path* ($\\mathrm{P}$) using **DFS**",
         "calculate the *minimum capacity* ($limit$) of **each** *edge* in $\\mathrm{P}$",
         "update the *capacity* of **each** *edge* in $\\mathrm{P}$ by $limit$:",
-        ["**for each** *edge* ($e$) in $\\mathrm{P}$",
-          ["decrease the *capacity* of $e$ by $limit$",
-            "increase the *capacity* of its *reverse edge* by $limit$"]],
-        "increase <u>*maxflow*</u> by $limit$"],
+        [
+          "**for each** *edge* ($e$) in $\\mathrm{P}$",
+          ["decrease the *capacity* of $e$ by $limit$", "increase the *capacity* of its *reverse edge* by $limit$"]
+        ],
+        "increase <u>*maxflow*</u> by $limit$"
+      ],
       "**return** {<u>*maxflow*</u>}"
+    ]
+  },
+  dfsfindpath: {
+    pseudo: [
+      "Start with the given vertice;",
+      "Move forward to its successor;",
+      "Cannot move forward, move backward to its predecessor;"
+    ]
+  },
+  bfsfindpath: {
+    pseudo: [
+      "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ]; enqueue(startPoint);",
+      "while queueNotEmpty():",
+      ["v = dequeue();", "[pi left( u \right) = pi left( v \right) + 1,;u in {Gamma ^ + }left( v \right)];"]
+    ]
+  },
+  criticalpath: {
+    pesudo: [
+      "for i = 1 to n:",
+      ["v = findZeroDegreeVertice(); markTopoSequence(v);", "for u in [{Gamma ^ - }left( v \right)]: degree[u]--;"],
+      "[pi left( {{v_1}'} \right) = 0];",
+      "for i = 2 to n:",
+      [
+        "[pi left( {{v_i}'} \right) = mathop {max }limits_{{v_j}' in {Gamma ^ - }left( {{v_i}'} \right)} left( {pi left( {{v_j}'} \right) + wleft( {{v_j}',{v_i}'} \right)} \right)]"
+      ]
+    ]
+  },
+  ford: {
+    pesudo: [
+      "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ];",
+      "while data been updated:",
+      [
+        "for i = 2 to n:",
+        [
+          "[pi left( {\rm{i}} \right) = min left[ {pi left( {\rm{i}} \right),mathop {min }limits_{j in {Gamma ^ - }left( i \right)} left( {pi left( {\rm{j}} \right) + {w_{ji}}} \right)} \right]];"
+        ]
+      ]
+    ]
+  },
+  kruskal: {
+    pesudo: [
+      "while [left| T \right| < n - 1] and [E \ne phi ]:",
+      ["choose e as the shortest edge in E; E = E - e;", "T = T + e if no loop in T + e;"]
+    ]
+  },
+  prim: {
+    pesudo: [
+      "T = [phi ]; U = [left{ {{v_1}} \right}];",
+      "while [U \ne V]:",
+      [
+        "find [eleft( {u,v} \right),wleft( {u,v} \right) = min left[ {wleft( {{v_i},{v_j}} \right)} \right],u in U,v in V - U]",
+        "[T = T + eleft( {u,v} \right)]; [U = U + v];"
+      ]
+    ]
+  },
+  salesmanprob: {
+    pesudo: [
+      "sort edges by distance;",
+      "while limit not reached:",
+      ["choose enough edges and update the answer;", "delete edges chosen last;"]
+    ]
+  },
+  salesmancheaperalgo: {
+    pesudo: [
+      "[T = left( {1,1} \right)]; [overline S  = left{ {{v_2}, ldots ,{v_n}} \right}];",
+      "while [overline S  \ne phi ]:",
+      [
+        "find [eleft( {u,v} \right),wleft( {u,v} \right) = min left[ {wleft( {{v_i},{v_j}} \right)} \right],u in overline S ,v in V - overline S ], insert u into T as v's predecessor or successor; [overline S  = overline S  - u];"
+      ]
     ]
   }
 };
