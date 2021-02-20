@@ -3,8 +3,12 @@ import { AdjacencyList, hasMultipleEdges, hasSelfLoop, Edge, Graph, Node, NodeEd
 import { Queue } from "../../utils/DataStructure";
 
 class Gabow extends GraphAlgorithm {
-  constructor() {
-    super("Gabow", "Gabow algorithm for Maximum Matching in General Graph");
+  // constructor() {
+  //   super("Gabow", "Gabow algorithm for Maximum Matching in General Graph");
+  // }
+
+  id() {
+    return "mm_gabow";
   }
 
   private n: number = 0;
@@ -82,22 +86,26 @@ class Gabow extends GraphAlgorithm {
     return new NodeEdgeList(this.nodes, this.edges);
   }
 
+  getStep(lineId: number): Step {
+    return {
+      graph: this.report(),
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
+  }
+
   *rematch(p: number, x: number, y: number) {
     this.path[x][0] = y;
-
     // path[x] is the augmenting path to be fliped
-
     for (let i = 0; ; ++i) {
       this.mark[this.path[x][i]] = this.path[x][i ^ 1];
       if (this.path[x][i] === p) break;
     }
-
-    yield { graph: this.report() };
-
+    yield this.getStep(25); // found augmenting path
     for (let i = 0; ; ++i) {
       this.match[this.path[x][i]] = this.path[x][i ^ 1];
       if (this.path[x][i] === p) break;
     }
+    yield this.getStep(27); // augmented
   }
 
   next(pos: number): number {
@@ -170,16 +178,12 @@ class Gabow extends GraphAlgorithm {
     this.adjlist = AdjacencyList.from(graph, false);
     if (hasMultipleEdges(this.adjlist)) throw new Error("algo Gabow : mutiple edges");
     (this.edges = graph.edges()), (this.nodes = graph.nodes()), (this.n = this.nodes.length);
-
     let res = 0;
+    yield this.getStep(23); // inited
     this.clear(this.match), this.clear(this.mark);
-    for (let i = 0; i < this.n; ++i) {
-      if (this.match[i] === -1 && (yield* this.check(i))) ++res;
-
-      yield { graph: this.report() };
-    }
-
-    console.log(`algo Gabow : {matched: ${res}}`);
+    for (let i = 0; i < this.n; ++i) if (this.match[i] === -1 && (yield* this.check(i))) ++res;
+    //console.log(`algo Gabow : {matched: ${res}}`);
+    yield this.getStep(28); // return
     return { matched: res };
   }
 }

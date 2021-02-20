@@ -8,7 +8,7 @@ class FordFulkerson extends GraphAlgorithm {
   // }
 
   id() {
-    return "ff_mf";
+    return "mf_ff";
   }
 
   parameters(): ParameterDescriptor[] {
@@ -46,8 +46,7 @@ class FordFulkerson extends GraphAlgorithm {
   *dfs(pos: number, lim: number) {
     this.visit[pos] = true;
     if (pos === this.T) {
-      // find an *augmenting path* ($\mathrm{P}$) using **DFS**
-      yield this.getStep(5);
+      yield this.getStep(16); // found augmenting path
       return lim;
     }
     let e: _Edge, re: _Edge;
@@ -71,22 +70,17 @@ class FordFulkerson extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    // initialize the *network flow graph*:
-    yield this.getStep(0);
-
     let flow = 0,
       delta = 0;
+    yield this.getStep(15); // inited
     do {
       this.clear(this.visit, false);
       delta = yield* this.dfs(this.S, Infinity);
       flow += delta;
-      // update the *capacity* of **each** *edge* in $\mathrm{P}$ by $limit$:
-      yield this.getStep(7);
+      yield this.getStep(19); // augmented
     } while (delta > 0);
-
     //console.log(`algo FordFulkerson : {flow: ${flow}}`);
-    // **return** {<u>*maxflow*</u>}
-    yield this.getStep(12);
+    yield this.getStep(21); // return
     return { flow };
   }
 }

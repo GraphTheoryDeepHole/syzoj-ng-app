@@ -9,7 +9,7 @@ class ZkwMCF extends GraphAlgorithm {
   // }
 
   id() {
-    return "zkw_mcf";
+    return "mcf_zkw";
   }
 
   parameters(): ParameterDescriptor[] {
@@ -64,7 +64,7 @@ class ZkwMCF extends GraphAlgorithm {
 
   report(): Graph {
     let rE = this.E.edges();
-    rE.forEach((e) =>
+    rE.forEach(e =>
       Object.assign(e.datum, {
         valid: this.is_valid(e)
       })
@@ -111,12 +111,11 @@ class ZkwMCF extends GraphAlgorithm {
   }
 
   *dfs(pos: number, lim: number) {
-    this.vis[pos] = true;
     if (pos === this.T) {
-      // **for each** *augmenting path* ($\mathrm{P}_i$) in $\mathrm{SG}$ (using **DFS**)
-      yield this.getStep(4);
+      yield this.getStep(24); // reached t
       return lim;
     }
+    this.vis[pos] = true;
     let e: _Edge, re: _Edge;
     let res = 0;
     for (let i = this.E.head[pos]; i !== -1; i = e.next) {
@@ -139,28 +138,22 @@ class ZkwMCF extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    // initialize the *weighted network flow graph*
-    yield this.getStep(0);
-
     let flow = 0,
       cost = 0;
+    yield this.getStep(34); // inited
     while (limit > 0 && this.spfa()) {
-      // find the *SSSP graph* ($\mathrm{SG}$) using **SPFA**, get the *minimum cost* ($cost$) from $\mathrm{S}$ to $\mathrm{T}$
-      yield this.getStep(2);
+      yield this.getStep(35); // built sssp graph
       do {
         this.clear(this.vis, false);
         let delta = yield* this.dfs(this.S, limit);
         limit -= delta;
         flow += delta;
         cost += delta * this.dis[this.S];
-        // increase <u>*maxflow*</u> by $sumlimit$, increase <u>*mincost*</u> by $sumlimit\cdot cost$, decrease *flow_limit* by $sumlimit$
-        yield this.getStep(7);
+        yield this.getStep(40); // augmented
       } while (this.vis[this.T]);
     }
-
     //console.log(`algo ZkwMCF : {flow: ${flow}, cost: ${cost}`);
-    // **return** {<u>*maxflow*</u>, <u>*mincost*</u>}
-    yield this.getStep(8);
+    yield this.getStep(42); // return
     return { flow, cost };
   }
 }
