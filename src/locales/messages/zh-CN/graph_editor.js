@@ -63,28 +63,28 @@ module.exports = {
         start_point: "起始点"
       }
     },
-    ff_mf: {
+    mf_ff: {
       name: "最大流：Ford-Fulkerson算法",
       para: {
         source_vertex: "源点",
         target_vertex: "汇点"
       }
     },
-    ek_mf: {
+    mf_ek: {
       name: "最大流：Edmonds-Karp算法",
       para: {
         source_vertex: "源点",
         target_vertex: "汇点"
       }
     },
-    dinic_mf: {
+    mf_dinic: {
       name: "最大流：Dinic算法",
       para: {
         source_vertex: "源点",
         target_vertex: "汇点"
       }
     },
-    classic_mcf: {
+    mcf_classic: {
       name: "最小费用最大流：经典算法",
       para: {
         source_vertex: "源点",
@@ -92,13 +92,29 @@ module.exports = {
         flow_limit: "最大流量"
       }
     },
-    zkw_mcf: {
+    mcf_zkw: {
       name: "最小费用最大流：Zkw算法",
       para: {
         source_vertex: "源点",
         target_vertex: "汇点",
         flow_limit: "最大流量"
       }
+    },
+    mbm_hungarian: {
+      name: "二分图最大匹配：匈牙利算法",
+      para: {}
+    },
+    mwbm_km: {
+      name: "二分图最大权匹配：Kuhn-Munkres算法",
+      para: {}
+    },
+    mm_gabow: {
+      name: "一般图最大匹配：带花树算法",
+      para: {}
+    },
+    pt_dmp: {
+      name: "平面性检测：Demoucron-Malgrange-Pertuiset算法",
+      para: {}
     },
     code_type: {
       pseudo: "伪代码"

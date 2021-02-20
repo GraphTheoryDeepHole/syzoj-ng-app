@@ -1,178 +1,471 @@
 module.exports = {
-  networkflow: {
-    FordFulkerson: {
-      pseudo: [
-        "initialize the *network flow graph*:",
+  mf_ff: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>FordFulkerson</u> ($\\mathrm{G}$, $s$, $t$):",
+      [
+        "**comment**:",
         [
-          "**for each** *edge* ($e=\\left(u,v\\right)$) in the *network flow graph*",
-          ["create its *reverse edge* ($\\bar{e}=\\left(v,u\\right)$)", "set the *capacity* of $\\bar{e}$ to 0"]
+          "Ford-Fulkerson Algorithm for Maximum Flow, **return** maximum *flow* of $\\mathrm{G}$ from $s$ to $t$.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *network flow graph*;  $\\mathrm{E}\\subset\\left\\{\\left(u,v,c\\right)\\middle|u,v\\in\\mathrm{V}\\right\\}$: *set* of *edge*;  $c$: *capacity* of *edge*;  $s,t\\in\\mathrm{V}$: *source vertex* and *sink vertex*;  $\\mathrm{G}_r=\\left(\\mathrm{V},\\mathrm{E}_r\\right)$: *residual graph* of $\\mathrm{G}$;  $\\mathrm{E}_r\\subset\\left\\{e=\\left(u,v,r_e\\right)\\right\\}$: *set* of *residual edge*, $\\forall \\left(u,v,c\\right)\\in\\mathrm{E}:\\ e=\\left(u,v,r_e\\right),\\bar{e}=(v,u,r_{\\bar{e}})\\in\\mathrm{E}_r,r_e+r_{\\bar{e}}=c$;  $r_e$: *residual capacity*, *capacity* of $e$;  $\\bar{e}$: *reverse edge* of $e$;  *valid edge* $e\\in\\mathrm{E}_r$: $r_e>0$;  *augmenting path*: *path* through ONLY *valid edge*;  $\\mathrm{P}_{st}$: *augmenting path* from $s$ to $t$."
         ],
-        "**while** *target vertex* ($\\mathrm{T}$)  is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph*",
+        "**function** <u>dfsFindAugmentingPathFrom</u> ($v$):",
         [
-          "find an *augmenting path* ($\\mathrm{P}$) using **DFS**",
-          "calculate the *minimum capacity* ($limit$) of **each** *edge* in $\\mathrm{P}$",
-          "update the *capacity* of **each** *edge* in $\\mathrm{P}$ by $limit$:",
+          "**comment**:",
           [
-            "**for each** *edge* ($e$) in $\\mathrm{P}$",
-            ["decrease the *capacity* of $e$ by $limit$", "increase the *capacity* of its *reverse edge* by $limit$"]
+            "find *augmenting path* using **DFS**, **return** whether $\\exists$ *augmenting path* from $v$ to $t$.",
+            "$v$: current *vertex*."
           ],
-          "increase <u>*maxflow*</u> by $limit$"
+          "mark $v$ as *visited*.",
+          "**if** $v=t$:  **return** **true**.    **comment**:  found $\\mathrm{P}_{st}.$",
+          "**for each** *valid edge* $\\left(v,u,r_e\\right)\\in\\mathrm{E}_r$:",
+          ["**if** $u$ is not *visited* **and** <u>dfsFindAugmentingPathFrom</u> ($u$):  **return** **true**."],
+          "**return** **false**."
         ],
-        "**return** {<u>*maxflow*</u>}"
-      ]
-    },
-    EdmondsKarp: {
-      pseudo: [
-        "initialize the *network flow graph*",
-        "**while** *target vertex* ($\\mathrm{T}$)  is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph*",
+        "**for each** $\\left(u,v,c\\right)\\in\\mathrm{E}$:  $r_e:=c$, $r_{\\bar{e}}:=0$.",
+        "$maxflow:=0$.  $\\color\\red{\\bullet}$",
+        "**while** <u>dfsFindAugmentingPathFrom</u> ($s$):  $\\color\\red{\\bullet}$",
         [
-          "find an *augmenting path* ($\\mathrm{P}$) using **BFS**",
-          "calculate the *minimum capacity* ($limit$) of **each** *edge* in $\\mathrm{P}$",
-          "update the *capacity* of **each** *edge* in $\\mathrm{P}$ by $limit$",
-          "increase <u>*maxflow*</u> by $limit$"
+          "$\\delta:=$ **minimum** of $r_e$ **for each** $e\\in\\mathrm{P}_{st}$.",
+          "**for each** $e\\in\\mathrm{P}_{st}$:  $r_e:=r_e-\\delta$, $r_{\\bar{e}}:=r_{\\bar{e}}+\\delta$.",
+          "$maxflow:=maxflow+\\delta$.  $\\color\\red{\\bullet}$",
+          "clear *visited* mark **for each** $v\\in\\mathrm{V}$."
         ],
-        "**return** {<u>*maxflow*</u>}"
+        "$\\color\\red{\\bullet}$  **return** $maxflow$."
       ]
-    },
-    Dinic: {
-      pseudo: [
-        "initialize the *network flow graph*",
-        "**while** *target vertex* ($\\mathrm{T}$)  is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph*",
+    ]
+  },
+  mf_ek: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>EdmondsKarp</u> ($\\mathrm{G}$, $s$, $t$):",
+      [
+        "**comment**:",
         [
-          "find the *level graph* ($\\mathrm{LG}$) using **BFS**",
-          "**for each** *augmenting path* ($\\mathrm{P}_i$) in $\\mathrm{LG}$ (using **DFS**)",
+          "Edmonds-Karp Algorithm for Maximum Flow, **return** maximum *flow* of $\\mathrm{G}$ from $s$ to $t$.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *network flow graph*;  $\\mathrm{E}\\subset\\left\\{\\left(u,v,c\\right)\\middle|u,v\\in\\mathrm{V}\\right\\}$: *set* of *edge*;  $c$: *capacity* of *edge*;  $s,t\\in\\mathrm{V}$: *source vertex* and *sink vertex*;  $\\mathrm{G}_r=\\left(\\mathrm{V},\\mathrm{E}_r\\right)$: *residual graph* of $\\mathrm{G}$;  $\\mathrm{E}_r\\subset\\left\\{e=\\left(u,v,r_e\\right)\\right\\}$: *set* of *residual edge*, $\\forall \\left(u,v,c\\right)\\in\\mathrm{E}:\\ e=\\left(u,v,r_e\\right),\\bar{e}=(v,u,r_{\\bar{e}})\\in\\mathrm{E}_r,r_e+r_{\\bar{e}}=c$;  $r_e$: *residual capacity*, *capacity* of $e$;  $\\bar{e}$: *reverse edge* of $e$;  *valid edge* $e\\in\\mathrm{E}_r$: $r_e>0$;  *augmenting path*: *path* through ONLY *valid edge*;  $\\mathrm{P}_{st}$: *augmenting path* from $s$ to $t$."
+        ],
+        "**function** <u>bfsFindAugmentingPath</u> ():",
+        [
+          "**comment**:",
           [
-            "calculate the *minimum capacity* ($limit_i$) of **each** *edge* in $\\mathrm{P}_i$",
-            "update the *capacity* of **each** *edge* in $\\mathrm{P}_i$ by $limit_i$"
+            "find *augmenting path* using **BFS**, **return** whether $\\exists$ $\\mathrm{P}_{st}$.",
+            "$\\mathrm{Q}$: *queue*."
           ],
-          "increase <u>*maxflow*</u> by the sum of **each** $limit_i$"
-        ],
-        "**return** {<u>*maxflow*</u>}"
-      ]
-    },
-    classicMCMF: {
-      pseudo: [
-        "initialize the *weighted network flow graph*:",
-        [
-          "**for each** *edge* ($e=\\left(u,v\\right)$) in the *network flow graph*",
+          "clear $\\mathrm{Q}$, clear *visited* mark **for each** $v\\in\\mathrm{V}$",
+          "mark $s$ as *visited*, push $s$ into $\\mathrm{Q}$.",
+          "**while** $\\mathrm{Q}$ is not *empty*:",
           [
-            "create its *reverse edge* ($\\bar{e}=\\left(v,u\\right)$)",
-            "set the *capacity* of $\\bar{e}$ to 0, set the *cost* of $\\bar{e}$ to the opposite number of which of $e$"
-          ]
+            "$v:=$ *front* of $\\mathrm{Q}$, pop $v$ from $\\mathrm{Q}$.",
+            "**if** $v=t$:  **return** **true**.    **comment**:  found $\\mathrm{P}_{st}$",
+            "**for each** *valid edge* $\\left(v,u,r_e\\right)\\in\\mathrm{E}_r$:",
+            ["**if** $u$ is not *visited*:", ["mark $u$ as *visited*, push $u$ into $\\mathrm{Q}$."]]
+          ],
+          "**return** **false**."
         ],
-        "**while** *target vertex* ($\\mathrm{T}$)  is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph* **and** *flow_limit* > 0",
+        "**for each** $\\left(u,v,c\\right)\\in\\mathrm{E}$:  $r_e:=c$, $r_{\\bar{e}}:=0$.",
+        "$maxflow:=0$.  $\\color\\red{\\bullet}$",
+        "**while** <u>bfsFindAugmentingPath</u> ():  $\\color\\red{\\bullet}$",
         [
-          "find an *augmenting path* ($\\mathrm{P}$) with *minimum total cost* ($cost$) using **SPFA**",
-          "calculate the *minimum capacity* ($limit$) of **each** *edge* in $\\mathrm{P}$ ($limit$ cannot exceed *flow_limit*)",
-          "update the *capacity* of **each** *edge* in $\\mathrm{P}$ by $limit$",
-          "increase <u>*maxflow*</u> by $limit$, increase <u>*mincost*</u> by $limit\\cdot cost$, decrease *flow_limit* by $limit$"
+          "$\\delta:=$ **minimum** of $r_e$ **for each** $e\\in\\mathrm{P}_{st}$.",
+          "**for each** $e\\in\\mathrm{P}_{st}$:  $r_e:=r_e-\\delta$, $r_{\\bar{e}}:=r_{\\bar{e}}+\\delta$.",
+          "$maxflow:=maxflow+\\delta$.  $\\color\\red{\\bullet}$"
         ],
-        "**return** {<u>*maxflow*</u>, <u>*mincost*</u>}"
+        "$\\color\\red{\\bullet}$  **return** $maxflow$."
       ]
-    },
-    ZkwMCMF: {
-      pseudo: [
-        "$\\bullet$ initialize the *weighted network flow graph*",
-        "**while** *target vertex* ($\\mathrm{T}$) is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph* ($\\mathrm{RG}$) **and** *flow_limit* > 0",
+    ]
+  },
+  mf_dinic: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>Dinic</u> ($\\mathrm{G}$, $s$, $t$):",
+      [
+        "**comment**:",
         [
-          "$\\bullet$ find the *SSSP graph* ($\\mathrm{SG}$) based on $\\mathrm{RG}$ using **SPFA**, get the *minimum cost* ($cost$) from $\\mathrm{S}$ to $\\mathrm{T}$",
-          "**while** $\\mathrm{T}$ is reachable from $\\mathrm{S}$ in $\\mathrm{SG}$ **and** *flow_limit* > 0",
+          "Dinic Algorithm for Maximum Flow, **return** maximum *flow* of $\\mathrm{G}$ from $s$ to $t$.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *network flow graph*;  $\\mathrm{E}\\subset\\left\\{\\left(u,v,c\\right)\\middle|u,v\\in\\mathrm{V}\\right\\}$: *set* of *edge*;  $c$: *capacity* of *edge*;  $s,t\\in\\mathrm{V}$: *source vertex* and *sink vertex*;  $\\mathrm{G}_r=\\left(\\mathrm{V},\\mathrm{E}_r\\right)$: *residual graph* of $\\mathrm{G}$;  $\\mathrm{E}_r\\subset\\left\\{e=\\left(u,v,r_e\\right)\\right\\}$: *set* of *residual edge*, $\\forall \\left(u,v,c\\right)\\in\\mathrm{E}:\\ e=\\left(u,v,r_e\\right),\\bar{e}=(v,u,r_{\\bar{e}})\\in\\mathrm{E}_r,r_e+r_{\\bar{e}}=c$;  $r_e$: *residual capacity*, *capacity* of $e$;  $\\bar{e}$: *reverse edge* of $e$;  *valid edge*: $e\\in\\mathrm{E}_r,r_e>0$;  *augmenting path*: *path* through ONLY *valid edge*;  $\\mathrm{P}_{st}$: *augmenting path* from $s$ to $t$;  $depth_v$: *minimum distance* of $v\\in\\mathrm{V}$ through *valid edge* from $s$."
+        ],
+        "**function** <u>bfsCalculateDepth</u> ():",
+        [
+          "**comment**:",
           [
-            "$\\bullet$ **for each** *augmenting path* ($\\mathrm{P}_i$) in $\\mathrm{SG}$ (using **DFS**)",
+            "calculate $depth_v$ for all *vertex* using **BFS**, **return** whether $t$ is *reachable* from $t$ in $\\mathrm{G}_l$.",
+            "$\\mathrm{Q}$: *queue*."
+          ],
+          "clear $\\mathrm{Q}$, clear *visited* mark **for each** $v\\in\\mathrm{V}$.",
+          "mark $s$ as *visited*, push $s$ into $\\mathrm{Q}$, $depth_s:=0$.",
+          "**while** $\\mathrm{Q}$ is not *empty*:",
+          [
+            "$v:=$ *front* of $\\mathrm{Q}$, pop $v$ from $\\mathrm{Q}$.",
+            "**if** $v=t$:  **return** **true**.    **comment**:  reached $t$.",
+            "**for each** *valid edge* $e=\\left(v,u,r_e\\right)\\in\\mathrm{E}_r$:",
             [
-              "calculate the *minimum capacity* ($limit_i$) of **each** *edge* in $\\mathrm{P}_i$  (the *sum of  $limit_i$* ($sumlimit$) cannot exceed *flow_limit*)",
-              "update the *capacity* of **each** *edge* in $\\mathrm{P}_i$ by $limit_i$"
-            ],
-            "$\\bullet$ increase <u>*maxflow*</u> by $sumlimit$, increase <u>*mincost*</u> by $sumlimit\\cdot cost$, decrease *flow_limit* by $sumlimit$"
-          ]
+              "**if** $u$ is not *visited*:",
+              ["mark $u$ as *visited*, push $u$ into $\\mathrm{Q}$, $depth_u:=depth_v+1$."]
+            ]
+          ],
+          "**return** **false**."
         ],
-        "$\\bullet$ **return** {<u>*maxflow*</u>, <u>*mincost*</u>}"
-      ]
-    }
-  },
-  matching: {
-    Hungarian: {
-      pseudo: [
-        "**for each** *vertex* ($v$) **in** the *left side*",
+        "**function** <u>dfsAugment</u> ($v$, $limit$):",
         [
-          "**if** find an *augmenting path* ($\\mathrm{P}$) from $v$ (using **DFS**)",
+          "**comment**:",
           [
-            "flip the *status* (*matched* or *unmatched*) of **each** *edge* in $\\mathrm{P}$",
-            "increase <u>*matched*</u> by 1"
+            "augment in $\\mathrm{G}_r$ using **DFS**, **return** *flow* augmented.",
+            "$v$: current *vertex*;  $limit$: *upperbound* of *flow* to be augmented."
+          ],
+          "**if** $v=t$:  $\\color\\red{\\bullet}$  **return** $limit$.    **comment**:  reach $t$, augment by $limit$.",
+          "$\\sigma:=0$.",
+          "**for each** *unchecked valid edge* $e=\\left(v,u,r_e\\right)\\in\\mathrm{E}_r$:",
+          [
+            "**if** $depth_u=depth_v+1$:    **comment**:  $e$ is in *level graph* of $\\mathrm{G}_r$ with respect to $depth_\\mathrm{V}$.",
+            [
+              "$\\delta:=$ <u>dfsAugment</u> ($u$, **minimum** of $limit$ and $r_e$).",
+              "$r_e:=r_e-\\delta$, $r_{\\bar{e}}:=r_{\\bar{e}}+\\delta$.",
+              "$limit:=limit-\\delta$, $\\sigma:=\\sigma+\\delta$.",
+              "**if** $limit=0$:  **return** $\\sigma$;",
+              "mark $e$ as *checked*."
+            ]
+          ],
+          "**return** $\\sigma$."
+        ],
+        "**for each** $\\left(u,v,c\\right)\\in\\mathrm{E}$:  $r_e:=c$, $r_{\\bar{e}}:=0$.",
+        "$maxflow:=0$.  $\\color\\red{\\bullet}$",
+        "**while** <u>bfsCalculateDepth</u> ():  $\\color\\red{\\bullet}$",
+        [
+          "**for each** $e\\in\\mathrm{E}_r$:  mark $e$ as *unchecked*.",
+          "$\\delta:=$ <u>dfsAugment</u> ($s$, $+\\infty$).",
+          "$maxflow:=maxflow+\\delta$.  $\\color\\red{\\bullet}$"
+        ],
+        "$\\color\\red{\\bullet}$  **return** $maxflow$."
+      ]
+    ]
+  },
+  mcf_classic: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>ClassicMCF</u> ($\\mathrm{G}$, $s$, $t$, $flowlimit$):",
+      [
+        "**comment**:",
+        [
+          "Classic Algorithm for Minimum-Cost maximum Flow, **return** maximum *flow* ($\\leq flowlimit$) of $\\mathrm{G}$ from $s$ to $t$ and its minimum *cost*.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *weighted network flow graph*;  $\\mathrm{E}\\subset\\left\\{\\left(u,v,c_a,c_o\\right)\\middle|u,v\\in\\mathrm{V}\\right\\}$: *set* of *edge*;  $c_a$: *capacity* of *edge*;  $c_o$: *cost* of *edge*;  $s,t\\in\\mathrm{V}$: *source vertex* and *sink vertex*;  $flowlimit$: *upperbound* of maximum *flow*;  $\\mathrm{G}_r=\\left(\\mathrm{V},\\mathrm{E}_r\\right)$: *residual graph* of $\\mathrm{G}$;  $\\mathrm{E}_r\\subset\\left\\{e=\\left(u,v,r_e,c_e\\right)\\right\\}$: *set* of *residual edge*, $\\forall \\left(u,v,c_a,c_o\\right)\\in\\mathrm{E}:\\ e=\\left(u,v,r_e,c_o\\right),\\bar{e}=(v,u,r_{\\bar{e}},-c_o)\\in\\mathrm{E}_r,r_e+r_{\\bar{e}}=c$;  $r_e$: *residual capacity*, *capacity* of $e$;  $\\bar{e}$: *reverse edge* of $e$;  *valid edge* $e\\in\\mathrm{E}_r$: $r_e>0$;  *augmenting path*: *minimum-cost path* through ONLY *valid edge*;  $\\mathrm{P}_{st}$: *augmenting path* from $s$ to $t$;  $dis_v$: minimum *cost* from $s$ to $v$."
+        ],
+        "**function** <u>spfaFindAugmentingPath</u> ():",
+        [
+          "**comment**:",
+          [
+            "find *minimum-cost* *augmenting path* using **SPFA**, **return** whether $\\exists$ $\\mathrm{P}_{st}$.",
+            "$\\mathrm{Q}$: *queue*."
+          ],
+          "clear $\\mathrm{Q}$.",
+          "**for each** $v\\in\\mathrm{V}$:  $dis_v:=+\\infty$.",
+          "$dis_s:=0$, push $s$ into $\\mathrm{Q}$, mark $s$ as *inqueue*.",
+          "**while** $\\mathrm{Q}$ is not *empty*:",
+          [
+            "$v:=$ *front* of $\\mathrm{Q}$, pop $v$ from $\\mathrm{Q}$, clear *inqueue* mark of $v$.",
+            "**for each** *valid edge* $\\left(v,u,r_e,c_e\\right)\\in\\mathrm{E}_r$:",
+            [
+              "**if** $dis_u>dis_v+c_e$:",
+              [
+                "$dis_u:=dis_v+c_e$.",
+                "**if** $u$ is not *inqueue*:",
+                ["push $u$ into $\\mathrm{Q}$, mark $u$ as *inqueue*."]
+              ]
+            ]
+          ],
+          "**return** whether $dis_t\\neq+\\infty$.    **comment**:  $dis_t\\neq+\\infty\\Leftrightarrow$ $t$ is *reachable* through *valid edge* from $s\\Leftrightarrow\\exists\\ \\mathrm{P}_{st}$."
+        ],
+        "**for each** $\\left(u,v,c_a,c_o\\right)\\in\\mathrm{E}$:  $r_e:=c_a$, $r_{\\bar{e}}:=0$, $c_e:=c_o$, $c_{\\bar{e}}:=-c_o$.",
+        "$maxflow:=0$, $mincost:=0$  $\\color\\red{\\bullet}$",
+        "**while** <u>spfaFindAugmentingPath</u> ():  $\\color\\red{\\bullet}$",
+        [
+          "$\\delta:=$ **minimum** of $flowlimit$ and $r_e$ **for each** $e\\in\\mathrm{P}_{st}$.",
+          "**for each** $e\\in\\mathrm{P}_{st}$:  $r_e:=r_e-\\delta$, $r_{\\bar{e}}:=r_{\\bar{e}}+\\delta$.",
+          "$flowlimit:=flowlimit-\\delta$.",
+          "$maxflow:=maxflow+\\delta$, $mincost:=mincost+\\delta\\cdot dis_t$  $\\color\\red{\\bullet}$"
+        ],
+        "$\\color\\red{\\bullet}$  **return** $maxflow$, $mincost$."
+      ]
+    ]
+  },
+  mcf_zkw: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>ZkwMCF</u> ($\\mathrm{G}$, $s$, $t$):",
+      [
+        "**comment**:",
+        [
+          "Zkw's Algorithm for Minimum-Cost maximum Flow, **return** maximum *flow* ($\\leq flowlimit$) of $\\mathrm{G}$ from $s$ to $t$ and its minimum *cost*.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *weighted network flow graph*;  $\\mathrm{E}\\subset\\left\\{\\left(u,v,c_a,c_o\\right)\\middle|u,v\\in\\mathrm{V}\\right\\}$: *set* of *edge*;  $c_a$: *capacity* of *edge*;  $c_o$: *cost* of *edge*;  $s,t\\in\\mathrm{V}$: *source vertex* and *sink vertex*;  $flowlimit$: *upperbound* of maximum *flow*;  $\\mathrm{G}_r=\\left(\\mathrm{V},\\mathrm{E}_r\\right)$: *residual graph* of $\\mathrm{G}$;  $\\mathrm{E}_r\\subset\\left\\{e=\\left(u,v,r_e,c_e\\right)\\right\\}$: *set* of *residual edge*, $\\forall \\left(u,v,c_a,c_o\\right)\\in\\mathrm{E}:\\ e=\\left(u,v,r_e,c_o\\right),\\bar{e}=(v,u,r_{\\bar{e}},-c_o)\\in\\mathrm{E}_r,r_e+r_{\\bar{e}}=c$;  $r_e$: *residual capacity*, *capacity* of $e$;  $\\bar{e}$: *reverse edge* of $e$;  *valid edge* $e\\in\\mathrm{E}_r$: $r_e>0$;  *augmenting path*: *minimum-cost path* through ONLY *valid edge*;  $\\mathrm{P}_{st}$: *augmenting path* from $s$ to $t$;  $dis_v$: minimum *cost* from $s$ to $v$."
+        ],
+        "**function** <u>spfaFindAugmentingPath</u> ():",
+        [
+          "**comment**:",
+          [
+            "find *minimum-cost* *augmenting path* using **SPFA**, **return** whether $\\exists$ $\\mathrm{P}_{st}$.",
+            "$\\mathrm{Q}$: *queue*."
+          ],
+          "clear $\\mathrm{Q}$.",
+          "**for each** $v\\in\\mathrm{V}$:  $dis_v:=+\\infty$.",
+          "$dis_s:=0$, push $s$ into $\\mathrm{Q}$, mark $s$ as *inqueue*.",
+          "**while** $\\mathrm{Q}$ is not *empty*:",
+          [
+            "$v:=$ *front* of $\\mathrm{Q}$, pop $v$ from $\\mathrm{Q}$, clear *inqueue* mark of $v$.",
+            "**for each** *valid edge* $\\left(v,u,r_e,c_e\\right)\\in\\mathrm{E}_r$:",
+            [
+              "**if** $dis_u>dis_v+c_e$:",
+              [
+                "$dis_u:=dis_v+c_e$.",
+                "**if** $u$ is not *inqueue*:",
+                ["push $u$ into $\\mathrm{Q}$, mark $u$ as *inqueue*."]
+              ]
+            ]
+          ],
+          "**return** whether $dis_t\\neq+\\infty$.    **comment**:  $dis_t\\neq+\\infty\\Leftrightarrow$ $t$ is *reachable* through *valid edge* from $s\\Leftrightarrow\\exists\\ \\mathrm{P}_{st}$."
+        ],
+        "**function** <u>dfsAugment</u> ($v$, $limit$):",
+        [
+          "**comment**:",
+          [
+            "augment in $\\mathrm{G}_r$ using **DFS**, **return** *flow* augmented.",
+            "$v$: current *vertex*;  $limit$: *upperbound* of *flow* to be augmented."
+          ],
+          "**if** $v=t$:  $\\color\\red{\\bullet}$  **return** $limit$.    **comment**:  reach $t$, augment by $limit$.",
+          "mark $v$ as *visited*, $\\sigma:=0$.",
+          "**for each** *valid edge* $e=\\left(v,u,r_e,c_e\\right)\\in\\mathrm{E}_r$:",
+          [
+            "**if** $u$ is not *visited* **and** $dis_u=dis_v+c_e$:    **comment**:  $e$ is in *SSSP graph* of $\\mathrm{G}_r$.",
+            [
+              "$\\delta:=$ <u>dfsAugment</u> ($u$, **minimum** of $limit$ and $r_e$).",
+              "$r_e:=r_e-\\delta$, $r_{\\bar{e}}:=r_{\\bar{e}}+\\delta$.",
+              "$limit:=limit-\\delta$, $\\sigma:=\\sigma+\\delta$.",
+              "**if** $limit=0$:  **return** $\\sigma$;"
+            ]
+          ],
+          "**return** $\\sigma$."
+        ],
+        "**for each** $\\left(u,v,c_a,c_o\\right)\\in\\mathrm{E}$:  $r_e:=c_a$, $r_{\\bar{e}}:=0$, $c_e:=c_o$, $c_{\\bar{e}}:=-c_o$.",
+        "$maxflow:=0$, $mincost:=0$  $\\color\\red{\\bullet}$",
+        "**while** <u>spfaFindAugmentingPath</u> ():  $\\color\\red{\\bullet}$",
+        [
+          "**do**:",
+          [
+            "clear *visited* mark **for each** $v\\in\\mathrm{V}$.",
+            "$\\delta:=$ <u>dfsAugment</u> ($s$, $flowlimit$).",
+            "$flowlimit:=flowlimit-\\delta$.",
+            "$maxflow:=maxflow+\\delta$, $mincost:=mincost+\\delta\\cdot dis_t$  $\\color\\red{\\bullet}$"
+          ],
+          "**while** $\\delta>0$."
+        ],
+        "$\\color\\red{\\bullet}$  **return** $maxflow$, $mincost$."
+      ]
+    ]
+  },
+  mbm_hungarian: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>Hungarian</u> ($\\mathrm{G}$):",
+      [
+        "**comment**:",
+        [
+          "Hungarian Algorithm for Maximum Bipartite Matching, **return** maximum matching of $\\mathrm{G}$.",
+          "$\\mathrm{G}=\\left(\\mathrm{X},\\mathrm{Y},\\mathrm{E}\\right)$: *bipartite graph*;  $\\mathrm{X},\\mathrm{Y}$: *set* of *vertex*;  $\\mathrm{E}\\subset\\left\\{e=\\left(x,y\\right)\\middle|x\\in\\mathrm{X},y\\in\\mathrm{Y}\\right\\}$: *set* of *edge*;  $\\mathrm{P}$: *augmenting path* in $\\mathrm{G}$."
+        ],
+        "**function** <u>dfsFindAugmentingPathFrom</u> ($x$):",
+        [
+          "**comment**:",
+          [
+            "find *augmenting path* using **DFS**, **return** whether $\\exists$ $\\mathrm{P}$ from $x$.",
+            "$x$: current *vertex*."
+          ],
+          "**for each** $\\left(x,y\\right)\\in\\mathrm{E}$:",
+          [
+            "**if** $y$ is not *visited*:",
+            [
+              "mark $y$ as *visited*.",
+              "**if** $y$ is *matched* with $x'$:",
+              ["**if** <u>dfsFindAugmentingPathFrom</u> ($x'$):  **return** **true**."],
+              "**else**:  $\\color\\red{\\bullet}$  **return** **true**.    **comment**:  found $\\mathrm{P}$ to $y$."
+            ]
+          ],
+          "**return** **false**."
+        ],
+        "$matched:=0$.  $\\color\\red{\\bullet}$",
+        "**for each** $x\\in\\mathrm{X}$:",
+        [
+          "clear *visited* mark **for each** $y\\in\\mathrm{Y}$.",
+          "**if** <u>dfsFindAugmentingPathFrom</u> ($x$):",
+          [
+            "**for each** $e\\in\\mathrm{P}_l$: flip *matching status* of $e$ (*matched* $\\leftrightarrow$ *unmatched*).",
+            "$matched:=matched+1$.  $\\color\\red{\\bullet}$"
           ]
         ],
-        "**return** {<u>*matched*</u>}"
+        "$\\color\\red{\\bullet}$  **return** $matched$."
       ]
-    },
-    KuhnMunkres: {
-      pseudo: [""]
-    },
-    Gabow: {
-      pseudo: [""]
-    }
+    ]
   },
-  planargraph: {
-    DMP: {
-      pseudo: [
-        "simplify the *graph* ($\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$):",
-        ["remove *self loop*, *multiple edges*, *vertex* whose *degree* ≤ 2"],
-        "quick test $\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$:",
+  mwbm_km: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>KuhnMunkres</u> ($\\mathrm{G}$):",
+      [
+        "**comment**:",
         [
-          "**if** $\\left|\\mathrm{E}\\right|$ < 9 **or** $\\left|\\mathrm{V}\\right|$ < 5",
-          ["set <u>*planarity*</u> to *true*, **goto** end"],
-          "**if** $\\left|\\mathrm{E}\\right|$ > $3\\left|\\mathrm{V}\\right|-6$",
-          ["set <u>*planarity*</u> to *false*, **goto** end"]
+          "Kuhn-Munkres Algorithm for Maximum Weighted Bipartite Matching, **return** maximum weighted matching of $\\mathrm{G}$",
+          "$\\mathrm{G}=\\left(\\mathrm{X},\\mathrm{Y},\\mathrm{E}\\right)$: *weighted bipartite graph*;  $\\mathrm{X},\\mathrm{Y}$: *set* of *vertex*;  $\\mathrm{E}=\\left\\{e_{ij}=\\left(x_i,y_j,w_{ij}\\right)\\middle|x_i\\in\\mathrm{X},y_j\\in\\mathrm{Y}\\right\\}$: *set* of *edge*;  $w_{ij}$: *weight* of $e_{ij}$;  $lx_i,ly_j$: *label* of $x_i,y_j$;  $\\mathrm{S}$: *subset* of $\\mathrm{X}$;  $\\mathrm{T}$: *subset* of $\\mathrm{Y}$;  *tight-edge* $e_{ij}$: $lx_i+ly_j=w_{ij}$;  $\\mathrm{G}_l$: *tight-edge subgraph* of $\\mathrm{G}$;  $\\mathrm{P}_l$: *augmenting path* in $\\mathrm{G}_l$."
         ],
-        "split $\\mathrm{G}$ into its *biconnected components* ($\\mathrm{BC}$)",
-        "**for each** *graph* ($\\mathrm{G}_i=\\left(\\mathrm{V}_i,\\mathrm{E}_i\\right)$) in $\\mathrm{BC}$",
+        "**for each** $x_i\\in\\mathrm{X}$:  $lx_i:=$ **maximum** of $w_{ij}$ **for each** $y_j\\in\\mathrm{Y}$.",
+        "**for each** $y_j\\in\\mathrm{Y}$:  $ly_j:=0$.  $\\color\\red{\\bullet}$",
+        "**for each** $x\\in\\mathrm{X}$:",
         [
-          "simplify $\\mathrm{G}_i$, quick test $\\mathrm{G}_i$",
-          "add an arbitrary *edge* ($e=\\left(u,v\\right)$) in $\\mathrm{E}_i$, *vertex* $u,v$ and initial *face* ($face_0=\\left[u,v\\right]$) to an empty *planar embedding* ($\\mathrm{G}_i'=\\left(\\mathrm{V}_i',\\mathrm{E}_i',\\mathrm{Faces}_i\\right)$)",
+          "$\\mathrm{S}:=\\left\\{x\\right\\}$, $\\mathrm{T}:=\\emptyset$.  $\\color\\red{\\bullet}$",
+          "**do**:",
+          [
+            "**while** $\\exists$ *tight edge* $e_{ij}$ from $\\mathrm{S}$ to $\\mathrm{Y}\\backslash\\mathrm{T}$:",
+            [
+              "add $y_j$ to $\\mathrm{T}$.",
+              "**if** $y_j$ is *matched* with $x_k$:  add $x_k$ to $\\mathrm{S}$.  $\\color\\red{\\bullet}$",
+              "**else**:  found $\\mathrm{P}_l$ from $x$ to $y_j$, **go to** <u>augment</u>."
+            ],
+            "$\\delta :=$ **minimum** of  $lx_i+ly_j-w_{ij}$ **for each** $e_{ij}$ from $\\mathrm{S}$ to $\\mathrm{Y}\\backslash\\mathrm{T}$.",
+            "**for each** $x_i\\in\\mathrm{S}$:  $lx_i := lx_i -\\delta$.",
+            "**for each** $y_j\\in\\mathrm{T}$:  $ly_j := ly_j +\\delta$.  $\\color\\red{\\bullet}$"
+          ],
+          "**while** $\\nexists$ $\\mathrm{P}_l$."
+        ]
+      ],
+      "<u>augment</u>:  $\\color\\red{\\bullet}$",
+      [
+        [
+          "**for each** $e\\in\\mathrm{P}_l$: flip *matching status* of $e$ (*matched* $\\leftrightarrow$ *unmatched*).   $\\color\\red{\\bullet}$"
+        ],
+        "$maxweight := $ **summation** of $lx_i$ **for each** $x_i\\in\\mathrm{X}$ $+$  **summation** of $ly_j$ **for each** $y_j\\in\\mathrm{Y}$.",
+        "$\\color\\red{\\bullet}$  **return** $maxweight$."
+      ]
+    ]
+  },
+  mm_gabow: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is partially simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>Gabow</u> (G):",
+      [
+        "**comment**:",
+        [
+          "Gabow Algorithm for Maximum Matching, **return** maximum matching of $\\mathrm{G}$.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *general undirected graph*;  $\\mathrm{P}$: *augmenting path* in $\\mathrm{G}$."
+        ],
+        "**function** <u>bfsFindAugmentingPathFrom</u> ($s$):",
+        [
+          "**comment**:",
+          [
+            "find *augmenting path* using **BFS**, **return** whether $\\exists$ $\\mathrm{P}$ from $s$.",
+            "$s$: *start vertex*;  $\\mathrm{Q}$: *queue* for *outer vertex*;  $\\mathrm{F}_{uv}$: *tree flower*(*odd-length circle*) derived from $u$ and $v$."
+          ],
+          "clear $\\mathrm{Q}$, clear all mark **for each** $v\\in\\mathrm{V}$.",
+          "mark $s$ as *outer*, push $s$ into $\\mathrm{Q}$.",
+          "**while** $\\mathrm{Q}$ is not *empty*:",
+          [
+            "$v:=$ *front* of $\\mathrm{Q}$, pop $v$ from $\\mathrm{Q}$.",
+            "**for each** $\\left(v,u\\right)\\in\\mathrm{E}$:",
+            [
+              "**if** $u$ is not *marked*:",
+              [
+                "**if** $u$ is *matched* with $t$:",
+                ["mark $u$ as *inner*.", "mark $t$ as *outer*, push $t$ into $\\mathrm{Q}$."],
+                "**else**:  **return** **true**.    **comment**:  found $\\mathrm{P}$ from $s$ to $u$."
+              ],
+              "**else if** $u$ is marked as *outer*:    **comment**:  found $\\mathrm{F}_{uv}$.",
+              ["**for each** *inner* $t\\in\\mathrm{F}_{uv}$:", ["mark $t$ as *outer*, push $t$ into $\\mathrm{Q}$."]]
+            ]
+          ],
+          "**return** **false**."
+        ],
+        "$matched:=0$.  $\\color\\red{\\bullet}$",
+        "**for each** *unchecked* unmatched $v\\in\\mathrm{V}$:",
+        [
+          "**if** <u>bfsFindAugmentingPathFrom</u> ($v$):  $\\color\\red{\\bullet}$",
+          [
+            "**for each** $e\\in\\mathrm{P}$: flip *matching status* of $e$ (*matched* $\\leftrightarrow$ *unmatched*).",
+            "$matched:=matched+1$.  $\\color\\red{\\bullet}$"
+          ]
+        ],
+        "$\\color\\red{\\bullet}$  **return** $matched$."
+      ]
+    ]
+  },
+  pt_dmp: {
+    pseudo: [
+      "<u>**NOTE**</u>: This Pseudo Code is GREATLY simplified and does NOT strictly correspond to internal implementation.",
+      "**function** <u>DMP</u> ($\\mathrm{G}$):",
+      [
+        "**comment**:",
+        [
+          "Demoucron-Malgrange-Pertuiset Algorithm for Planar Testing, **return** *planarity* of $\\mathrm{G}$.",
+          "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *general undirected graph*;  $\\mathrm{BC}$: *set* of *biconnected component* of $\\mathrm{G}$."
+        ],
+        "**function** <u>dmpTest</u> ($\\mathrm{G}$):",
+        [
+          "**comment**:",
+          [
+            "test *planarity* of *biconnected component* using **DMP**, **return** *planarity* of $\\mathrm{G}$.",
+            "$\\mathrm{G}=\\left(\\mathrm{V},\\mathrm{E}\\right)$: *biconnected component*;  $\\mathrm{G}'=\\left(\\mathrm{V}',\\mathrm{E}',\\mathrm{Faces}\\right)$: *planar embedding* of $\\mathrm{G}$;  $\\mathrm{Faces}$: *set* of *face* of $\\mathrm{G}$;  $\\mathrm{ValidFaces}_{fragment}\\subset\\mathrm{Faces}$: *set* of *embeddable face* for $fragment$;  $\\mathrm{Fragments}$: *set* of *fragment* of $\\mathrm{G}$ with respect to $\\mathrm{G}'$;  $\\mathrm{P}_{u,v}$: *path* from $u$ to $v$."
+          ],
+          "$\\color\\red{\\bullet}$  remove *self loop* and *multiple edges* $\\in\\mathrm{E}$, *vertex* whose *degree* $\\leq 2$ $\\in\\mathrm{}V$.  $\\color\\red{\\bullet}$",
+          "**if** $\\left|\\mathrm{E}\\right|<9$ **or** $\\left|\\mathrm{V}\\right|<5$:  **return** **true**.",
+          "**if** $\\left|\\mathrm{E}\\right|$ > $3\\left|\\mathrm{V}\\right|-6$:  **return** **false**.",
+          "select *arbitrary* $\\left(u,v\\right)\\in\\mathrm{E}$, $\\mathrm{V}':=\\left\\{u,v\\right\\}$, $\\mathrm{E}':=\\left\\{\\left(u,v\\right)\\right\\}$, $\\mathrm{Faces}:=\\left\\{\\left[u,v\\right]\\right\\}$.  $\\color\\red{\\bullet}$",
           "**repeat**:",
           [
-            "find **all** *fragment* ($\\mathrm{Fragments}$) of $\\mathrm{G}_i$ with respect to $\\mathrm{G}_i'$",
-            "**if** $fragments$ is empty",
-            ["set <u>*planarity*</u> to *true*, **goto** end"],
-            "**for each** *fragment* ($fragment_j$) in $\\mathrm{Fragments}$",
-            ["find **all** *embeddable face* ($\\mathrm{Face}_j$) in $\\mathrm{G}_i'$ for $fragment_j$"],
-            "**if** there is a $\\mathrm{Face}_j$ that is empty",
-            ["set *<u>planarity</u>* to *false*, **goto** end"],
-            "**if** there is a $\\mathrm{Face}_j$ that has only one *face* ($face$) in it",
-            ["set $fragment$ to $fragment_j$"],
-            "**else**",
-            [
-              "set $fragment$ to an arbitrary $fragment_j$ in $\\mathrm{Fragments}$",
-              "set $face$ to an arbitrary *face* in $\\mathrm{Face}_j$"
-            ],
-            "find a *path* ($\\mathrm{P}$) in $fragment$ whose first and last *vertex* is in $face$",
-            "add **all** *edge* and *vertex* in $\\mathrm{P}$ to $\\mathrm{G}_i'$",
-            "replace $face$ in $\\mathrm{G}_i'$ with two new *face* split from $face$ by $\\mathrm{P}$"
+            "**if** $\\mathrm{Fragments}=\\emptyset$:  **return** **true**.",
+            "**if** $\\exists \\ fragment\\in\\mathrm{Fragments}:\\mathrm{ValidFaces}_{i,fragment}=\\emptyset$:  **return** **false**.",
+            "**if** $\\exists \\ fragment\\in\\mathrm{Fragments}:\\mathrm{ValidFaces}_{i,fragment}=\\left\\{face\\right\\}$:  $f_r:=fragment$, $f_a:=face$.",
+            "**else**:  $f_r:=$ *arbitrary fragment* $\\in\\mathrm{Fragments}$, $f_a:=$ *arbitrary face* $\\in\\mathrm{ValidFace}_{i,f_r}.$",
+            "$\\color\\red{\\bullet}$  select *arbitrary unique* $u,v\\in f_a\\cap f_r$, $\\mathrm{P}_{u,v}:=$ *path* $\\in f_r$ from $u$ to $v$.",
+            "**for each** $v\\in\\mathrm{P}_{u,v}\\cap \\mathrm{V}$:  add $v$ into $\\mathrm{V}'$.",
+            "**for each** $e\\in\\mathrm{P}_{u,v}\\cap \\mathrm{E}$:  add $e$ into $\\mathrm{E}'$.",
+            "split $f_a$ into $newface_1,newface_2$ by $\\mathrm{P}_{u,v}$.",
+            "replace $f_a\\in\\mathrm{Faces}$ with $newface_1,newface_2$.  $\\color\\red{\\bullet}$"
           ]
         ],
-        "end:",
-        ["**return** {<u>*planarity*</u>}"]
-      ]
-    }
+        "$\\color\\red{\\bullet}$  remove *self loop* and *multiple edges* $\\in\\mathrm{E}$, *vertex* whose *degree* $\\leq 2$ $\\in\\mathrm{}V$.  $\\color\\red{\\bullet}$",
+        "**if** $\\left|\\mathrm{E}\\right|<9$ **or** $\\left|\\mathrm{V}\\right|<5$:  $planarity:=$ **true**, **go to** <u>end</u>.",
+        "**if** $\\left|\\mathrm{E}\\right|$ > $3\\left|\\mathrm{V}\\right|-6$:  $planarity:=$ **false**, **go to** <u>end</u>.",
+        "$planarity:=$ **true**.",
+        "split $\\mathrm{G}$ into $\\mathrm{BC}$.  $\\color\\red{\\bullet}$",
+        "**for each** $\\mathrm{G}_i\\in\\mathrm{BC}$:",
+        ["**if** not <u>dmpTest</u> ($\\mathrm{G}_i$):", ["$planarity:=$ **false**, **go to** <u>end</u>."]]
+      ],
+      "<u>end</u>:",
+      ["$\\color\\red{\\bullet}$  **return** $planarity$."]
+    ]
   },
   dijkstra: {
     pseudo: [
       "令$\\bar{S}=\\{2,3,\\cdots ,n\\}, \\pi (1)=0, \\pi (i)=\\left\\{\\begin{array}{ll} w_i, i \\in \\Gamma^+_1 \\\\ \\infty, \\text{otherwise} \\\\ \\end{array} \\right.$",
-      ["在$\\bar{S}$中，令$\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，置$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$。若$\\bar{S}=\\Phi$，结束，否则转步骤3。",
-        ["对全部的$i\\in \\bar{S}\\cap\\Gamma^+_j$，置$\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$，转步骤2。"]]
+      [
+        "在$\\bar{S}$中，令$\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，置$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$。若$\\bar{S}=\\Phi$，结束，否则转步骤3。",
+        [
+          "对全部的$i\\in \\bar{S}\\cap\\Gamma^+_j$，置$\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$，转步骤2。"
+        ]
+      ]
     ],
     test: [
       "initialize the *network flow graph*:",
-      ["**for each** *edge* ($e=\\left(u,v\\right)$) in the *network flow graph*",
-        ["create its *reverse edge* ($\\bar{e}=\\left(v,u\\right)$)",
-          "set the *capacity* of $\\bar{e}$ to 0"]],
+      [
+        "**for each** *edge* ($e=\\left(u,v\\right)$) in the *network flow graph*",
+        ["create its *reverse edge* ($\\bar{e}=\\left(v,u\\right)$)", "set the *capacity* of $\\bar{e}$ to 0"]
+      ],
       "**while** *target vertex* ($\\mathrm{T}$)  is reachable from *source vertex* ($\\mathrm{S}$) in the *residual graph*",
-      ["find an *augmenting path* ($\\mathrm{P}$) using **DFS**",
+      [
+        "find an *augmenting path* ($\\mathrm{P}$) using **DFS**",
         "calculate the *minimum capacity* ($limit$) of **each** *edge* in $\\mathrm{P}$",
         "update the *capacity* of **each** *edge* in $\\mathrm{P}$ by $limit$:",
-        ["**for each** *edge* ($e$) in $\\mathrm{P}$",
-          ["decrease the *capacity* of $e$ by $limit$",
-            "increase the *capacity* of its *reverse edge* by $limit$"]],
-        "increase <u>*maxflow*</u> by $limit$"],
+        [
+          "**for each** *edge* ($e$) in $\\mathrm{P}$",
+          ["decrease the *capacity* of $e$ by $limit$", "increase the *capacity* of its *reverse edge* by $limit$"]
+        ],
+        "increase <u>*maxflow*</u> by $limit$"
+      ],
       "**return** {<u>*maxflow*</u>}"
     ]
   }

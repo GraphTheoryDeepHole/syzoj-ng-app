@@ -9,7 +9,7 @@ class Dinic extends GraphAlgorithm {
   // }
 
   id() {
-    return "dinic_mf";
+    return "mf_dinic";
   }
 
   parameters(): ParameterDescriptor[] {
@@ -100,8 +100,7 @@ class Dinic extends GraphAlgorithm {
 
   *dfs(pos: number, lim: number) {
     if (pos === this.T) {
-      // **for each** *augmenting path* ($\mathrm{P}_i$) in $\mathrm{LG}$ (using **DFS**)
-      yield this.getStep(3);
+      yield this.getStep(22); // reached t
       return lim;
     }
     let e: _Edge, re: _Edge;
@@ -125,23 +124,17 @@ class Dinic extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    // initialize the *network flow graph*
-    yield this.getStep(0);
-
     let flow = 0,
       delta = 0;
+    yield this.getStep(33); // inited
     while (this.bfs()) {
-      // find the *level graph* ($\mathrm{LG}$) using **BFS**
-      yield this.getStep(2);
+      yield this.getStep(34); // built level graph
       delta = yield* this.dfs(this.S, Infinity);
       flow += delta;
-      // increase <u>*maxflow*</u> by the sum of **each** $limit_i$
-      yield this.getStep(6);
+      yield this.getStep(37); // augmented
     }
-
     //console.log(`algo Dinic : {flow: ${flow}}`);
-    // **return** {<u>*maxflow*</u>}
-    yield this.getStep(7);
+    yield this.getStep(38); // return
     return { flow };
   }
 }

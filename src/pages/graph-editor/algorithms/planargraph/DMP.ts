@@ -6,19 +6,13 @@ function clear<type>(buf: type[], val: type, cnt: number) {
   for (let _ = 0; _ < cnt; ++_) buf[_] = val;
 }
 
-function max<type>(x: type, y: type): type {
-  if (x >= y) return x;
-  return y;
-}
-
-function min<type>(x: type, y: type): type {
-  if (x <= y) return x;
-  return y;
-}
-
 class DMP extends GraphAlgorithm {
-  constructor() {
-    super("DMP", "Demoucron-Malgrange-Pertuiset Algorithm for Planarity Testing");
+  // constructor() {
+  //   super("DMP", "Demoucron-Malgrange-Pertuiset Algorithm for Planarity Testing");
+  // }
+
+  id() {
+    return "pt_dmp";
   }
 
   private graphs: DMPGraph[] = [];
@@ -48,9 +42,9 @@ class DMP extends GraphAlgorithm {
         if (q === f) continue;
         if (dfn[q] === 0) {
           dfs1(q, p);
-          low[p] = min(low[p], low[q]);
+          low[p] = Math.min(low[p], low[q]);
           if (low[q] >= dfn[p]) newBCC(p, q);
-        } else low[p] = min(low[p], dfn[q]);
+        } else low[p] = Math.min(low[p], dfn[q]);
       }
     }
 
@@ -62,7 +56,6 @@ class DMP extends GraphAlgorithm {
   report(): NodeEdgeList {
     let resNodes: Node[] = [];
     let resEdges: Edge[] = [];
-    let nodeList: number[];
     let tempGraph: NodeEdgeList;
 
     for (let graph of this.graphs) {
@@ -74,9 +67,17 @@ class DMP extends GraphAlgorithm {
     return new NodeEdgeList(resNodes, resEdges);
   }
 
+  getStep(lineId: number, graph: Graph = this.report()): Step {
+    return {
+      graph,
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
+  }
+
   *test(G: DMPGraph, quickTest: boolean) {
+    yield this.getStep(9); // simplify
     G.simplify();
-    yield { graph: this.report() };
+    yield this.getStep(9); // simplified
 
     //console.table(G.nodes().map(n=>n.datum.displayId));
 
@@ -191,7 +192,7 @@ class DMP extends GraphAlgorithm {
       let face = faces[faceId];
 
       G.mark(fragment.nodesId());
-      yield { graph: this.report() };
+      yield this.getStep(18); // found fragment
       G.clearMark();
 
       let path: number[] = getPath(fragment);
@@ -210,34 +211,29 @@ class DMP extends GraphAlgorithm {
       faces = faces.filter((_, i) => i !== faceId);
       faces.push(new Face(nodeList1));
       faces.push(new Face(nodeList2));
+      yield this.getStep(22); // embedded
     }
 
     return true;
   }
 
-  *run(G: Graph, quickTest: boolean = false): Generator<Step> {
+  *run(G: Graph, quickTest: boolean = true): Generator<Step> {
     let planarity: boolean = true;
     let graph = DMPGraph.from(G);
+    yield this.getStep(23, graph); // simplify
     graph.simplify();
     graph.active();
-    yield { graph };
-
+    yield this.getStep(23, graph); // simplified
     this.graphs = this.split(graph);
-    yield { graph: this.report() };
-
+    yield this.getStep(27); // split
     for (let g of this.graphs) {
       g.active();
-      yield { graph: this.report() };
-
       if (!(yield* this.test(g, quickTest))) planarity = false;
       //console.log(`graph: ${graph}\nresult: ${planarity}`);
-
       g.active(false);
       if (quickTest && !planarity) break;
     }
-
-    yield { graph: this.report() };
-
+    yield this.getStep(32); // return
     return { planarity };
   }
 }
