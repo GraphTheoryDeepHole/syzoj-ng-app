@@ -2,8 +2,12 @@ import { GraphAlgorithm } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class Kruskal extends GraphAlgorithm {
-  constructor() {
-    super("Kruskal", "Minimum Spanning Tree - Kruskal");
+  id() {
+    return "Kruskal";
+  }
+
+  requiredParameter(): string[] {
+    return [];
   }
 
   father = [];
@@ -45,6 +49,9 @@ class Kruskal extends GraphAlgorithm {
           graph.edges()[j].datum.chosen = 2;
         }
       }
+
+      yield { graph };
+
       this.father[edges[i].source] = this.getFather(edges[i].source);
       this.father[edges[i].target] = this.getFather(edges[i].target);
       if (this.father[edges[i].source] != this.father[edges[i].target]) {
@@ -57,14 +64,13 @@ class Kruskal extends GraphAlgorithm {
         }
       }
 
-      yield { graph };
-
       for (let j = 0; j < graph.edges().length; j++) {
         if (graph.edges()[j].datum.chosen == 2) {
           graph.edges()[j].datum.chosen = 0;
-          yield { graph };
         }
       }
+
+      yield { graph };
 
       if (counter == graph.nodes().length - 1) {
         break;

@@ -8,8 +8,12 @@ class SalesmanStep extends Step {
 }
 
 class SalesmanCheaperAlgo extends GraphAlgorithm {
-  constructor() {
-    super("SalesmanProbCheaperAlgo", "Traveling Salesman Problem (Cheaper Algorithm)");
+  id() {
+    return "SalesmanCheaperAlgorithm";
+  }
+
+  requiredParameter(): string[] {
+    return [];
   }
 
   *salesmanCheaperAlgo(graph: Graph): Generator<SalesmanStep> {

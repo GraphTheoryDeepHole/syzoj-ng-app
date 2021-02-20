@@ -1,7 +1,7 @@
 import { Prim } from "./Prim";
 import { AdjacencyMatrix } from "../GraphStructure";
 
-test("CriticalPath", () => {
+test("Prim", () => {
   let mat = [
     [0, 15, 0, 40, 25],
     [15, 0, 30, 20, 30],
