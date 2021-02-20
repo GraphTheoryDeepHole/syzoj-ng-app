@@ -8,8 +8,12 @@ class SalesmanStep extends Step {
 }
 
 class SalesmanPath extends GraphAlgorithm {
-  constructor() {
-    super("SalesmanProb", "Traveling Salesman Problem");
+  id() {
+    return "SalesmanProb";
+  }
+
+  requiredParameter(): string[] {
+    return [];
   }
 
   judge(graph: Graph, edges: Edge[]) {

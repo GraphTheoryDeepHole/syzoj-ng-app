@@ -2,8 +2,12 @@ import { GraphAlgorithm } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class Prim extends GraphAlgorithm {
-  constructor() {
-    super("Prim", "Minimum Spanning Tree - Prim");
+  id() {
+    return "Prim";
+  }
+
+  requiredParameter(): string[] {
+    return [];
   }
 
   *run(graph: Graph) {

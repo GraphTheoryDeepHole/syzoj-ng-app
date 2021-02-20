@@ -2,8 +2,12 @@ import { GraphAlgorithm } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class CriticalPath extends GraphAlgorithm {
-  constructor() {
-    super("criticalPath", "Critical Path");
+  id() {
+    return "CriticalPath";
+  }
+
+  requiredParameter(): string[] {
+    return [];
   }
 
   *run(graph: Graph) {

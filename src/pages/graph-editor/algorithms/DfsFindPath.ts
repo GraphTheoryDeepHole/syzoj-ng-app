@@ -2,8 +2,12 @@ import { GraphAlgorithm, Step } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class DfsFindPath extends GraphAlgorithm {
-  constructor() {
-    super("DFS", "Depth First Search");
+  id() {
+    return "DFS";
+  }
+
+  requiredParameter(): string[] {
+    return ["start_point"];
   }
 
   *dfs(dfn: number, graph: AdjacencyMatrix, this_node: number): Generator<Step> {

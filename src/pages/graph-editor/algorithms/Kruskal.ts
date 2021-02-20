@@ -2,8 +2,12 @@ import { GraphAlgorithm } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class Kruskal extends GraphAlgorithm {
-  constructor() {
-    super("Kruskal", "Minimum Spanning Tree - Kruskal");
+  id() {
+    return "Kruskal";
+  }
+
+  requiredParameter(): string[] {
+    return [];
   }
 
   father = [];

@@ -2,8 +2,12 @@ import { GraphAlgorithm } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class BfsFindPath extends GraphAlgorithm {
-  constructor() {
-    super("BFS", "Breadth First Search");
+  id() {
+    return "BFS";
+  }
+
+  requiredParameter(): string[] {
+    return ["start_point"];
   }
 
   *run(graph: Graph, start_point: number) {

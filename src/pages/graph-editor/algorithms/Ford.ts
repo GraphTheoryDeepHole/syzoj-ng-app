@@ -2,8 +2,12 @@ import { GraphAlgorithm } from "../GraphAlgorithm";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class Ford extends GraphAlgorithm {
-  constructor() {
-    super("Ford", "Ford Single Source Shortest Path");
+  id() {
+    return "Ford";
+  }
+
+  requiredParameter(): string[] {
+    return ["start_point"];
   }
 
   *run(graph: Graph, startPoint: number) {
