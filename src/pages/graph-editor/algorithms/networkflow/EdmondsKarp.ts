@@ -9,7 +9,7 @@ class EdmondsKarp extends GraphAlgorithm {
   // }
 
   id() {
-    return "ek_mf";
+    return "mf_ek";
   }
 
   parameters(): ParameterDescriptor[] {
@@ -93,25 +93,17 @@ class EdmondsKarp extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    // initialize the *network flow graph*:
-    yield this.getStep(0);
-
     let flow = 0,
       delta = 0;
+    yield this.getStep(19); // inited
     while (this.bfs()) {
-      // find an *augmenting path* ($\mathrm{P}$) using **BFS**
-      yield this.getStep(2);
-
+      yield this.getStep(20); // found augmenting path
       delta = this.flip();
       flow += delta;
-
-      // update the *capacity* of **each** *edge* in $\mathrm{P}$ by $limit$
-      yield this.getStep(4);
+      yield this.getStep(23); // augmented
     }
-
     //console.log(`algo EdmondsKarp : {flow: ${flow}}`);
-    // **return** {<u>*maxflow*</u>}
-    yield this.getStep(6);
+    yield this.getStep(24); // return
     return { flow };
   }
 }

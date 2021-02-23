@@ -2,13 +2,24 @@ import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { AdjacencyList, BipartiteGraph, Edge, Graph, Node, NodeEdgeList } from "../../GraphStructure";
 
 class HungarianDFS extends GraphAlgorithm {
-  constructor() {
-    super("HungarianDFS", "DFS version of Hungarian algorithm for Maximum Matching in Bipartite Graph");
+  // constructor() {
+  //   super("HungarianDFS", "DFS version of Hungarian algorithm for Maximum Matching in Bipartite Graph");
+  // }
+
+  id() {
+    return "mbm_hungarian";
   }
 
   private edges: Edge[] = [];
   private nodes: Node[] = [];
   private adjlist: AdjacencyList;
+
+  getStep(lineId: number): Step {
+    return {
+      graph: new NodeEdgeList(this.nodes, this.edges),
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
+  }
 
   *dfs(pos: number) {
     let sn = this.nodes[pos],
@@ -23,7 +34,7 @@ class HungarianDFS extends GraphAlgorithm {
           if (td.match === -1) {
             this.edges.forEach(edge => (edge.datum.matched = this.nodes[edge.source].datum.match === edge.target));
             this.edges.forEach(edge => (edge.datum.marked = this.nodes[edge.source].datum.mark === edge.target));
-            yield { graph: new NodeEdgeList(this.nodes, this.edges) };
+            yield this.getStep(14); // found augmenmting path
           }
           (td.match = sn.id), (sd.match = tn.id), (td.tag = sd.tag = 1);
           return true;
@@ -31,6 +42,7 @@ class HungarianDFS extends GraphAlgorithm {
         td.mark = sd.mark = -1;
       }
     }
+    return false;
   }
 
   *run(graph: Graph): Generator<Step> {
@@ -51,20 +63,19 @@ class HungarianDFS extends GraphAlgorithm {
           }
     );
     this.edges.forEach(e => Object.assign(e.datum, { marked: false, matched: false }));
-
     let res = 0;
+    yield this.getStep(16); // inited
     for (let leftnode of left) {
       right.forEach(rightnode => (this.nodes[rightnode.id].datum.visit = false));
       this.nodes.forEach(node => (node.datum.mark = -1));
       if (!(yield* this.dfs(leftnode.id))) this.nodes[leftnode.id].datum.tag = 2;
       else ++res;
-
       this.edges.forEach(edge => (edge.datum.matched = this.nodes[edge.source].datum.match === edge.target));
       this.edges.forEach(edge => (edge.datum.marked = false));
-      yield { graph: new NodeEdgeList(this.nodes, this.edges) };
+      yield this.getStep(21); // augmented
     }
-
-    console.log(`algo HungarianDFS : {matched: ${res}}`);
+    //console.log(`algo HungarianDFS : {matched: ${res}}`);
+    yield this.getStep(22); // return
     return { matched: res };
   }
 }

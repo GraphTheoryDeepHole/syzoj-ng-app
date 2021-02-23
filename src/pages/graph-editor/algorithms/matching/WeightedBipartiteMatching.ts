@@ -1,20 +1,14 @@
 import { Queue } from "../../utils/DataStructure";
-import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
+import { GraphAlgorithm, ParameterDescriptor, Step } from "../../GraphAlgorithm";
 import { BipartiteMatrix, Node, Edge, Graph, NodeEdgeList } from "../../GraphStructure";
 
-function max<type>(x: type, y: type): type {
-  if (x >= y) return x;
-  return y;
-}
-
-function min<type>(x: type, y: type): type {
-  if (x <= y) return x;
-  return y;
-}
-
 class KuhnMunkres extends GraphAlgorithm {
-  constructor() {
-    super("KuhnMunkres Algorithm", "Kuhn-Munkres algorithm for Maximum Weighted Matching in Bipartite Graph");
+  // constructor() {
+  //   super("KuhnMunkres Algorithm", "Kuhn-Munkres algorithm for Maximum Weighted Matching in Bipartite Graph");
+  // }
+
+  id() {
+    return "mwbm_km";
   }
 
   private que: Queue<number> = new Queue<number>();
@@ -70,7 +64,7 @@ class KuhnMunkres extends GraphAlgorithm {
   }
 
   report(): NodeEdgeList {
-    this.assert();
+    //this.assert();
 
     this.edges.forEach(e =>
       Object.assign(e.datum, {
@@ -98,10 +92,17 @@ class KuhnMunkres extends GraphAlgorithm {
     return new NodeEdgeList(this.X.concat(this.Y), this.edges);
   }
 
+  getStep(lineId: number): Step {
+    return {
+      graph: this.report(),
+      codePosition: new Map<string, number>([["pseudo", lineId]])
+    };
+  }
+
   *flip(y: number) {
     this.markx[this.slackx[y]] = y;
     if (this.matchx[this.slackx[y]] !== -1) yield* this.flip(this.matchx[this.slackx[y]]);
-    else yield { graph: this.report() }; // Yield before flipping Edges
+    else yield this.getStep(18); // found augmenting path
     (this.matchy[y] = this.slackx[y]), (this.matchx[this.slackx[y]] = y);
   }
 
@@ -117,7 +118,10 @@ class KuhnMunkres extends GraphAlgorithm {
           yield* this.flip(y);
           return true;
         }
-        if (!this.inS[this.matchy[y]]) this.addToS(this.matchy[y]);
+        if (!this.inS[this.matchy[y]]) {
+          this.addToS(this.matchy[y]);
+          yield this.getStep(12); // added to S
+        }
       }
     }
     return false;
@@ -130,33 +134,29 @@ class KuhnMunkres extends GraphAlgorithm {
     this.w = graph.mat.map(line => line.map(e => e.weight));
     this.lx = Array.from({ length: this.n }, (_, x) => {
       let res = -Infinity;
-      for (let y = 0; y < this.n; ++y) res = max(res, this.w[x][y]);
+      this.w[x].forEach(v => (res = Math.max(res, v)));
       return res;
     });
     this.ly = Array.from({ length: this.n }, () => 0);
-
     (this.X = graph.leftSide), (this.Y = graph.rightSide), (this.edges = graph.edges());
-
     this.clear(this.matchx), this.clear(this.matchy), this.clear(this.markx);
+    yield this.getStep(6); // inited
 
     for (let x = 0; x < this.n; ++x) {
       this.clear(this.slackx), this.clear(this.slackv, Infinity);
       this.clear(this.inS, false), this.clear(this.inT, false);
       this.que.clear();
-
       this.addToS(x);
+      yield this.getStep(8); // new x
       while (!(yield* this.extand())) {
         let delta: number = Infinity;
-        for (let y = 0; y < this.n; ++y) if (!this.inT[y]) delta = min(delta, this.slackv[y]);
+        for (let y = 0; y < this.n; ++y) if (!this.inT[y]) delta = Math.min(delta, this.slackv[y]);
         for (let i = 0; i < this.n; ++i) {
           if (this.inS[i]) this.lx[i] -= delta;
           if (this.inT[i]) this.ly[i] += delta;
           else this.slackv[i] -= delta;
         }
-
-        // Yield after adjusting lx[], ly[], slackv[]
-        yield { graph: this.report() };
-
+        yield this.getStep(16); // adjusted
         let break_flag: boolean = false;
         for (let y = 0; y < this.n; ++y) {
           if (!this.inT[y] && this.slackv[y] === 0) {
@@ -167,18 +167,17 @@ class KuhnMunkres extends GraphAlgorithm {
               break;
             }
             this.addToS(this.matchy[y]);
+            yield this.getStep(12); // added to S
           }
         }
         if (break_flag) break;
       }
-
-      // Yeild after matching Xi
-      yield { graph: this.report() };
+      yield this.getStep(19); // augmented
     }
-
     let res = 0;
     for (let i = 0; i < this.n; ++i) res += this.lx[i] + this.ly[i];
-    console.log(`algo KuhnMunkres : {weight: ${res}}`);
+    //console.log(`algo KuhnMunkres : {weight: ${res}}`);
+    yield this.getStep(21); // return
     return { weight: res };
   }
 }

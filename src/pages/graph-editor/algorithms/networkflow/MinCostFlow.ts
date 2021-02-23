@@ -9,7 +9,7 @@ class MinCostFlow extends GraphAlgorithm {
   // }
 
   id() {
-    return "classic_mcf";
+    return "mcf_classic";
   }
 
   parameters(): ParameterDescriptor[] {
@@ -34,10 +34,6 @@ class MinCostFlow extends GraphAlgorithm {
         }
       }
     ];
-  }
-
-  requiredParameter(): string[] {
-    return ["source_vertex", "target_vertex", "flow_limit"];
   }
 
   private que: Queue<number> = new Queue<number>();
@@ -119,11 +115,9 @@ class MinCostFlow extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    // initialize the *weighted network flow graph*:
-    yield this.getStep(0);
-
     let flow = 0,
       cost = 0;
+    yield this.getStep(21); // inited
     while (limit > 0 && this.spfa()) {
       let delta = limit;
       let e: _Edge;
@@ -132,10 +126,7 @@ class MinCostFlow extends GraphAlgorithm {
         delta = Math.min(delta, e.flow);
         e.mark = true;
       }
-
-      // find an *augmenting path* ($\mathrm{P}$) with *minimum total cost* ($cost$) using **SPFA**
-      yield this.getStep(5);
-
+      yield this.getStep(22); // found augmenting path
       limit -= delta;
       flow += delta;
       cost += delta * this.dis[this.T];
@@ -143,14 +134,10 @@ class MinCostFlow extends GraphAlgorithm {
         this.E.edge[this.eid[pos]].flow -= delta;
         this.E.edge[this.eid[pos] ^ 1].flow += delta;
       }
-
-      // update the *capacity* of **each** *edge* in $\mathrm{P}$ by $limit$
-      yield this.getStep(7);
+      yield this.getStep(26); // augmented
     }
-
     //console.log(`algo MinCostFlow : {flow: ${flow}, cost: ${cost}`);
-    // **return** {<u>*maxflow*</u>, <u>*mincost*</u>}
-    yield this.getStep(9);
+    yield this.getStep(27); // return
     return { flow, cost };
   }
 }
