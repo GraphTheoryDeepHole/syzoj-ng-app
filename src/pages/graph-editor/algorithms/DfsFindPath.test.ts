@@ -12,7 +12,7 @@ test("DfsFindPath", () => {
   let graph = new AdjacencyMatrix(mat, true);
   let res = [];
   for (let step of new DfsFindPath().run(graph, 0)) {
-    res.push(step.graph.nodes().map(n => n.datum.sequence + ', ' + n.datum.visited));
+    res.push(step.graph.nodes().map(n => n.datum.sequence + ", " + n.datum.visited));
   }
   console.table(res);
 });
