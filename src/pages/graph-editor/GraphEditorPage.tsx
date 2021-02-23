@@ -60,7 +60,7 @@ let GraphEditor: React.FC = props => {
           floatingData: () => ""
         }}
       />
-      <AlgorithmControl />
+      <AlgorithmControl graph={graph} />
     </>
   );
 };
