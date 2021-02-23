@@ -1,4 +1,4 @@
-import { Button, Comment, Dropdown, Form, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
+import { Button, Card, Comment, Dropdown, Form, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
 import React, { Reducer, useEffect, useReducer, useState } from "react";
 import { algorithms, codeMap } from "@/pages/graph-editor/algorithms";
 import MarkdownContent from "@/markdown/MarkdownContent";
@@ -161,7 +161,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     <Comment key={i}>
       {typeof e === "string" ? (
         <>
-          <Comment.Text className={runnerState != "stop" && currentStep === i ? style.currentStep : null}>
+          <Comment.Text className={runnerState != "stop" && currentStep === i ? style.currentStep : style.step}>
             <MarkdownContent content={e} />
           </Comment.Text>
         </>
@@ -179,19 +179,26 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     return (
       <Grid.Row>
         <Grid.Column width={16}>
-          <Form>
-            <Form.Group widths={"equal"}>
-              {descriptors.map(({ name }, i) => (
-                <Form.Input
-                  fluid
-                  key={name}
-                  label={_(`.algo.${algorithm.id()}.para.${name}`)}
-                  error={parseError[i] ? _(parseError[i]) : null}
-                  onChange={onChange(i)}
-                />
-              ))}
-            </Form.Group>
-          </Form>
+          <Card>
+            <Card.Content>
+              <Card.Header>Parameters</Card.Header>
+            </Card.Content>
+            <Card.Content>
+              <Form>
+                <Form.Group widths={"equal"}>
+                  {descriptors.map(({ name }, i) => (
+                    <Form.Input
+                      fluid
+                      key={name}
+                      label={_(`.algo.${algorithm.id()}.para.${name}`)}
+                      error={parseError[i] ? _(parseError[i]) : null}
+                      onChange={onChange(i)}
+                    />
+                  ))}
+                </Form.Group>
+              </Form>
+            </Card.Content>
+          </Card>
         </Grid.Column>
       </Grid.Row>
     );
@@ -231,7 +238,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
           </Grid.Row>
           {parameterInputs()}
           <Grid.Row>
-            <Grid.Column width={3}>
+            <Grid.Column width={6}>
               <Dropdown
                 placeholder="Select Algorithm"
                 fluid
@@ -245,7 +252,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
                 onChange={onAlgorithmChanged}
               />
             </Grid.Column>
-            <Grid.Column width={3}>
+            <Grid.Column width={3}>{middleButton()}</Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column width={6}>
               <Dropdown
                 placeholder="Select Code Type"
                 fluid
@@ -263,15 +273,16 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
                 onChange={onCodeTypeChanged}
               />
             </Grid.Column>
-            <Grid.Column width={3}>{middleButton()}</Grid.Column>
+            <Grid.Column width={3}>
+              {auto ? (
+                <Button fluid icon="pause" content="Stop" onClick={flipAuto} />
+              ) : (
+                <Button fluid icon="play" content="Start" onClick={flipAuto} />
+              )}
+            </Grid.Column>
             <Grid.Column width={7}>
               <Button.Group fluid>
                 <Button labelPosition="left" icon="left chevron" content="Back" onClick={previousStep} />
-                {auto ? (
-                  <Button icon="pause" content="Stop" onClick={flipAuto} />
-                ) : (
-                  <Button icon="play" content="Start" onClick={flipAuto} />
-                )}
                 <Button labelPosition="right" icon="right chevron" content="Forward" onClick={nextStep} />
               </Button.Group>
             </Grid.Column>

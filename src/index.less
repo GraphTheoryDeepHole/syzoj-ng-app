@@ -45,6 +45,7 @@ body {
 .ui.dimmer .ui.workaround.loader::before {
   border-color: rgba(0, 0, 0, 0.1);
 }
+
 .ui.dimmer .ui.workaround.loader::after {
   border-color: #767676 transparent transparent;
 }
@@ -75,7 +76,7 @@ body {
 
 /* Hide reCAPTCHA Badge */
 
-.grecaptcha-badge { 
+.grecaptcha-badge {
   visibility: hidden;
 }
 
@@ -103,12 +104,12 @@ body {
   #root,
   .ui.popup:not(.inverted), .ui.popup:not(.inverted)::before,
   .ui.modal:not(.basic),
-  // menu
+    // menu
   .ui.menu:not(.tabular),
   .ui.menu .dropdown.item .menu,
   .ui.menu .ui.dropdown .menu > .item,
   .ui.dropdown .menu,
-  // search
+    // search
   .results {
     background: var(--theme-background) !important;
     color: var(--theme-foreground) !important;
@@ -124,7 +125,7 @@ body {
   .item,
   .ui.menu .ui.dropdown .menu > .item,
   .ui.menu .ui.dropdown .menu > .selected.item,
-  // comments
+    // comments
   .ui.comments .comment .author, .ui.comments .comment .text {
     color: var(--theme-foreground) !important;
   }
@@ -134,7 +135,9 @@ body {
   .header, .content,
   .ui.icon:not(.button):not(.item):not(.message),
   .ui.breadcrumb .icon.divider,
-  // inputs
+    // card
+  .ui.card,
+    // inputs
   .ui.input, input,
   .ui.form .inline.fields > label,
   .ui.input textarea, .ui.form textarea,
@@ -145,17 +148,17 @@ body {
   .ui.checkbox label:hover, .ui.checkbox + label:hover,
   .ui.checkbox label, .ui.checkbox + label,
   .ui.form .field > label,
-  // dropdown
+    // dropdown
   .ui.selection.visible.dropdown > .text:not(.default),
   .ui.menu .ui.dropdown .menu > .active.item,
   .ui.menu .ui.dropdown .menu > .item:hover,
-  // accordion
+    // accordion
   .ui.accordion, .ui.accordion > .title, .ui.accordion > .content,
-  // search
+    // search
   .result, .result > .title,
-  // statistic
+    // statistic
   .ui.statistic > *,
-  // table
+    // table
   table, tr, td, th {
     background: inherit !important;
     color: inherit !important;
@@ -165,15 +168,17 @@ body {
   .ui.dropdown,
   .header, .content,
   .ui.popup:not(.inverted), .ui.popup:not(.inverted)::before,
-  // menu
+    // card
+  .ui.card,
+    // menu
   .ui.menu,
-  // input
+    // input
   .ui.input, input, .ui.input textarea, .ui.form textarea,
-  // label
+    // label
   .ui.basic.label@{selector-not-colored},
-  // search
+    // search
   .results, .result,
-  // table
+    // table
   table@{selector-not-colored},
   tr, td, th {
     border-color: var(--theme-border) !important;
@@ -222,14 +227,14 @@ body {
       background: var(--theme-button-background-active) !important;
     }
   }
-  
+
   input, .ui.input textarea, .ui.form textarea {
     & {
       &::placeholder {
         color: var(--theme-input-placeholder) !important;
       }
     }
-  
+
     &:focus {
       &::placeholder {
         color: var(--theme-input-placeholder-focus) !important;
@@ -240,10 +245,10 @@ body {
   .ui.input.focus:not(.transparent) > input, .ui.input:not(.transparent) > input:focus, .ui.form textarea:focus {
     border-color: var(--theme-input-border-focus) !important;
   }
-  
+
   a, .ui.breadcrumb a {
     color: var(--theme-hyperlink);
-  
+
     &:hover {
       color: var(--theme-hyperlink-hover);
     }
@@ -294,6 +299,7 @@ body {
   .ui.menu .ui.dropdown .menu > .item:hover, .ui.dropdown .menu > .item:hover {
     background-color: var(--theme-dropdown-item-hover-background) !important;
   }
+
   .ui.dropdown .menu .selected.item, .ui.dropdown.selected, .ui.menu .ui.dropdown .menu > .selected.item {
     background-color: var(--theme-dropdown-item-selected-background) !important;
   }
@@ -313,6 +319,7 @@ body {
       background-color: var(--theme-background) !important;
     }
   }
+
   .ui.secondary.pointing.menu .item:hover, .ui.secondary.pointing.menu .active.item, .ui.secondary.pointing.menu .item {
     background-color: transparent !important;
   }
@@ -363,7 +370,7 @@ body {
   .ui.segment:not(.vertical):not(.attached) {
     box-shadow: 0 1px 2px 0 var(--theme-shadow);
   }
-  
+
   .ui.styled.accordion, .ui.styled.accordion .accordion {
     box-shadow: 0 1px 2px 0 var(--theme-border), 0 0 0 1px var(--theme-border);
 
@@ -374,6 +381,10 @@ body {
         color: var(--theme-accordion-non-active) !important;
       }
     }
+  }
+
+  .ui.card {
+    box-shadow: 0 1px 3px 0 var(--theme-border), 0 0 0 1px var(--theme-border);
   }
 
   .ui.placeholder.segment {
@@ -437,15 +448,15 @@ body {
           background-color: var(--theme-background) !important;
         }
       }
-  
+
       & ~ label:before {
         border-color: var(--theme-border) !important;
       }
-  
+
       &:checked ~ label:before, & ~ label:hover:before {
         border-color: var(--theme-border-hover) !important;
       }
-  
+
       &:focus ~ label:before {
         border-color: var(--theme-border-active) !important;
       }
@@ -461,9 +472,18 @@ body {
     color: unset !important;
     background-color: var(--theme-selection-background) !important;
   }
-  ::selection { .selection(); }
-  ::-moz-selection { .selection(); }
-  ::-webkit-selection { .selection(); }
+
+  ::selection {
+    .selection();
+  }
+
+  ::-moz-selection {
+    .selection();
+  }
+
+  ::-webkit-selection {
+    .selection();
+  }
 }
 
 html, body {
@@ -472,12 +492,12 @@ html, body {
     width: 10px;
     height: 10px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: var(--theme-scrollbar-track) !important;
     border-radius: 0;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     cursor: pointer;
     border-radius: 5px;
@@ -485,11 +505,11 @@ html, body {
     -webkit-transition: color 0.2s ease;
     transition: color 0.2s ease;
   }
-  
+
   ::-webkit-scrollbar-thumb:window-inactive {
     background: var(--theme-scrollbar-thumb-inactive) !important;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     background: var(--theme-scrollbar-thumb-hover) !important;
   }
