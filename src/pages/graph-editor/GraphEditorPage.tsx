@@ -9,7 +9,6 @@ import { route } from "navi";
 import { newAlgorithm } from "@/pages/graph-editor/algorithms";
 import { EdgeRenderHint, GeneralRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
-
 let GraphEditor: React.FC = props => {
   let g = fromRandom(10, 15, true, false, false, false);
 
@@ -43,8 +42,11 @@ let GraphEditor: React.FC = props => {
         nodeRenderHint={nodeRenderHint}
         edgeRenderHint={edgeRenderHint}
       />
-      <AlgorithmControl dataGraph={dataGraph} setDisplayedGraph={g => setDisplayGraph(g)}
-                        onAlgorithmChanged={onAlgorithmChanged} />
+      <AlgorithmControl
+        dataGraph={dataGraph}
+        setDisplayedGraph={g => setDisplayGraph(g)}
+        onAlgorithmChanged={onAlgorithmChanged}
+      />
     </>
   );
 };

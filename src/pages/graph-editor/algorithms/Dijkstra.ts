@@ -4,7 +4,7 @@ import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class Dijkstra extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
-    return { fillingColor: node => node.datum.visited ? "#ff0000" : undefined };
+    return { fillingColor: node => (node.datum.visited ? "#ff0000" : undefined) };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
@@ -29,7 +29,7 @@ class Dijkstra extends GraphAlgorithm {
     ];
   }
 
-  * run(graph: Graph, startPoint: number) {
+  *run(graph: Graph, startPoint: number) {
     let mat = AdjacencyMatrix.from(graph, true).mat;
     graph.nodes().forEach(n => {
       n.datum.visited = false;

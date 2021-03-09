@@ -25,8 +25,7 @@ class AlgorithmRunner {
   public stepCount: number;
   public result: any;
 
-  constructor(private setDisplayedGraph: (g: Graph) => void) {
-  }
+  constructor(private setDisplayedGraph: (g: Graph) => void) {}
 
   public clear() {
     Object.assign(this, {
@@ -82,8 +81,7 @@ class ParameterManager {
   public parseError: string[];
   public state: ParameterState;
 
-  constructor(private graph: Graph) {
-  }
+  constructor(private graph: Graph) {}
 
   clear() {
     Object.assign(this, {
@@ -131,8 +129,14 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     newState[action.type](action);
     return newState;
   };
-  const [runner, runnerDispatch] = useReducer<Reducer<AlgorithmRunner, any>>(reducer, new AlgorithmRunner(props.setDisplayedGraph));
-  const [para, paraDispatch] = useReducer<Reducer<ParameterManager, any>>(reducer, new ParameterManager(props.dataGraph));
+  const [runner, runnerDispatch] = useReducer<Reducer<AlgorithmRunner, any>>(
+    reducer,
+    new AlgorithmRunner(props.setDisplayedGraph)
+  );
+  const [para, paraDispatch] = useReducer<Reducer<ParameterManager, any>>(
+    reducer,
+    new ParameterManager(props.dataGraph)
+  );
   const { state: runnerState, steps, algorithm, stepGen, currentStep, stepCount, result } = runner;
   const { parseResult, descriptors, inputTexts, parseError, state: parameterState } = para;
   const [auto, setAuto] = useState(false);
@@ -294,10 +298,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
                 options={
                   algorithm
                     ? Object.keys(codeMap[algorithm.id()]).map(key => ({
-                      key,
-                      text: _(`.algo.code_type.${key}`),
-                      value: key
-                    }))
+                        key,
+                        text: _(`.algo.code_type.${key}`),
+                        value: key
+                      }))
                     : []
                 }
                 onChange={onCodeTypeChanged}

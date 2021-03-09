@@ -48,9 +48,9 @@ type DeepPartial<T> = {
 };
 
 interface RenderHints {
-  general: GeneralRenderHint,
-  node: NodeRenderHint,
-  edge: EdgeRenderHint
+  general: GeneralRenderHint;
+  node: NodeRenderHint;
+  edge: EdgeRenderHint;
 }
 
 const cssProp = (key: string) => getComputedStyle(document.body).getPropertyValue(key);
@@ -85,13 +85,13 @@ class CanvasGraphRenderer {
   public patcher: DeepPartial<RenderHints>;
   public hint: RenderHints = defaultRenderHints;
   public size: {
-    width: number,
-    height: number
+    width: number;
+    height: number;
   };
 
   // update function
   // modify information and try to start/restart simulation and rendering
-  updateGraph(args: { graph: Graph, newGraph?: boolean }) {
+  updateGraph(args: { graph: Graph; newGraph?: boolean }) {
     const { graph, newGraph } = args;
     if (isEqual(graph, this.graphCache)) {
       return;
@@ -118,7 +118,10 @@ class CanvasGraphRenderer {
       // should we deep copy?
       this.edges = edges;
       // reset link force
-      this.simulation.force("link", d3.forceLink(this.edges).distance(edge => edge.graphEdge.datum.weight || 30));
+      this.simulation.force(
+        "link",
+        d3.forceLink(this.edges).distance(edge => edge.graphEdge.datum.weight || 30)
+      );
       // restart behaviour?
       this.simulation.restart();
     }
@@ -137,7 +140,8 @@ class CanvasGraphRenderer {
           } else {
             if (typeof this.hint[prop][childProp] == "function") {
               // TODO: infinity callback
-              this.hint[prop][childProp] = (...args) => patcher[prop][childProp](...args) || defaultRenderHints[prop][childProp](...args);
+              this.hint[prop][childProp] = (...args) =>
+                patcher[prop][childProp](...args) || defaultRenderHints[prop][childProp](...args);
             } else {
               this.hint[prop][childProp] = patcher[prop][childProp];
             }
@@ -157,7 +161,7 @@ class CanvasGraphRenderer {
     this.mountDragCallback();
   }
 
-  updateSize(args: { width: number, height: number }) {
+  updateSize(args: { width: number; height: number }) {
     const { width, height } = args;
     if (width == this.size?.width && height == this.size?.height) return;
     this.size = args;
@@ -171,14 +175,22 @@ class CanvasGraphRenderer {
     if (n < a) return a;
     if (n > b) return b;
     return n;
-  };
+  }
 
   private xInRange(x: number): number {
-    return CanvasGraphRenderer.makeInRange(x, this.hint.general.nodeRadius, this.size.width - this.hint.general.nodeRadius);
+    return CanvasGraphRenderer.makeInRange(
+      x,
+      this.hint.general.nodeRadius,
+      this.size.width - this.hint.general.nodeRadius
+    );
   }
 
   private yInRange(y: number): number {
-    return CanvasGraphRenderer.makeInRange(y, this.hint.general.nodeRadius, this.size.height - this.hint.general.nodeRadius);
+    return CanvasGraphRenderer.makeInRange(
+      y,
+      this.hint.general.nodeRadius,
+      this.size.height - this.hint.general.nodeRadius
+    );
   }
 
   private boxConstraint(): Force<any, any> {
@@ -195,7 +207,10 @@ class CanvasGraphRenderer {
 
     this.simulation = d3
       .forceSimulation(this.nodes)
-      .force("link", d3.forceLink(this.edges).distance(edge => edge.graphEdge.datum.weight || 30)) // default id implement may work
+      .force(
+        "link",
+        d3.forceLink(this.edges).distance(edge => edge.graphEdge.datum.weight || 30)
+      ) // default id implement may work
       .force("charge", d3.forceManyBody().strength(mbForce))
       .on("tick", () => this.render())
       .stop();
@@ -310,7 +325,6 @@ class CanvasGraphRenderer {
 
     // TODO: Render popup data
   }
-
 }
 
 export default CanvasGraphRenderer;

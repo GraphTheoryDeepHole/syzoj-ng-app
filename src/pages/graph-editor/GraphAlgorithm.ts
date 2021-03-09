@@ -26,10 +26,11 @@ class Step {
    * @param extraData Extra data produced by the algorithm. This array contains the [name, type, data] tuples .name can be a valid markdown string.
    * type suggests the display method of data, such as "map", "stack", "list".
    */
-  constructor(public readonly graph: Graph,
-              public readonly codePosition?: Map<string, number>,
-              public readonly extraData?: [string, string, any][]) {
-  }
+  constructor(
+    public readonly graph: Graph,
+    public readonly codePosition?: Map<string, number>,
+    public readonly extraData?: [string, string, any][]
+  ) {}
 }
 
 abstract class GraphAlgorithm {

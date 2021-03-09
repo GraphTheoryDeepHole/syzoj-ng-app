@@ -39,7 +39,7 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
   };
   const [renderer, dispatch] = useReducer(reducer, new CanvasGraphRenderer());
   const { width, ref: resizeRef } = useResizeDetector<HTMLDivElement>();
-  const height = width * 0.625;    // 16:10
+  const height = width * 0.625; // 16:10
 
   useEffect(() => {
     dispatch({ type: "updateGraph", graph: dataGraph, newGraph: true });
@@ -47,7 +47,8 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
 
   useEffect(() => {
     dispatch({
-      type: "updateRenderHint", patcher: {
+      type: "updateRenderHint",
+      patcher: {
         general: generalRenderHint,
         node: nodeRenderHint,
         edge: edgeRenderHint
@@ -55,7 +56,7 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
     });
   }, [generalRenderHint, nodeRenderHint, edgeRenderHint]);
 
-  const onCanvasMount = (canvas) => {
+  const onCanvasMount = canvas => {
     dispatch({ type: "updateCanvas", canvas: canvas });
   };
 
