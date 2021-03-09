@@ -4,4 +4,6 @@ import codeMap from "./codeMap";
 
 const algorithms = new Map<string, () => GraphAlgorithm>([["dijkstra", () => new Dijkstra()]]);
 
-export { algorithms, codeMap };
+const newAlgorithm = name => algorithms.get(name)();
+
+export { algorithms, codeMap, newAlgorithm };

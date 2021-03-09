@@ -64,7 +64,7 @@ let RandomGraphComponent: MethodComponent = props => {
     <Form onSubmit={onFormSubmit} error={error !== undefined}>
       <Form.Group widths={"equal"}>
         {firstLine.map(([name, state, setter]) => (
-          <Form.Input key={name} label={_(`.input.props.${name}`)} value={String(state)} onChange={setter} />
+          <Form.Input fluid key={name} label={_(`.input.props.${name}`)} value={String(state)} onChange={setter} />
         ))}
       </Form.Group>
       <Form.Group inline>

@@ -1,66 +1,50 @@
 import React, { useEffect, useState } from "react";
-import { route } from "navi";
 import { useLocalizer } from "@/utils/hooks";
 import { appState } from "@/appState";
 import GraphDisplay from "./display/GraphDisplay";
 import GraphInputPanel from "./input/GraphInputPanel";
-import { AdjacencyMatrix, fromRandom } from "@/pages/graph-editor/GraphStructure";
+import { fromRandom, Graph } from "@/pages/graph-editor/GraphStructure";
 import AlgorithmControl from "@/pages/graph-editor/control/AlgorithmControl";
+import { route } from "navi";
+import { newAlgorithm } from "@/pages/graph-editor/algorithms";
+import { EdgeRenderHint, GeneralRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+
 
 let GraphEditor: React.FC = props => {
   let g = fromRandom(10, 15, true, false, false, false);
 
-  const [graph, setGraph] = useState(g);
-  const [error, setError] = useState<string>();
-  const _ = useLocalizer("graph_editor");
+  const cssProp = (key: string) => getComputedStyle(document.body).getPropertyValue(key);
 
-  let onGraphInputPanelSync = (method: string, content: string) => {
-    if (method === "adjmat") {
-      let adjmat = content.split("\n").map(line => line.split(/\s+/).map(s => parseInt(s)));
-      try {
-        let graph = new AdjacencyMatrix(adjmat, true);
-        setGraph(graph);
-        setError(undefined);
-      } catch (e) {
-        setError(e.message);
-      }
-    }
-  };
+  const [dataGraph, setDataGraph] = useState(g);
+  const [displayGraph, setDisplayGraph] = useState<Graph>();
+  const [generalRenderHint, setGeneralRenderHint] = useState<GeneralRenderHint>();
+  const [nodeRenderHint, setNodeRenderHint] = useState<Partial<NodeRenderHint>>();
+  const [edgeRenderHint, setEdgeRenderHint] = useState<Partial<EdgeRenderHint>>();
+
+  const _ = useLocalizer("graph_editor");
 
   useEffect(() => {
     appState.enterNewPage(_(".title"), "graph_editor");
   }, [appState.locale]);
 
-  let cssProp = (key: string) => getComputedStyle(document.body).getPropertyValue(key);
+  const onAlgorithmChanged = newName => {
+    const algo = newAlgorithm(newName);
+    setNodeRenderHint(algo.nodeRenderPatcher());
+    setEdgeRenderHint(algo.edgeRenderPatcher());
+  };
 
   return (
     <>
-      <GraphInputPanel graph={graph} error={error} setGraph={g => setGraph(g)} />
+      <GraphInputPanel graph={dataGraph} setGraph={g => setDataGraph(g)} />
       <GraphDisplay
-        width={500}
-        height={500}
-        graph={graph}
-        generalRenderHint={{
-          directed: true,
-          nodeRadius: 15,
-          textColor: cssProp("--theme-foreground"),
-          backgroundColor: cssProp("--theme-background"),
-          simulationForceManyBodyStrength: -500
-        }}
-        nodeRenderHint={{
-          borderThickness: () => 3,
-          borderColor: () => cssProp("--theme-border"),
-          fillingColor: () => cssProp("--theme-button-background"),
-          floatingData: node => String(node.id),
-          popupData: () => []
-        }}
-        edgeRenderHint={{
-          thickness: () => 3,
-          color: () => cssProp("--theme-hyperlink"),
-          floatingData: () => ""
-        }}
+        dataGraph={dataGraph}
+        displayedGraph={displayGraph}
+        generalRenderHint={generalRenderHint}
+        nodeRenderHint={nodeRenderHint}
+        edgeRenderHint={edgeRenderHint}
       />
-      <AlgorithmControl graph={graph} />
+      <AlgorithmControl dataGraph={dataGraph} setDisplayedGraph={g => setDisplayGraph(g)}
+                        onAlgorithmChanged={onAlgorithmChanged} />
     </>
   );
 };

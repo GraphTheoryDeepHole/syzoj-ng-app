@@ -14,7 +14,6 @@ export interface MethodComponent extends React.FC<MethodComponentProps> {}
 interface GraphInputPanelProps {
   graph: Graph;
   setGraph: (g: Graph) => void;
-  error?: string;
 }
 
 let GraphInputPanel: React.FC<GraphInputPanelProps> = props => {

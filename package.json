@@ -111,6 +111,7 @@
     "react-intl": "^5.10.16",
     "react-monaco-editor": "0.40.0",
     "react-navi": "^0.14.4",
+    "react-resize-detector": "^6.6.0",
     "react-scripts": "4.0.1",
     "react-textarea-autosize": "^8.3.0",
     "semantic-ui-react": "^2.0.3",

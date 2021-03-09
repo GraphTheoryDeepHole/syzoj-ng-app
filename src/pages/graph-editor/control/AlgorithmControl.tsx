@@ -1,6 +1,6 @@
 import { Button, Card, Comment, Dropdown, Form, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
 import React, { Reducer, useEffect, useReducer, useState } from "react";
-import { algorithms, codeMap } from "@/pages/graph-editor/algorithms";
+import { algorithms, codeMap, newAlgorithm } from "@/pages/graph-editor/algorithms";
 import MarkdownContent from "@/markdown/MarkdownContent";
 import { useLocalizer } from "@/utils/hooks";
 import { GraphAlgorithm, ParameterDescriptor, Step } from "@/pages/graph-editor/GraphAlgorithm";
@@ -9,7 +9,9 @@ import cloneDeep from "lodash.clonedeep";
 import style from "./AlgorithmControl.module.less";
 
 interface AlgorithmControlProps {
-  graph: Graph;
+  dataGraph: Graph;
+  setDisplayedGraph: (g: Graph) => void;
+  onAlgorithmChanged: (algorithm: string) => void;
 }
 
 type RunningState = "stop" | "running" | "done";
@@ -21,7 +23,10 @@ class AlgorithmRunner {
   public stepGen: Generator<Step>;
   public currentStep: number;
   public stepCount: number;
-  public result: any = undefined;
+  public result: any;
+
+  constructor(private setDisplayedGraph: (g: Graph) => void) {
+  }
 
   public clear() {
     Object.assign(this, {
@@ -30,13 +35,13 @@ class AlgorithmRunner {
       stepGen: null,
       currentStep: 0,
       stepCount: 0,
-      result: undefined
+      result: null
     });
   }
 
   public changeAlgorithm(args: { name: string }) {
     this.clear();
-    this.algorithm = algorithms.get(args.name)();
+    this.algorithm = newAlgorithm(args.name);
   }
 
   public start(args: { graph: Graph; para: any[] }) {
@@ -77,7 +82,8 @@ class ParameterManager {
   public parseError: string[];
   public state: ParameterState;
 
-  constructor(private graph: Graph) {}
+  constructor(private graph: Graph) {
+  }
 
   clear() {
     Object.assign(this, {
@@ -90,7 +96,7 @@ class ParameterManager {
 
   public changeAlgorithm(args: { name: string }) {
     this.clear();
-    this.descriptors = algorithms.get(args.name)().parameters();
+    this.descriptors = newAlgorithm(args.name).parameters();
     for (let i = 0; i < this.descriptors.length; i++) {
       this.changeText({ index: i, text: "" });
     }
@@ -125,8 +131,8 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     newState[action.type](action);
     return newState;
   };
-  const [runner, runnerDispatch] = useReducer<Reducer<AlgorithmRunner, any>>(reducer, new AlgorithmRunner());
-  const [para, paraDispatch] = useReducer<Reducer<ParameterManager, any>>(reducer, new ParameterManager(props.graph));
+  const [runner, runnerDispatch] = useReducer<Reducer<AlgorithmRunner, any>>(reducer, new AlgorithmRunner(props.setDisplayedGraph));
+  const [para, paraDispatch] = useReducer<Reducer<ParameterManager, any>>(reducer, new ParameterManager(props.dataGraph));
   const { state: runnerState, steps, algorithm, stepGen, currentStep, stepCount, result } = runner;
   const { parseResult, descriptors, inputTexts, parseError, state: parameterState } = para;
   const [auto, setAuto] = useState(false);
@@ -134,34 +140,51 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
 
   // Clear states when graph changes
   useEffect(() => {
-    paraDispatch({ type: "setGraph", graph: props.graph });
+    paraDispatch({ type: "setGraph", graph: props.dataGraph });
     runnerDispatch({ type: "clear" });
-  }, [props.graph]);
+  }, [props.dataGraph]);
 
   // Utility functions
   const flipAuto = () => setAuto(!auto);
   const onAlgorithmChanged = (_, { value }) => {
     paraDispatch({ type: "changeAlgorithm", name: value });
     runnerDispatch({ type: "changeAlgorithm", name: value });
+    props.onAlgorithmChanged(value);
   };
   const onCodeTypeChanged = (_, { value }) => {
     setCodeType(value);
   };
   const runAlgorithm = () => {
-    // paraDispatch({ type: "parse", graph: props.graph });
     if (parameterState != "error") {
-      runnerDispatch({ type: "start", graph: props.graph, para: parseResult });
+      runnerDispatch({ type: "start", graph: props.dataGraph, para: parseResult });
     }
   };
-  const previousStep = () => runnerDispatch({ type: "previousStep" });
-  const nextStep = () => runnerDispatch({ type: "nextStep" });
+  const updateDisplayed = () => {
+    if (steps[currentStep]) {
+      props.setDisplayedGraph(steps[currentStep].graph);
+    }
+  };
+  const previousStep = () => {
+    runnerDispatch({ type: "previousStep" });
+    updateDisplayed();
+  };
+  const nextStep = () => {
+    runnerDispatch({ type: "nextStep" });
+    updateDisplayed();
+  };
 
   // UI helper
   const mapCodeLines = (outerIndexes: number[]) => (e, i) => (
     <Comment key={i}>
       {typeof e === "string" ? (
         <>
-          <Comment.Text className={runnerState != "stop" && currentStep === i ? style.currentStep : style.step}>
+          <Comment.Text
+            className={
+              runnerState != "stop" && steps[currentStep]?.codePosition?.get(codeType) === i
+                ? style.currentStep
+                : style.step
+            }
+          >
             <MarkdownContent content={e} />
           </Comment.Text>
         </>
@@ -225,15 +248,22 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
         <Grid padded>
           <Grid.Row>
             <Grid.Column width={16}>
-              {algorithm && codeType ? (
-                <Comment.Group>{codeMap[algorithm.id()][codeType].map(mapCodeLines([]))}</Comment.Group>
-              ) : (
-                <Placeholder>
-                  {Array.from({ length: 7 }, (_, i) => (
-                    <Placeholder.Line key={i} />
-                  ))}
-                </Placeholder>
-              )}
+              <Card fluid>
+                <Card.Content>
+                  <Card.Header>Steps</Card.Header>
+                </Card.Content>
+                <Card.Content>
+                  {algorithm && codeType ? (
+                    <Comment.Group>{codeMap[algorithm.id()][codeType].map(mapCodeLines([]))}</Comment.Group>
+                  ) : (
+                    <Placeholder fluid>
+                      {Array.from({ length: 7 }, (_, i) => (
+                        <Placeholder.Line key={i} />
+                      ))}
+                    </Placeholder>
+                  )}
+                </Card.Content>
+              </Card>
             </Grid.Column>
           </Grid.Row>
           {parameterInputs()}
@@ -264,10 +294,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
                 options={
                   algorithm
                     ? Object.keys(codeMap[algorithm.id()]).map(key => ({
-                        key,
-                        text: _(`.algo.code_type.${key}`),
-                        value: key
-                      }))
+                      key,
+                      text: _(`.algo.code_type.${key}`),
+                      value: key
+                    }))
                     : []
                 }
                 onChange={onCodeTypeChanged}
@@ -293,4 +323,4 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   );
 };
 
-export default AlgorithmControl;
+export default React.memo(AlgorithmControl);
