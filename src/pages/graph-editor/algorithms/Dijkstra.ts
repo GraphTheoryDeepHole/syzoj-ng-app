@@ -2,9 +2,20 @@ import { GraphAlgorithm, ParameterDescriptor } from "../GraphAlgorithm";
 import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
+type NodeState = "relaxing" | "updating" | "updated" | "relaxed" | string;
+const stateColorMap: Map<NodeState, string> = new Map(
+  [
+    ["relaxing", "#fae52d"],
+    ["updating", "#59ffff"],
+    ["updated", "#107eff"],
+    ["relaxed", "#ff0000"]
+  ]
+);
+
 class Dijkstra extends GraphAlgorithm {
+
   nodeRenderPatcher(): Partial<NodeRenderHint> {
-    return { fillingColor: node => (node.datum.visited ? "#ff0000" : undefined) };
+    return { fillingColor: node => stateColorMap.get(node.datum.state) };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
@@ -29,33 +40,52 @@ class Dijkstra extends GraphAlgorithm {
     ];
   }
 
-  *run(graph: Graph, startPoint: number) {
-    let mat = AdjacencyMatrix.from(graph, true).mat;
+  * run(graph: Graph, startPoint: number) {
+    let mat = AdjacencyMatrix.from(graph, true).mat.map(
+      line => line.map(
+        datum => datum ? (datum.weight || 1) : 0
+      )
+    );
+    const getState = (id: number) => graph.nodes()[id].datum.state as NodeState;
+    const setState = (id: number, state: NodeState = "") => graph.nodes()[id].datum.state = state;
+    const getDist = (id: number) => graph.nodes()[id].datum.dist as number;
+    const setDist = (id: number, dist: number = 0) => graph.nodes()[id].datum.dist = dist;
+
     graph.nodes().forEach(n => {
-      n.datum.visited = false;
+      n.datum.state = ("" as NodeState);
       n.datum.dist = Infinity;
     });
-    graph.nodes()[startPoint].datum.dist = 0;
-
-    yield { graph };
+    setDist(startPoint);
 
     for (let i = 0; i < graph.nodes().length; i++) {
       let minDist = Infinity;
       let point = 0;
       for (let j = 0; j < graph.nodes().length; j++) {
-        if (graph.nodes()[j].datum.visited == false && graph.nodes()[j].datum.dist < minDist) {
+        if (getState(j) != "relaxed" && getDist(j) < minDist) {
           point = j;
-          minDist = graph.nodes()[j].datum.dist;
+          minDist = getDist(j);
         }
       }
+      setState(point, "relaxing");
+      yield { graph };
 
-      graph.nodes()[point].datum.visited = true;
       for (let j = 0; j < graph.nodes().length; j++) {
-        if (graph.nodes()[point].datum.dist + mat[point][j] < graph.nodes()[j].datum.dist) {
-          graph.nodes()[j].datum.dist = graph.nodes()[point].datum.dist + mat[point][j];
+        if (mat[point][j]) {
+          setState(j, "updating");
+          yield { graph };
+          if (getDist(point) + mat[point][j] < getDist(j)) {
+            setDist(j, getDist(point) + mat[point][j]);
+            setState(j, "updated");
+          } else {
+            setState(j);
+          }
+          yield { graph };
         }
       }
 
+      for (let j = 0; j < graph.nodes().length; j++) {
+        setState(j, (j == point || getState(j) == "relaxed") ? "relaxed" : "");
+      }
       yield { graph };
     }
   }
