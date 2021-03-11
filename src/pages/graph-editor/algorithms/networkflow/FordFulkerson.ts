@@ -1,6 +1,7 @@
 import { GraphAlgorithm, Step, ParameterDescriptor, parseRangedInt } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { NetworkFlowBase, _Edge } from "./Common";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class FordFulkerson extends GraphAlgorithm {
   // constructor() {
@@ -24,11 +25,24 @@ class FordFulkerson extends GraphAlgorithm {
     ];
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {};
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      color: edge => (edge.datum.mark === 1 ? "#ff0000" : edge.datum.mark === -1 ? "#00ff00" : undefined),
+      floatingData: edge => `(${edge.datum.flow},${edge.datum.used})`
+    };
+  }
+
   private E: NetworkFlowBase;
   private V: Node[] = [];
   private n: number = 0;
   private S: number;
   private T: number;
+  private maxflow: number = 0;
 
   private visit: boolean[] = [];
 
@@ -39,7 +53,8 @@ class FordFulkerson extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: new EdgeList(this.n, this.E.edges()),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [["$maxflow$", "number", this.maxflow]]
     };
   }
 
@@ -70,63 +85,19 @@ class FordFulkerson extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    let flow = 0,
-      delta = 0;
+    let delta = 0;
+    this.maxflow = 0;
     yield this.getStep(15); // inited
     do {
       this.clear(this.visit, false);
       delta = yield* this.dfs(this.S, Infinity);
-      flow += delta;
+      this.maxflow += delta;
       yield this.getStep(19); // augmented
     } while (delta > 0);
     //console.log(`algo FordFulkerson : {flow: ${flow}}`);
     yield this.getStep(21); // return
-    return { flow };
+    return { flow: this.maxflow };
   }
 }
 
 export { FordFulkerson };
-
-/*
-Reference:
-
-int n,m,s,t;
-int h[205],fr[10005],to[10005],w[10005],cnt=1;//边表，w是容量
-void add(int u,int v,int val){
-	fr[++cnt]=h[u];
-	h[u]=cnt;
-	to[cnt]=v;
-	w[cnt]=val;
-}
-int vis[10005];//表示每个点是否被标过号了
-int dfs(int x,int delta)//x表示现在标到哪个点了，delta表示现在找到的s到x的容量 (即x将获得的标号)
-{
-	if(vis[x])return 0;//若被标过号了则不需重新标号
-	vis[x]=1;//x现在会被标号
-	if(x==t) return delta;//如果标到了t则开始增流
-	for(int i=h[x];i;i=fr[i])//如果x不是t，则寻找下一个可以标号的点
-	{
-		if(w[i])//只有w[i]>0才能通过这条边标号(因为经过上面介绍过的转化思路我们把“向后边容量>0”这一条件转化为了反向边的容量)
-		{
-			int flow=dfs(to[i],min(delta,w[i]));//给to[i]标号
-			if(flow>0)//说明找到了增流路径
-			{
-				w[i]-=flow;
-				w[i^1]+=flow;//按我们的转化思路修正边的容量
-				return flow;
-			}
-		}
-	}
-	return 0;//没有找到增流路径
-}
-int FF()
-{
-	int ans=0,delta=0;
-	do{
-		for(int i=1;i<=n;i++)vis[i]=0;//恢复到每个点都没被标号的状态
-		delta=dfs(s,inf);//标号并增流，delta代表找到的增流路径增加了多少流量
-		ans+=delta;
-	}while(delta);//如果找不到增流路径就会退出
-	return ans;
-}
- */

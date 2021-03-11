@@ -2,6 +2,7 @@ import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../..
 import { EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge } from "./Common";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class EdmondsKarp extends GraphAlgorithm {
   // constructor() {
@@ -25,6 +26,18 @@ class EdmondsKarp extends GraphAlgorithm {
     ];
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {};
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      color: edge => (edge.datum.mark === 1 ? "#ff0000" : edge.datum.mark === -1 ? "#00ff00" : undefined),
+      floatingData: edge => `(${edge.datum.flow},${edge.datum.used})`
+    };
+  }
+
   private que: Queue<number> = new Queue<number>();
 
   private E: NetworkFlowBase;
@@ -32,6 +45,7 @@ class EdmondsKarp extends GraphAlgorithm {
   private n: number = 0;
   private S: number;
   private T: number;
+  private maxflow: number = 0;
 
   private pre: number[] = [];
   private eid: number[] = [];
@@ -44,7 +58,8 @@ class EdmondsKarp extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: new EdgeList(this.n, this.E.edges()),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [["$maxflow$", "number", this.maxflow]]
     };
   }
 
@@ -93,78 +108,19 @@ class EdmondsKarp extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    let flow = 0,
-      delta = 0;
+    let delta = 0;
+    this.maxflow = 0;
     yield this.getStep(19); // inited
     while (this.bfs()) {
       yield this.getStep(20); // found augmenting path
       delta = this.flip();
-      flow += delta;
+      this.maxflow += delta;
       yield this.getStep(23); // augmented
     }
     //console.log(`algo EdmondsKarp : {flow: ${flow}}`);
     yield this.getStep(24); // return
-    return { flow };
+    return { flow: this.maxflow };
   }
 }
 
 export { EdmondsKarp };
-
-/*
-Reference:
-
-int n,m,s,t;
-int h[205],fr[10005],to[10005],w[10005],cnt=1;
-void add(int u,int v,int val)
-{
-	fr[++cnt]=h[u];
-	h[u]=cnt;
-	to[cnt]=v;
-	w[cnt]=val;
-}
-int lst[205],edg[205],f[205];//分别表示每个点由哪个点、哪条边得到标号，以及流量
-bool bfs()
-{
-	queue<int>q;
-	memset(lst,0,sizeof(lst));
-	f[s]=inf;
-	q.push(s);
-	while(!q.empty())//寻找最短增流路径
-	{
-		int x=q.front();q.pop();
-		if(x==t)return 1;//可以找到到达t的增流路径，且为最短
-		for(int i=h[x];i;i=fr[i])
-		{
-			if(w[i]&&(!lst[to[i]]))
-			{
-				q.push(to[i]);
-				lst[to[i]]=x;
-				edg[to[i]]=i;
-				f[to[i]]=min(f[x],w[i]);
-			}
-		}
-	}
-	return 0;
-}
-int flow()
-{
-	int x=t;
-	while(x!=s)
-	{
-		int e=edg[x];
-		w[e]-=f[t];
-		w[e^1]+=f[t];
-		x=lst[x];//增流过程，由之前所说直接修改流量
-	}
-	return f[t];
-}
-int EK()
-{
-	int ans=0;
-	while(bfs())
-	{
-		ans+=flow();
-	}
-	return ans;
-}
- */
