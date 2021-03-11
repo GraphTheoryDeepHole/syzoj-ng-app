@@ -1,12 +1,24 @@
-import { GraphAlgorithm } from "../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class Kruskal extends GraphAlgorithm {
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {};
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      color: edge => (edge.datum.chosen == 0 ? "#ff0000" : (edge.datum.chosen == 1 ? "#00ff00" : "#0000ff")),
+      floatingData: edge => (edge.datum.dist)
+    };
+  }
+
   id() {
     return "Kruskal";
   }
 
-  requiredParameter(): string[] {
+  parameters(): ParameterDescriptor[] {
     return [];
   }
 
@@ -20,7 +32,7 @@ class Kruskal extends GraphAlgorithm {
     return this.father[node];
   }
 
-  *run(graph: Graph) {
+  *run(graph: Graph): Generator<Step> {
     let edges = [];
     let counter = 0;
     Object.assign(edges, AdjacencyMatrix.from(graph, false).edges());
@@ -50,7 +62,10 @@ class Kruskal extends GraphAlgorithm {
         }
       }
 
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 1]])
+      };
 
       this.father[edges[i].source] = this.getFather(edges[i].source);
       this.father[edges[i].target] = this.getFather(edges[i].target);
@@ -70,7 +85,10 @@ class Kruskal extends GraphAlgorithm {
         }
       }
 
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
+      };
 
       if (counter == graph.nodes().length - 1) {
         break;

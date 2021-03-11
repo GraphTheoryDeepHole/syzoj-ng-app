@@ -441,9 +441,9 @@ module.exports = {
   },
   dijkstra: {
     pseudo: [
-      "令$\\bar{S}=\\{2,3,\\cdots ,n\\}, \\pi (1)=0, \\pi (i)=\\left\\{\\begin{array}{ll} w_i, i \\in \\Gamma^+_1 \\\\ \\infty, \\text{otherwise} \\\\ \\end{array} \\right.$",
-      "在$\\bar{S}$中，令$\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，置$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$。若$\\bar{S}=\\Phi$，结束，否则转步骤3。",
-      "对全部的$i\\in \\bar{S}\\cap\\Gamma^+_j$，置$\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$，转步骤2。"
+      "Let $\\bar{S}=\\{2,3,\\cdots ,n\\}, \\pi (1)=0, \\pi (i)=\\left\\{\\begin{array}{ll} w_i, i \\in \\Gamma^+_1 \\\\ \\infty, \\text{otherwise} \\\\ \\end{array} \\right.$",
+      "In $\\bar{S}$，let $\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$. If $\\bar{S}=\\Phi$, end, otherwise, go to step 3.",
+      "For all $i\\in \\bar{S}\\cap\\Gamma^+_j$, $\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$, go to step 2."
     ]
   },
   dfsfindpath: {

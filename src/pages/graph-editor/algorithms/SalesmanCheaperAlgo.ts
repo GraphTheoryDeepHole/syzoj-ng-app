@@ -1,37 +1,49 @@
-import { GraphAlgorithm, Step } from "../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
-class SalesmanStep extends Step {
-  constructor(public readonly graph: Graph, public readonly answer: number) {
-    super(graph);
-  }
-}
-
 class SalesmanCheaperAlgo extends GraphAlgorithm {
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      fillingColor: node => (node.datum.chosen ? "#ff0000" : undefined),
+      floatingData: node => (node.id == 0 ? node.datum.answer : "")
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      color: edge => (edge.datum.chosen ? "#00ff00" : undefined),
+      floatingData: edge => (edge.datum.dist)
+    };
+  }
+
   id() {
     return "SalesmanCheaperAlgorithm";
   }
 
-  requiredParameter(): string[] {
+  parameters(): ParameterDescriptor[] {
     return [];
   }
 
-  *salesmanCheaperAlgo(graph: Graph): Generator<SalesmanStep> {
+  *salesmanCheaperAlgo(graph: Graph): Generator<Step> {
     let nodes = [];
     let mat = AdjacencyMatrix.from(graph, true).mat;
-    let answer = 0;
 
     for (let i = 0; i < graph.nodes().length; i++) {
       mat[i][i] = 0;
       nodes[i] = i;
       graph.nodes()[i].datum = { chosen: 0 };
     }
+    graph.nodes()[0].datum.answer = 0;
 
     for (let i = 0; i < graph.edges().length; i++) {
       graph.edges()[i].datum = { dist: graph.edges()[i].datum, chosen: 0 };
     }
 
-    yield new SalesmanStep(graph, answer);
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     //共进行n-1次操作
     for (let i = 0; i < graph.nodes().length - 1; i++) {
@@ -63,7 +75,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
           nodes[j] = nodes[j - 1];
         }
         nodes[minj] = tmp;
-        answer += mat[preNode][insNode] + mat[insNode][curNode] - mat[preNode][curNode];
+        graph.nodes()[0].datum.answer += mat[preNode][insNode] + mat[insNode][curNode] - mat[preNode][curNode];
         for (let edge of graph.edges()) {
           if (
             (edge.source == preNode && edge.target == insNode) ||
@@ -80,7 +92,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
           nodes[j] = nodes[j - 1];
         }
         nodes[minj + 1] = tmp;
-        answer += mat[postNode][insNode] + mat[insNode][curNode] - mat[postNode][curNode];
+        graph.nodes()[0].datum.answer += mat[postNode][insNode] + mat[insNode][curNode] - mat[postNode][curNode];
         for (let edge of graph.edges()) {
           if (
             (edge.source == curNode && edge.target == insNode) ||
@@ -93,7 +105,10 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
           }
         }
       }
-      yield new SalesmanStep(graph, answer);
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
+      };
     }
   }
 
@@ -102,4 +117,4 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
   }
 }
 
-export { SalesmanStep, SalesmanCheaperAlgo };
+export { SalesmanCheaperAlgo };
