@@ -29,7 +29,7 @@ let MatrixInputComponent: React.FC<MatrixInputProps> = props => {
         setError(undefined);
       }
     ]);
-  const onTextAreaChange = (value) => setContent(String(value));
+  const onTextAreaChange = value => setContent(String(value));
   const onFormSubmit = () => {
     const parseIntWithThrow = v => {
       let n = parseInt(v);

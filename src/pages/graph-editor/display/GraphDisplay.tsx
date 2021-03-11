@@ -44,8 +44,7 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
   }, [dataGraph]);
 
   useEffect(() => {
-    if (displayedGraph)
-      dispatch({ type: "updateGraph", graph: displayedGraph, newGraph: false });
+    if (displayedGraph) dispatch({ type: "updateGraph", graph: displayedGraph, newGraph: false });
   }, [displayedGraph]);
 
   useEffect(() => {

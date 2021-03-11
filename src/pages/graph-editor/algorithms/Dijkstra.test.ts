@@ -9,11 +9,7 @@ test("Dijkstra", () => {
     [0, 0, 0, 0, 0, 0],
     [0, 3, 0, 5, 0, 0],
     [0, 0, 0, 0, 3, 0]
-  ].map(
-    line => line.map(
-      weight => weight == 0 ? undefined : ({ weight: weight })
-    )
-  );
+  ].map(line => line.map(weight => (weight == 0 ? undefined : { weight: weight })));
   let graph = new AdjacencyMatrix(mat, true);
   let res: number[][] = [];
   for (let step of new Dijkstra().run(graph, 0)) {

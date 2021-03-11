@@ -139,8 +139,12 @@ class CanvasGraphRenderer {
             this.hint[prop][childProp] = defaultRenderHints[prop][childProp];
           } else {
             if (typeof this.hint[prop][childProp] == "function") {
-              const functionWithDefault = (newFunc, defaultFunc) => (...args) => newFunc(...args) || defaultFunc(...args);
-              this.hint[prop][childProp] = functionWithDefault(patcher[prop][childProp], defaultRenderHints[prop][childProp]);
+              const functionWithDefault = (newFunc, defaultFunc) => (...args) =>
+                newFunc(...args) || defaultFunc(...args);
+              this.hint[prop][childProp] = functionWithDefault(
+                patcher[prop][childProp],
+                defaultRenderHints[prop][childProp]
+              );
             } else {
               this.hint[prop][childProp] = patcher[prop][childProp];
             }

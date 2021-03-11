@@ -3,17 +3,14 @@ import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 type NodeState = "relaxing" | "updating" | "updated" | "relaxed" | string;
-const stateColorMap: Map<NodeState, string> = new Map(
-  [
-    ["relaxing", "#fae52d"],
-    ["updating", "#59ffff"],
-    ["updated", "#107eff"],
-    ["relaxed", "#ff0000"]
-  ]
-);
+const stateColorMap: Map<NodeState, string> = new Map([
+  ["relaxing", "#fae52d"],
+  ["updating", "#59ffff"],
+  ["updated", "#107eff"],
+  ["relaxed", "#ff0000"]
+]);
 
 class Dijkstra extends GraphAlgorithm {
-
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return { fillingColor: node => stateColorMap.get(node.datum.state) };
   }
@@ -40,19 +37,15 @@ class Dijkstra extends GraphAlgorithm {
     ];
   }
 
-  * run(graph: Graph, startPoint: number) {
-    let mat = AdjacencyMatrix.from(graph, true).mat.map(
-      line => line.map(
-        datum => datum ? (datum.weight || 1) : 0
-      )
-    );
+  *run(graph: Graph, startPoint: number) {
+    let mat = AdjacencyMatrix.from(graph, true).mat.map(line => line.map(datum => (datum ? datum.weight || 1 : 0)));
     const getState = (id: number) => graph.nodes()[id].datum.state as NodeState;
-    const setState = (id: number, state: NodeState = "") => graph.nodes()[id].datum.state = state;
+    const setState = (id: number, state: NodeState = "") => (graph.nodes()[id].datum.state = state);
     const getDist = (id: number) => graph.nodes()[id].datum.dist as number;
-    const setDist = (id: number, dist: number = 0) => graph.nodes()[id].datum.dist = dist;
+    const setDist = (id: number, dist: number = 0) => (graph.nodes()[id].datum.dist = dist);
 
     graph.nodes().forEach(n => {
-      n.datum.state = ("" as NodeState);
+      n.datum.state = "" as NodeState;
       n.datum.dist = Infinity;
     });
     setDist(startPoint);
@@ -84,7 +77,7 @@ class Dijkstra extends GraphAlgorithm {
       }
 
       for (let j = 0; j < graph.nodes().length; j++) {
-        setState(j, (j == point || getState(j) == "relaxed") ? "relaxed" : "");
+        setState(j, j == point || getState(j) == "relaxed" ? "relaxed" : "");
       }
       yield { graph };
     }
