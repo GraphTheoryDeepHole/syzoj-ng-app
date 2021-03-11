@@ -1,6 +1,7 @@
 import { Queue } from "../../utils/DataStructure";
-import { GraphAlgorithm, ParameterDescriptor, Step } from "../../GraphAlgorithm";
+import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { BipartiteMatrix, Node, Edge, Graph, NodeEdgeList } from "../../GraphStructure";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class KuhnMunkres extends GraphAlgorithm {
   // constructor() {
@@ -9,6 +10,30 @@ class KuhnMunkres extends GraphAlgorithm {
 
   id() {
     return "mwbm_km";
+  }
+
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      borderColor: node => (node.datum.side === "left" ? undefined : node.datum.label === 1 ? "#77ff77" : "#7777ff"),
+      fillingColor: node => (node.datum.in ? "#cccccc" : "#ffffff"),
+      floatingData: node => {
+        if (node.datum.side === "left") return `L${node.id}`;
+        return `R${node.id}`;
+      }
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      floatingData: edge => edge.datum.weight,
+      thickness: edge => (edge.datum.valid ? 5 : undefined),
+      color: edge => {
+        if (!edge.datum.valid) return "#cccccc";
+        if (edge.datum.matched) return "#000000";
+        if (edge.datum.marked) return "#ff0000";
+        return undefined;
+      }
+    };
   }
 
   private que: Queue<number> = new Queue<number>();
@@ -31,6 +56,12 @@ class KuhnMunkres extends GraphAlgorithm {
 
   clear(buf: any[], val: any = -1, cnt: number = this.n) {
     for (let _ = 0; _ < cnt; ++_) buf[_] = val;
+  }
+
+  totweight(): number {
+    let res: number = 0;
+    for (let i = 0; i < this.n; ++i) res += this.lx[i] + this.ly[i];
+    return res;
   }
 
   addToS(x: number) {
@@ -95,7 +126,11 @@ class KuhnMunkres extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: this.report(),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [
+        ["$weight$", "number", this.totweight()],
+        ["$label$", "array", this.lx.concat(this.ly)]
+      ]
     };
   }
 
@@ -174,11 +209,10 @@ class KuhnMunkres extends GraphAlgorithm {
       }
       yield this.getStep(19); // augmented
     }
-    let res = 0;
-    for (let i = 0; i < this.n; ++i) res += this.lx[i] + this.ly[i];
+
     //console.log(`algo KuhnMunkres : {weight: ${res}}`);
     yield this.getStep(21); // return
-    return { weight: res };
+    return { weight: this.totweight() };
   }
 }
 

@@ -1,6 +1,7 @@
 import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { AdjacencyList, hasMultipleEdges, hasSelfLoop, Edge, Graph, Node, NodeEdgeList } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class Gabow extends GraphAlgorithm {
   // constructor() {
@@ -11,10 +12,29 @@ class Gabow extends GraphAlgorithm {
     return "mm_gabow";
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      borderColor: node => (node.datum.label === 0 ? undefined : node.datum.label === 1 ? "#33ff33" : "#3333ff"),
+      fillingColor: node => (node.datum.label === 0 ? "#cccccc" : "#ffffff")
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.matched || edge.datum.marked ? 5 : undefined),
+      color: edge => {
+        if (edge.datum.matched) return "#000000";
+        if (edge.datum.marked) return "#ff0000";
+        return undefined;
+      }
+    };
+  }
+
   private n: number = 0;
   private nodes: Node[] = [];
   private edges: Edge[] = [];
   private adjlist: AdjacencyList;
+  private matched: number = 0;
 
   private mark: number[] = [];
   private match: number[] = [];
@@ -89,7 +109,11 @@ class Gabow extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: this.report(),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [
+        ["$matched$", "number", this.matched],
+        ["$first$", "array", this.first]
+      ]
     };
   }
 
@@ -178,13 +202,13 @@ class Gabow extends GraphAlgorithm {
     this.adjlist = AdjacencyList.from(graph, false);
     if (hasMultipleEdges(this.adjlist)) throw new Error("algo Gabow : mutiple edges");
     (this.edges = graph.edges()), (this.nodes = graph.nodes()), (this.n = this.nodes.length);
-    let res = 0;
+    this.matched = 0;
     yield this.getStep(23); // inited
     this.clear(this.match), this.clear(this.mark);
-    for (let i = 0; i < this.n; ++i) if (this.match[i] === -1 && (yield* this.check(i))) ++res;
+    for (let i = 0; i < this.n; ++i) if (this.match[i] === -1 && (yield* this.check(i))) ++this.matched;
     //console.log(`algo Gabow : {matched: ${res}}`);
     yield this.getStep(28); // return
-    return { matched: res };
+    return { matched: this.matched };
   }
 }
 
