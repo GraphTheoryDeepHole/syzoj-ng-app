@@ -2,6 +2,7 @@ import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../..
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge } from "./Common";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class MinCostFlow extends GraphAlgorithm {
   // constructor() {
@@ -36,6 +37,25 @@ class MinCostFlow extends GraphAlgorithm {
     ];
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      borderColor: node => (node.datum.dist !== Infinity ? "#cccccc" : undefined),
+      fillingColor: node => (node.datum.dist !== Infinity ? "#eeeeee" : undefined)
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      color: edge => {
+        if (edge.datum.mark) return edge.datum.mark === 1 ? "#ff0000" : "#00ff00";
+        if (edge.datum.valid) return "#ffaaaa";
+        return "#cccccc";
+      },
+      floatingData: edge => `(${edge.datum.flow},${edge.datum.used}),${edge.datum.cost}`
+    };
+  }
+
   private que: Queue<number> = new Queue<number>();
 
   private E: NetworkFlowBase;
@@ -43,6 +63,8 @@ class MinCostFlow extends GraphAlgorithm {
   private n: number = 0;
   private S: number;
   private T: number;
+  private maxflow: number = 0;
+  private mincost: number = 0;
 
   private dis: number[] = [];
   private pre: number[] = [];
@@ -74,7 +96,12 @@ class MinCostFlow extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: this.report(),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [
+        ["$maxflow$", "number", this.maxflow],
+        ["$mincost$", "number", this.mincost],
+        ["$dist$", "array", this.dis]
+      ]
     };
   }
 
@@ -115,8 +142,7 @@ class MinCostFlow extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    let flow = 0,
-      cost = 0;
+    (this.maxflow = 0), (this.mincost = 0);
     yield this.getStep(21); // inited
     while (limit > 0 && this.spfa()) {
       let delta = limit;
@@ -128,8 +154,8 @@ class MinCostFlow extends GraphAlgorithm {
       }
       yield this.getStep(22); // found augmenting path
       limit -= delta;
-      flow += delta;
-      cost += delta * this.dis[this.T];
+      this.maxflow += delta;
+      this.mincost += delta * this.dis[this.T];
       for (let pos = this.T; pos !== this.S; pos = this.pre[pos]) {
         this.E.edge[this.eid[pos]].flow -= delta;
         this.E.edge[this.eid[pos] ^ 1].flow += delta;
@@ -138,69 +164,8 @@ class MinCostFlow extends GraphAlgorithm {
     }
     //console.log(`algo MinCostFlow : {flow: ${flow}, cost: ${cost}`);
     yield this.getStep(27); // return
-    return { flow, cost };
+    return { flow: this.maxflow, cost: this.mincost };
   }
 }
 
 export { MinCostFlow };
-
-/*
-Reference:
-
-int n,m,s,t;
-int cnt=1,h[5005],fr[100005],to[100005],f[100005],w[100005];
-void add(int a,int b,int c,int d) {
-    fr[++cnt]=h[a];
-    h[a]=cnt;
-    to[cnt]=b;
-    f[cnt]=c;
-    w[cnt]=d;
-}
-int dis[5005],vis[5005],pre[5005],prn[5005];//分别表示spfa中当前每个点的距离标号，是否在队列中，每个点从哪条边、哪个点得到标号
-bool spfa() {
-    memset(dis,0x3f,sizeof(dis));
-    memset(pre,0,sizeof(pre));
-    memset(prn,0,sizeof(prn));
-    dis[s]=0;
-    queue<int>q;
-    q.push(s);
-    //spfa求最短路
-    while(!q.empty()) {
-        int x=q.top(),v=dis[x];q.pop();vis[x]=0;
-        for(int i=h[x];i;i=fr[i]) {
-            if(f[i]>0&&dis[to[i]]>v+w[i]) {
-                dis[to[i]]=v+w[i];
-                pre[to[i]]=i;
-                prn[to[i]]=x;
-                if(!vis[to[i]]) {
-                	vis[to[i]]=1;
-                	q.push(to[i]);
-                }
-            }
-        }
-    }
-    return dis[t]!=dis[5004];
-}
-void mfmc() {
-    int flow=0,ans=0;//最大流和费用
-    while(spfa()) {
-        int x=t,res=2e9;
-        while(x!=s) {
-            int i=pre[x];
-            res=min(res,f[i]);
-            x=prn[x];
-        }//找出最短路的流量
-        if(res==0)break;
-        flow+=res;
-        ans+=res*dis[t];
-        x=t;
-        while(x!=s) {
-            int i=pre[x];
-            f[i]-=res;
-            f[i^1]+=res;
-            x=prn[x];
-        }//修改路径的容量
-    }
-    printf("%d %d",flow,ans);
-}
-*/
