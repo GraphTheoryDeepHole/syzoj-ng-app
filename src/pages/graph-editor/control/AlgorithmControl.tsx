@@ -87,22 +87,23 @@ class ParameterManager {
     Object.assign(this, {
       parseResult: [],
       inputTexts: [],
-      parseError: [],
-      parameterState: "ok"
+      parseError: []
     });
-  }
-
-  public changeAlgorithm(args: { name: string }) {
-    this.clear();
-    this.descriptors = newAlgorithm(args.name).parameters();
-    for (let i = 0; i < this.descriptors.length; i++) {
-      this.changeText({ index: i, text: "" });
+    if (this.descriptors) {
+      for (let i = 0; i < this.descriptors.length; i++) {
+        this.changeText({ index: i, text: "" });
+      }
     }
   }
 
-  public setGraph(args: { graph: Graph }) {
+  public changeAlgorithm(args: { name: string }) {
+    this.descriptors = newAlgorithm(args.name).parameters();
     this.clear();
+  }
+
+  public setGraph(args: { graph: Graph }) {
     this.graph = args.graph;
+    this.clear();
   }
 
   public changeText(args: { index: number; text: string }) {
@@ -219,6 +220,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
                       key={name}
                       label={_(`.algo.${algorithm.id()}.para.${name}`)}
                       error={parseError[i] ? _(parseError[i]) : null}
+                      value={inputTexts[i]}
                       onChange={onChange(i)}
                     />
                   ))}
