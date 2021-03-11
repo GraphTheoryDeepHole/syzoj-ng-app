@@ -13,7 +13,7 @@ class SalesmanPath extends GraphAlgorithm {
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
       color: edge => (edge.datum.chosen ? "#00ff00" : undefined),
-      floatingData: edge => (edge.datum.dist)
+      floatingData: edge => edge.datum.dist
     };
   }
 

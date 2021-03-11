@@ -12,8 +12,8 @@ class Dijkstra extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge =>(edge.datum.visited ? "#00ff00" : undefined),
-      floatingData: edge => (edge.datum.dist)
+      color: edge => (edge.datum.visited ? "#00ff00" : undefined),
+      floatingData: edge => edge.datum.dist
     };
   }
 
@@ -44,7 +44,7 @@ class Dijkstra extends GraphAlgorithm {
     graph.edges().forEach(e => {
       e.datum.dist = e.datum;
       e.datum.visited = false;
-    })
+    });
     graph.nodes()[startPoint].datum.dist = 0;
 
     yield {

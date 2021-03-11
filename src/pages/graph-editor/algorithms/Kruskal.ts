@@ -9,8 +9,8 @@ class Kruskal extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.chosen == 0 ? "#ff0000" : (edge.datum.chosen == 1 ? "#00ff00" : "#0000ff")),
-      floatingData: edge => (edge.datum.dist)
+      color: edge => (edge.datum.chosen == 0 ? "#ff0000" : edge.datum.chosen == 1 ? "#00ff00" : "#0000ff"),
+      floatingData: edge => edge.datum.dist
     };
   }
 

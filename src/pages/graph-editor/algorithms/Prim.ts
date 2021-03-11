@@ -10,7 +10,7 @@ class Prim extends GraphAlgorithm {
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
       color: edge => (edge.datum.chosen ? "#00ff00" : "#0000ff"),
-      floatingData: edge => (edge.datum.dist)
+      floatingData: edge => edge.datum.dist
     };
   }
 

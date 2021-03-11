@@ -6,14 +6,14 @@ class CriticalPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: node => (node.datum.visited ? "#ff0000" : undefined),
-      floatingData: node => (node.datum.visited ? "Topo: " + node.datum.topoSequence +  "Dist: " + node.datum.dist: "")
+      floatingData: node => (node.datum.visited ? "Topo: " + node.datum.topoSequence + "Dist: " + node.datum.dist : "")
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
       color: edge => (edge.datum.visited ? "#00ff00" : undefined),
-      floatingData: edge => (edge.datum.dist)
+      floatingData: edge => edge.datum.dist
     };
   }
 
@@ -51,7 +51,7 @@ class CriticalPath extends GraphAlgorithm {
           yield {
             graph: graph,
             codePosition: new Map<string, number>([["pseudo", 1]])
-          };;
+          };
 
           for (let j = 0; j < graph.nodes().length; j++) {
             if (mat[i][j] != undefined) {
@@ -67,7 +67,7 @@ class CriticalPath extends GraphAlgorithm {
           yield {
             graph: graph,
             codePosition: new Map<string, number>([["pseudo", 2]])
-          };;
+          };
         }
       }
     }

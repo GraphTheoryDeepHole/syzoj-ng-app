@@ -34,7 +34,7 @@ class Ford extends GraphAlgorithm {
 
   *run(graph: Graph, startPoint: number): Generator<Step> {
     let mat = AdjacencyMatrix.from(graph, true).mat;
-    graph.nodes().forEach(n => (n.datum.dist = Infinity, n.datum.visited = false));
+    graph.nodes().forEach(n => ((n.datum.dist = Infinity), (n.datum.visited = false)));
     graph.nodes()[startPoint].datum.dist = 0;
 
     yield {
