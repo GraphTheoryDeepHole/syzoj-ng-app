@@ -13,7 +13,7 @@ class CriticalPath extends GraphAlgorithm {
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
       color: edge => (edge.datum.visited ? "#00ff00" : undefined),
-      floatingData: edge => edge.datum.dist
+      floatingData: edge => (edge.datum.dist)
     };
   }
 
@@ -54,7 +54,7 @@ class CriticalPath extends GraphAlgorithm {
           };
 
           for (let j = 0; j < graph.nodes().length; j++) {
-            if (mat[i][j] != undefined) {
+            if (mat[i][j] != 0) {
               graph.nodes()[j].datum.degree--;
               graph.edges().forEach(edge => {
                 if (edge.source == i && edge.target == j) {
