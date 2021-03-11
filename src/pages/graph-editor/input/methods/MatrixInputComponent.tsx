@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Message } from "semantic-ui-react";
 import { useLocalizer } from "@/utils/hooks";
 import { CheckboxProps } from "semantic-ui-react/dist/commonjs/modules/Checkbox/Checkbox";
+import ReactMonacoEditor from "react-monaco-editor";
 
 interface MatrixInputProps {
   initContent: string;
@@ -28,7 +29,7 @@ let MatrixInputComponent: React.FC<MatrixInputProps> = props => {
         setError(undefined);
       }
     ]);
-  const onTextAreaChange = (_, { value }) => setContent(String(value));
+  const onTextAreaChange = (value) => setContent(String(value));
   const onFormSubmit = () => {
     const parseIntWithThrow = v => {
       let n = parseInt(v);
@@ -57,7 +58,11 @@ let MatrixInputComponent: React.FC<MatrixInputProps> = props => {
 
   return (
     <Form onSubmit={onFormSubmit} error={error !== undefined}>
-      <Form.TextArea rows={10} style={{ fontFamily: "monospace" }} value={content} onChange={onTextAreaChange} />
+      <Form.Field>
+        <label>Matrix</label>
+        <ReactMonacoEditor height={200} value={content} onChange={onTextAreaChange} />
+      </Form.Field>
+      {/*<Form.TextArea rows={10} style={{ fontFamily: "monospace" }} value={content} onChange={onTextAreaChange} />*/}
       <Form.Group inline>
         {optionStates.map(([name, option, setter]) => (
           <Form.Checkbox key={name} label={_(`.input.props.${name}`)} checked={option} onChange={setter} />
