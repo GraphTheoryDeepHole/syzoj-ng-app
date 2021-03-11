@@ -1,16 +1,38 @@
-import { GraphAlgorithm } from "../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class BfsFindPath extends GraphAlgorithm {
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      fillingColor: node => (node.datum.visited ? "#ff0000" : undefined),
+      floatingData: node => (node.datum.visited ? node.datum.dist : "")
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {};
+  }
+
   id() {
     return "BFS";
   }
 
-  requiredParameter(): string[] {
-    return ["start_point"];
+  parameters(): ParameterDescriptor[] {
+    return [
+      {
+        name: "start_point",
+        parser: (text, graph) => {
+          let x = parseInt(text);
+          if (isNaN(x)) throw new Error(".input.error.nan");
+          if (x <= 0 || x > graph.nodes().length) throw new Error(".input.error.out_of_range");
+          return x;
+        }
+      }
+    ];
   }
 
-  *run(graph: Graph, start_point: number) {
+  *run(graph: Graph, start_point: number): Generator<Step> {
     graph = AdjacencyMatrix.from(graph, true);
     graph.nodes().forEach(n => (n.datum.visited = 0));
 
@@ -18,12 +40,18 @@ class BfsFindPath extends GraphAlgorithm {
       fr = 0,
       bk = 1;
     Object.assign(graph.nodes()[start_point].datum, { visited: 1, dist: 0 });
-    yield { graph };
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
     while (fr != bk) {
       let cur_node = que[fr++],
         cur_data = graph.nodes()[cur_node].datum;
       graph.nodes()[cur_node].datum.visited = 2;
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
+      };
       for (let i = 0; i < graph.nodes().length; i++) {
         let i_data = graph.nodes()[i].datum;
         if (i_data.visited == false && (graph as AdjacencyMatrix).get(cur_node, i)) {
@@ -31,7 +59,10 @@ class BfsFindPath extends GraphAlgorithm {
           que[bk++] = i;
         }
       }
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 3]])
+      };
     }
   }
 }

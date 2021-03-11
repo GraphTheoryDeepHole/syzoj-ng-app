@@ -1,4 +1,4 @@
-import { GraphAlgorithm, ParameterDescriptor } from "../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
 import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
@@ -16,7 +16,10 @@ class Dijkstra extends GraphAlgorithm {
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
-    return {};
+    return {
+      color: edge => (edge.datum.visited ? "#00ff00" : undefined),
+      floatingData: edge => edge.datum.dist
+    };
   }
 
   id() {
@@ -73,6 +76,11 @@ class Dijkstra extends GraphAlgorithm {
             setState(j);
           }
           yield { graph };
+        }
+        for (let k = 0; k < graph.edges().length; k++) {
+          if (graph.edges()[k].source == point && graph.edges()[k].target == j) {
+            graph.edges()[k].datum.visited = true;
+          }
         }
       }
 

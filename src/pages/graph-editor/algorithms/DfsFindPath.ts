@@ -1,13 +1,35 @@
-import { GraphAlgorithm, Step } from "../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../GraphStructure";
 
 class DfsFindPath extends GraphAlgorithm {
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      fillingColor: node => (node.datum.visited ? "#ff0000" : undefined),
+      floatingData: node => (node.datum.visited ? node.datum.sequence : "")
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {};
+  }
+
   id() {
     return "DFS";
   }
 
-  requiredParameter(): string[] {
-    return ["start_point"];
+  parameters(): ParameterDescriptor[] {
+    return [
+      {
+        name: "start_point",
+        parser: (text, graph) => {
+          let x = parseInt(text);
+          if (isNaN(x)) throw new Error(".input.error.nan");
+          if (x <= 0 || x > graph.nodes().length) throw new Error(".input.error.out_of_range");
+          return x;
+        }
+      }
+    ];
   }
 
   *dfs(dfn: number, graph: AdjacencyMatrix, this_node: number): Generator<Step> {
@@ -17,7 +39,10 @@ class DfsFindPath extends GraphAlgorithm {
       }
     }
     Object.assign(graph.nodes()[this_node].datum, { visited: 2, sequence: dfn });
-    yield { graph };
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 1]])
+    };
     for (let i = 0; i < graph.mat.length; i++) {
       if (!graph.nodes()[i].datum.visited && graph.get(this_node, i)) {
         yield* this.dfs(dfn + 1, graph, i);
@@ -27,13 +52,20 @@ class DfsFindPath extends GraphAlgorithm {
           }
         }
         graph.nodes()[this_node].datum.visited = 2;
-        yield { graph };
+        yield {
+          graph: graph,
+          codePosition: new Map<string, number>([["pseudo", 2]])
+        };
       }
     }
   }
 
-  run(graph: Graph, start_point: number) {
+  *run(graph: Graph, start_point: number): Generator<Step> {
     graph.nodes().forEach(n => (n.datum.visited = 0));
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
     return this.dfs(0, AdjacencyMatrix.from(graph, true), start_point);
   }
 }

@@ -1,16 +1,28 @@
-import { GraphAlgorithm } from "../GraphAlgorithm";
-import { AdjacencyMatrix, Graph } from "../GraphStructure";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
+import { Graph } from "../GraphStructure";
 
 class Prim extends GraphAlgorithm {
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {};
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      color: edge => (edge.datum.chosen ? "#00ff00" : "#0000ff"),
+      floatingData: edge => edge.datum.dist
+    };
+  }
+
   id() {
     return "Prim";
   }
 
-  requiredParameter(): string[] {
+  parameters(): ParameterDescriptor[] {
     return [];
   }
 
-  *run(graph: Graph) {
+  *run(graph: Graph): Generator<Step> {
     //并查集初始化
     for (let i = 0; i < graph.nodes().length; i++) {
       graph.nodes()[i].datum = { visited: false };
@@ -22,7 +34,10 @@ class Prim extends GraphAlgorithm {
 
     //Prim
     graph.nodes()[0].datum.visited = true;
-    yield { graph };
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     for (let i = 0; i < graph.nodes().length - 1; i++) {
       let tarIdx = 0;
@@ -39,13 +54,19 @@ class Prim extends GraphAlgorithm {
         }
       }
 
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
+      };
 
       graph.nodes()[graph.edges()[tarIdx].source].datum.visited = true;
       graph.nodes()[graph.edges()[tarIdx].target].datum.visited = true;
       graph.edges()[tarIdx].datum.chosen = 1;
 
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 3]])
+      };
     }
   }
 }

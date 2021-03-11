@@ -1,18 +1,27 @@
-import { GraphAlgorithm, Step } from "../GraphAlgorithm";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Edge, Graph } from "../GraphStructure";
 
-class SalesmanStep extends Step {
-  constructor(public readonly graph: Graph, public readonly answer: number) {
-    super(graph);
-  }
-}
-
 class SalesmanPath extends GraphAlgorithm {
-  id() {
-    return "SalesmanProb";
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      fillingColor: node => (node.datum.chosen ? "#ff0000" : undefined),
+      floatingData: node => (node.id == 0 ? node.datum.answer : "")
+    };
   }
 
-  requiredParameter(): string[] {
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      color: edge => (edge.datum.chosen ? "#00ff00" : undefined),
+      floatingData: edge => edge.datum.dist
+    };
+  }
+
+  id() {
+    return "SalesmanProblem";
+  }
+
+  parameters(): ParameterDescriptor[] {
     return [];
   }
 
@@ -56,19 +65,21 @@ class SalesmanPath extends GraphAlgorithm {
     return 2;
   }
 
-  *salesmanProb(graph: Graph, edges: Edge[]): Generator<SalesmanStep> {
+  *salesmanProb(graph: Graph, edges: Edge[]): Generator<Step> {
     let node = 0;
     let chosenCnt = 0;
     let now = 0;
-    //界初始时为无穷
-    let boundary = Infinity;
 
     //所有边初始时均为未选中状态
     for (let i = 0; i < edges.length; i++) {
       edges[i].datum = { dist: edges[i].datum, chosen: 0 };
     }
+    graph.nodes()[0].datum.answer = Infinity;
 
-    yield new SalesmanStep(graph, boundary);
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     while (node >= 0) {
       //选择足够的边
@@ -90,14 +101,17 @@ class SalesmanPath extends GraphAlgorithm {
       });
 
       //判断选择是否合法
-      let judRes = now >= boundary ? 1 : this.judge(graph, edges);
+      let judRes = now >= graph.nodes()[0].datum.answer ? 1 : this.judge(graph, edges);
       //更新答案
       if (judRes == 2) {
-        if (now < boundary) {
-          boundary = now;
+        if (now < graph.nodes()[0].datum.answer) {
+          graph.nodes()[0].datum.answer = now;
         }
       }
-      yield new SalesmanStep(graph, boundary);
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
+      };
 
       //退栈
       if (judRes > 0 || node >= edges.length) {
@@ -110,7 +124,10 @@ class SalesmanPath extends GraphAlgorithm {
             chosenCnt--;
           }
         }
-        yield new SalesmanStep(graph, boundary);
+        yield {
+          graph: graph,
+          codePosition: new Map<string, number>([["pseudo", 3]])
+        };
       }
 
       //继续深探
@@ -144,4 +161,4 @@ class SalesmanPath extends GraphAlgorithm {
   }
 }
 
-export { SalesmanStep, SalesmanPath };
+export { SalesmanPath };
