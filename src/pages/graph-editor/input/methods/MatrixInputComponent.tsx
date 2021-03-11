@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Form, Message } from "semantic-ui-react";
 import { useLocalizer } from "@/utils/hooks";
 import { CheckboxProps } from "semantic-ui-react/dist/commonjs/modules/Checkbox/Checkbox";
-import ReactMonacoEditor from "react-monaco-editor";
+import CodeEditor from "@/components/CodeEditor";
+import "./MonacoEditorPatcher.css";
 
 interface MatrixInputProps {
   initContent: string;
@@ -60,7 +61,15 @@ let MatrixInputComponent: React.FC<MatrixInputProps> = props => {
     <Form onSubmit={onFormSubmit} error={error !== undefined}>
       <Form.Field>
         <label>Matrix</label>
-        <ReactMonacoEditor height={200} value={content} onChange={onTextAreaChange} />
+        <CodeEditor
+          language={null}
+          value={content}
+          onChange={onTextAreaChange}
+          options={{
+            minimap: { enabled: false },
+            dimension: { width: null, height: 200 }
+          }}
+        />
       </Form.Field>
       {/*<Form.TextArea rows={10} style={{ fontFamily: "monospace" }} value={content} onChange={onTextAreaChange} />*/}
       <Form.Group inline>
