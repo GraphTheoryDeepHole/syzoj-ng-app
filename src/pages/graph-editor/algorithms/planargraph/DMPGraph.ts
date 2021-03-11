@@ -55,7 +55,7 @@ export class DMPGraph extends NodeEdgeList implements Graph {
   }
 
   // remove self loop & mutiple edges
-  _simplify(): boolean {
+  simplifyEdges(): boolean {
     let edgeCount = this._edges.length;
     this._edges = this._edges.filter(({ source: s, target: t }) => s !== t);
     let edgeSet = Array.from({ length: this._nodes.length }, () => new Set<number>());
@@ -64,42 +64,33 @@ export class DMPGraph extends NodeEdgeList implements Graph {
     return this._edges.length !== edgeCount;
   }
 
-  // remove sl, me & naive nodes(degree <= 2)
+  // remove naive nodes (degree <= 2)
+  simplifyNodes(): boolean {
+    let res: boolean = false;
+    this.adjacencyList.every((edges, s) => {
+      if (edges.length > 2) return true;
+      else res = true;
+      if (edges.length === 2) this._edges.push({ source: edges[0].target, target: edges[1].target, datum: {} });
+      let newNodes = Array.from({ length: this._nodes.length }, (_, i) => i).filter(i => i !== s);
+      let newGraph = this.subGraph(newNodes);
+      this._nodes = newGraph.nodes();
+      this._edges = newGraph.edges();
+      return false;
+    });
+    if (res) this.refreshAdjList();
+    return res;
+  }
+
   simplify() {
-    let changed = true;
-    while (changed) {
-      changed = this._simplify();
-
-      this.adjacencyList.every((edges, s) => {
-        if (edges.length > 2) return true;
-        else changed = true;
-
-        if (edges.length === 2) {
-          let t1 = edges[0].target,
-            t2 = edges[1].target;
-          this._edges.push({ source: t1, target: t2, datum: {} });
-        }
-        let newNodes = Array.from({ length: this._nodes.length }, (_, i) => i).filter(i => i !== s);
-        let newGraph = this.subGraph(newNodes);
-        this._nodes = newGraph.nodes();
-        this._edges = newGraph.edges();
-        this.refreshAdjList();
-
-        return false;
-      });
-    }
+    while (this.simplifyEdges() || this.simplifyNodes());
   }
 
   adjacentEdges(pos: number) {
     return this.adjacencyList[pos];
   }
 
-  mark(nodeList: number[]) {
-    let nodeMap: boolean[] = Array.from({ length: this._nodes.length }, () => false);
-    nodeList.forEach(i => (nodeMap[i] = true));
-    this._edges.forEach(e => {
-      if (e.datum.tag !== 2 && nodeMap[e.source] && nodeMap[e.target]) e.datum.mark = true;
-    });
+  mark(edgeList: number[]) {
+    edgeList.forEach(id => (this._edges[id].datum.mark = true));
   }
 
   clearMark() {
@@ -109,18 +100,10 @@ export class DMPGraph extends NodeEdgeList implements Graph {
 
 export class Face {
   constructor(public nodesId: number[] = []) {}
-
-  check(nodeList: number[]): boolean {
-    return nodeList.every(i => this.nodesId.includes(i));
-  }
 }
 
 export class Fragment {
   public validFacesId: number[] = [];
 
-  constructor(public nNodesId: number[] = [], public cNodesId: number[] = []) {}
-
-  nodesId() {
-    return this.nNodesId.concat(this.cNodesId);
-  }
+  constructor(public nodesId: number[] = [], public edgesId: number[] = []) {}
 }

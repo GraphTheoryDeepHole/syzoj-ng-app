@@ -2,6 +2,7 @@ import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../..
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge } from "./Common";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class Dinic extends GraphAlgorithm {
   // constructor() {
@@ -25,6 +26,25 @@ class Dinic extends GraphAlgorithm {
     ];
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      borderColor: node => (node.datum.depth !== -1 ? "#cccccc" : undefined),
+      fillingColor: node => (node.datum.depth !== -1 ? "#eeeeee" : undefined)
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      color: edge => {
+        if (edge.datum.mark) return edge.datum.mark === 1 ? "#ff0000" : "#00ff00";
+        if (edge.datum.valid) return edge.datum.valid === 1 ? "#ffaaaa" : "#aaffaa";
+        return "#cccccc";
+      },
+      floatingData: edge => `(${edge.datum.flow},${edge.datum.used})`
+    };
+  }
+
   private que: Queue<number> = new Queue<number>();
 
   private E: NetworkFlowBase;
@@ -32,6 +52,7 @@ class Dinic extends GraphAlgorithm {
   private n: number = 0;
   private S: number;
   private T: number;
+  private maxflow: number;
 
   private dep: number[] = [];
   private cur: number[] = [];
@@ -70,7 +91,11 @@ class Dinic extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: this.report(),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [
+        ["$maxflow$", "number", this.maxflow],
+        ["$depth$", "array", this.dep]
+      ]
     };
   }
 
@@ -124,81 +149,19 @@ class Dinic extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    let flow = 0,
-      delta = 0;
+    let delta = 0;
+    this.maxflow = 0;
     yield this.getStep(33); // inited
     while (this.bfs()) {
       yield this.getStep(34); // built level graph
       delta = yield* this.dfs(this.S, Infinity);
-      flow += delta;
+      this.maxflow += delta;
       yield this.getStep(37); // augmented
     }
     //console.log(`algo Dinic : {flow: ${flow}}`);
     yield this.getStep(38); // return
-    return { flow };
+    return { flow: this.maxflow };
   }
 }
 
 export { Dinic };
-
-/*
-Reference:
-
-int n,m,s,t;
-int cnt=1,h[10005],fr[200005],to[200005],w[200005],r[10005];//r即当前弧优化中记录从哪条路开始还没搜过
-void add(int x,int y,int z){
-    fr[++cnt]=h[x];
-    h[x]=cnt;
-    to[cnt]=y;
-    w[cnt]=z;
-}
-int dep[10005];//每个点在一次bfs后的深度
-//分层，其实就是计算s到每个点的最短路
-bool bfs(){
-    memset(dep,-1,sizeof(dep));
-    queue<int>q;
-    dep[s]=0;
-    q.push(s);
-    while(!q.empty()){
-        int now=q.front();
-        q.pop();
-        if(now==t)return 1;
-        for(int i=h[now];i;i=fr[i]){
-            if(w[i]>0&&dep[to[i]]==-1){
-                dep[to[i]]=dep[now]+1;
-                q.push(to[i]);
-            }
-        }
-    }
-    return 0;
-}
-int dfs(int x,int f){
-    if(x==t)return f;
-    int res=0;
-    //因为当前弧优化，我们只搜还可能有价值的边
-    for(int i=r[x];i;i=fr[i]){
-    	r[x]=i;//记录一下这条边之前的边在重建前就不用再搜索了
-        //与FF的区别：只能访问下一层的点
-        if(w[i]>0&&dep[to[i]]==dep[x]+1){
-            int c=dfs(to[i],min(w[i],f));
-            if(c>0){
-                w[i]-=c;
-                w[i^1]+=c;
-                f-=c;
-                res+=c;
-                //与FF的区别在于，这里并没有立即return c
-                if(!f)return res;
-            }
-        }
-    }
-    return res;
-}
-int dinic(){
-    int flow=0;
-    while(bfs()){
-    	for(int i=1;i<=n;i++)r[i]=h[i];
-        flow+=dfs(s,2e9);//初始时从s开始，携带无穷大的流量进行dfs；也可以理解为类似FF算法的标号过程
-    }
-    return flow;
-}
- */

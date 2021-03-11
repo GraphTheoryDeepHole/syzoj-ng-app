@@ -2,6 +2,7 @@ import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../..
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge } from "./Common";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class ZkwMCF extends GraphAlgorithm {
   // constructor() {
@@ -36,6 +37,25 @@ class ZkwMCF extends GraphAlgorithm {
     ];
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      borderColor: node => (node.datum.dist !== Infinity ? "#cccccc" : undefined),
+      fillingColor: node => (node.datum.dist !== Infinity ? "#eeeeee" : undefined)
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      color: edge => {
+        if (edge.datum.mark) return edge.datum.mark === 1 ? "#ff0000" : "#00ff00";
+        if (edge.datum.valid) return "#ffaaaa";
+        return "#cccccc";
+      },
+      floatingData: edge => `(${edge.datum.flow},${edge.datum.used}),${edge.datum.cost}`
+    };
+  }
+
   private que: Queue<number> = new Queue<number>();
 
   private E: NetworkFlowBase;
@@ -43,6 +63,8 @@ class ZkwMCF extends GraphAlgorithm {
   private n: number = 0;
   private S: number;
   private T: number;
+  private maxflow: number = 0;
+  private mincost: number = 0;
 
   private dis: number[] = [];
   private vis: boolean[] = [];
@@ -76,7 +98,12 @@ class ZkwMCF extends GraphAlgorithm {
   getStep(lineId: number): Step {
     return {
       graph: this.report(),
-      codePosition: new Map<string, number>([["pseudo", lineId]])
+      codePosition: new Map<string, number>([["pseudo", lineId]]),
+      extraData: [
+        ["$maxflow$", "number", this.maxflow],
+        ["$mincost$", "number", this.mincost],
+        ["$dist$", "array", this.dis]
+      ]
     };
   }
 
@@ -138,8 +165,7 @@ class ZkwMCF extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    let flow = 0,
-      cost = 0;
+    (this.maxflow = 0), (this.mincost = 0);
     yield this.getStep(34); // inited
     while (limit > 0 && this.spfa()) {
       yield this.getStep(35); // built sssp graph
@@ -147,14 +173,14 @@ class ZkwMCF extends GraphAlgorithm {
         this.clear(this.vis, false);
         let delta = yield* this.dfs(this.S, limit);
         limit -= delta;
-        flow += delta;
-        cost += delta * this.dis[this.S];
+        this.maxflow += delta;
+        this.mincost += delta * this.dis[this.S];
         yield this.getStep(40); // augmented
       } while (this.vis[this.T]);
     }
     //console.log(`algo ZkwMCF : {flow: ${flow}, cost: ${cost}`);
     yield this.getStep(42); // return
-    return { flow, cost };
+    return { flow: this.maxflow, cost: this.mincost };
   }
 }
 
