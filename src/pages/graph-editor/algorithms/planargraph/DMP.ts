@@ -1,6 +1,7 @@
 import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { Edge, Graph, Node, NodeEdgeList } from "../../GraphStructure";
 import { DMPGraph, Face, Fragment } from "./DMPGraph";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 function clear<type>(buf: type[], val: type, cnt: number) {
   for (let _ = 0; _ < cnt; ++_) buf[_] = val;
@@ -15,6 +16,23 @@ class DMP extends GraphAlgorithm {
     return "pt_dmp";
   }
 
+  nodeRenderPatcher(): Partial<NodeRenderHint> {
+    return {
+      floatingData: node => node.datum.displayId,
+      borderColor: node => (node.datum.active ? undefined : "#cccccc"),
+      fillingColor: node => (node.datum.active ? undefined : "#eeeeee")
+    };
+  }
+
+  edgeRenderPatcher(): Partial<EdgeRenderHint> {
+    return {
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      color: edge => (edge.datum.mark === 1 ? "#ff0000" : edge.datum.mark === -1 ? "#00ff00" : undefined),
+      floatingData: edge => `(${edge.datum.flow},${edge.datum.used})`
+    };
+  }
+
+  private planarity: boolean;
   private graphs: DMPGraph[] = [];
 
   split(graph: DMPGraph): DMPGraph[] {
@@ -24,7 +42,8 @@ class DMP extends GraphAlgorithm {
     let dfn: number[] = [];
     let low: number[] = [];
     let stack: number[] = [];
-    clear(dfn, 0, n), clear(low, 0, n);
+    clear(dfn, 0, n);
+    clear(low, 0, n);
 
     function newBCC(p: number, q: number) {
       let nodeList: number[] = [p];
@@ -81,63 +100,70 @@ class DMP extends GraphAlgorithm {
 
     //console.table(G.nodes().map(n=>n.datum.displayId));
 
-    let V = G.nodes(),
-      E = G.edges();
-    let n = V.length,
-      m = E.length;
+    let V = G.nodes();
+    let E = G.edges();
+    let n = V.length;
+    let m = E.length;
     if (n === 0 || m === 0) return true;
     if (quickTest && (n < 5 || m < 9)) return true;
     if (quickTest && m > 3 * n - 6) return false;
 
     let faces: Face[] = [];
     let fragments: Fragment[] = [];
+    let timeTag: number[] = [];
+    let curTime: number = 0;
+    clear(timeTag, 0, n);
 
     function embed(e: Edge) {
       e.datum.tag = V[e.source].datum.tag = V[e.target].datum.tag = 2;
     }
 
-    function getFragment(e: Edge): Fragment {
-      let visit: boolean[] = [];
-      let nNodesId: number[] = [];
-      let cNodesId: number[] = [];
-      clear(visit, false, n);
+    function check(A: number[], B: number[]): boolean {
+      ++curTime;
+      A.forEach(id => (timeTag[id] = curTime));
+      return B.every(id => timeTag[id] === curTime);
+    }
+
+    function getFragment(eid: number): Fragment {
+      let nodesId: number[] = [];
+      let edgesId: number[] = [];
+      ++curTime;
+
+      function addEdge(eid: number) {
+        edgesId.push(eid);
+        E[eid].datum.tag = 1;
+      }
 
       function dfs2(p: number) {
-        visit[p] = true;
+        timeTag[p] = curTime;
         if (V[p].datum.tag === 2) {
-          cNodesId.push(p);
+          nodesId.push(p);
           return;
-        } else nNodesId.push(p);
+        }
         for (let {
           target: q,
           datum: { id: i }
         } of G.adjacentEdges(p)) {
           if (E[i].datum.tag !== 0) continue;
-          E[i].datum.tag = 1;
-          if (!visit[q]) dfs2(q);
+          addEdge(i);
+          if (timeTag[q] !== curTime) dfs2(q);
         }
       }
 
-      e.datum.tag = 1;
-      dfs2(e.source), dfs2(e.target);
-
-      let res = new Fragment(nNodesId, cNodesId);
-      faces.forEach((face, i) => {
-        if (face.check(cNodesId)) res.validFacesId.push(i);
-      });
-
-      return res;
+      addEdge(eid);
+      dfs2(E[eid].source);
+      dfs2(E[eid].target);
+      return new Fragment(nodesId, edgesId);
     }
 
     function getPath(f: Fragment): number[] {
       let res: number[] = [];
-      let vis: boolean[] = [];
-      clear(vis, true, n);
-      f.nodesId().forEach(i => (vis[i] = false));
+      ++curTime;
+      f.edgesId.forEach(id => (E[id].datum.tag = 0));
 
-      function dfs3(p: number, fir: boolean = false): boolean {
-        vis[p] = true;
-        if (!fir && V[p].datum.tag === 2) {
+      function dfs3(p: number): boolean {
+        timeTag[p] = curTime;
+        if (V[p].datum.tag === 2 && p !== f.nodesId[0]) {
           res.push(p);
           return true;
         }
@@ -145,59 +171,55 @@ class DMP extends GraphAlgorithm {
           target: q,
           datum: { id: i }
         } of G.adjacentEdges(p)) {
-          if (vis[q] || E[i].datum.tag === 2) continue;
+          if (E[i].datum.tag !== 0 || timeTag[q] == curTime) continue;
           if (dfs3(q)) {
-            embed(E[i]), res.push(p);
+            embed(E[i]);
+            res.push(p);
             return true;
           }
         }
         return false;
       }
 
-      dfs3(f.cNodesId[0], true);
-
+      dfs3(f.nodesId[0]);
       return res;
     }
 
     // init face
-    embed(E[0]), faces.push(new Face([E[0].source, E[0].target]));
+    embed(E[0]);
+    faces.push(new Face([E[0].source, E[0].target]));
 
     while (faces.length < m - n + 2) {
-      E.forEach(e => {
-        if (e.datum.tag !== 2) e.datum.tag = 0;
+      E.forEach((e, i) => {
+        if (e.datum.tag === 0) fragments.push(getFragment(i));
       });
-      fragments = [];
 
-      E.forEach(e => {
-        if (e.datum.tag !== 0) return;
-        fragments.push(getFragment(e));
+      fragments.forEach(fr => {
+        fr.validFacesId = [];
+        faces.forEach((fa, id) => {
+          if (check(fa.nodesId, fr.nodesId)) fr.validFacesId.push(id);
+        });
       });
 
       //console.log(G);
-      //faces.forEach(f=>console.log(f));
-      //fragments.forEach(f=>console.log(f));
+      //faces.forEach(f => console.log(f));
+      //fragments.forEach(f => console.log(f));
 
       if (fragments.some(f => f.validFacesId.length === 0)) return false;
 
-      let fragmentId = 0;
-      fragments.every((f, i) => {
-        if (f.validFacesId.length === 1) {
-          fragmentId = i;
-          return false;
-        }
-      });
-
+      let fragmentId = fragments.findIndex(f => f.validFacesId.length === 1);
+      if (fragmentId === -1) fragmentId = 0;
       let fragment = fragments[fragmentId];
       let faceId = fragment.validFacesId[0];
       let face = faces[faceId];
 
-      G.mark(fragment.nodesId());
+      G.mark(fragment.edgesId);
       yield this.getStep(18); // found fragment
       G.clearMark();
 
       let path: number[] = getPath(fragment);
 
-      //console.log(path);
+      console.log(path);
 
       let nodeList1: number[] = [];
       let nodeList2: number[] = [];
@@ -205,10 +227,17 @@ class DMP extends GraphAlgorithm {
       let pos2 = face.nodesId.findIndex(i => i === path[path.length - 1]);
       let tot = face.nodesId.length;
       for (let i of path) nodeList1.push(i), nodeList2.push(i);
-      for (let i = (pos2 + 1) % tot; i != pos1; i = (i + 1) % tot) nodeList1.push(face.nodesId[i]);
-      for (let i = (tot + pos2 - 1) % tot; i != pos1; i = (tot + i - 1) % tot) nodeList2.push(face.nodesId[i]);
+      function nextId(cur: number): number {
+        return cur + 1 === tot ? 0 : cur + 1;
+      }
+      function prevId(cur: number): number {
+        return cur === 0 ? tot - 1 : cur - 1;
+      }
+      for (let i = nextId(pos2) % tot; i != pos1; i = nextId(i)) nodeList1.push(face.nodesId[i]);
+      for (let i = prevId(pos2) % tot; i != pos1; i = prevId(i)) nodeList2.push(face.nodesId[i]);
 
       faces = faces.filter((_, i) => i !== faceId);
+      fragments = fragments.filter((_, i) => i !== fragmentId);
       faces.push(new Face(nodeList1));
       faces.push(new Face(nodeList2));
       yield this.getStep(22); // embedded
@@ -218,7 +247,7 @@ class DMP extends GraphAlgorithm {
   }
 
   *run(G: Graph, quickTest: boolean = true): Generator<Step> {
-    let planarity: boolean = true;
+    this.planarity = true;
     let graph = DMPGraph.from(G);
     yield this.getStep(23, graph); // simplify
     graph.simplify();
@@ -228,13 +257,13 @@ class DMP extends GraphAlgorithm {
     yield this.getStep(27); // split
     for (let g of this.graphs) {
       g.active();
-      if (!(yield* this.test(g, quickTest))) planarity = false;
+      if (!(yield* this.test(g, quickTest))) this.planarity = false;
       //console.log(`graph: ${graph}\nresult: ${planarity}`);
       g.active(false);
-      if (quickTest && !planarity) break;
+      if (quickTest && !this.planarity) break;
     }
     yield this.getStep(32); // return
-    return { planarity };
+    return { planarity: this.planarity };
   }
 }
 
