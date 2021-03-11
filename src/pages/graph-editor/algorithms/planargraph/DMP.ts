@@ -219,7 +219,7 @@ class DMP extends GraphAlgorithm {
 
       let path: number[] = getPath(fragment);
 
-      console.log(path);
+      //console.log(path);
 
       let nodeList1: number[] = [];
       let nodeList2: number[] = [];
