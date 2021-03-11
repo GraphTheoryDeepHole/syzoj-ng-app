@@ -32,9 +32,7 @@ function toD3EdgeDatum(edge: Edge): D3SimulationEdge {
 let GraphDisplay: React.FC<GraphDisplayProp> = props => {
   const { dataGraph, generalRenderHint, nodeRenderHint, edgeRenderHint } = props;
   const reducer = (renderer, action) => {
-    console.log(action);
     renderer[action.type](action);
-    // Should we copy the renderer to toggle react rerender?
     return renderer;
   };
   const [renderer, dispatch] = useReducer(reducer, new CanvasGraphRenderer());
