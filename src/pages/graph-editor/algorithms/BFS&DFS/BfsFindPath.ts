@@ -7,16 +7,16 @@ class BfsFindPath extends GraphAlgorithm {
     return {
       fillingColor: node => {
         if (node.datum.visited == 1) {
-          return "#00df6f";
+          return "#808000";
         } else if (node.datum.visited == 2) {
-          return "#00ffff";
+          return "#ffff00";
         } else if (node.datum.visited == 3) {
-          return "#00ff00";
+          return "#adff2f";
         } else {
           return undefined;
         }
       },
-      floatingData: node => `(id: ${node.id}, dist: ${node.datum.dist})`
+      floatingData: node => `(id:${node.id},dist:${node.datum.dist})`
     };
   }
 
@@ -49,7 +49,7 @@ class BfsFindPath extends GraphAlgorithm {
     let que = [start_point],
       fr = 0,
       bk = 1;
-    Object.assign(graph.nodes()[start_point].datum, { visited: 1, dist: 0 });
+    Object.assign(graph.nodes()[start_point].datum, { visited: 1, dist: -1 });
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 0]])
@@ -75,6 +75,11 @@ class BfsFindPath extends GraphAlgorithm {
       };
       graph.nodes()[cur_node].datum.visited = 3;
     }
+
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 4]])
+    };
   }
 }
 

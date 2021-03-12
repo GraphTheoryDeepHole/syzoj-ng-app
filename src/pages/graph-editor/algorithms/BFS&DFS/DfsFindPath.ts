@@ -5,8 +5,18 @@ import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 class DfsFindPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      fillingColor: node => (node.datum.visited ? "#ff0000" : undefined),
-      floatingData: node => (node.datum.visited ? node.datum.sequence : "")
+      fillingColor: node => {
+        if (node.datum.visited == 1) {
+          return "#808000";
+        } else if (node.datum.visited == 2) {
+          return "#ffff00";
+        } else if (node.datum.visited == 3) {
+          return "#adff2f";
+        } else {
+          return undefined;
+        }
+      },
+      floatingData: node => `(id:${node.id},dfn:${node.datum.sequence})`
     };
   }
 
@@ -61,12 +71,8 @@ class DfsFindPath extends GraphAlgorithm {
   }
 
   *run(graph: Graph, start_point: number): Generator<Step> {
-    graph.nodes().forEach(n => (n.datum.visited = 0));
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };
-    return this.dfs(0, AdjacencyMatrix.from(graph, true), start_point);
+    graph.nodes().forEach(n => (n.datum.visited = 0, n.datum.sequence = -1));
+    yield* this.dfs(0, AdjacencyMatrix.from(graph, true), start_point);
   }
 }
 
