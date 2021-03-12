@@ -71,7 +71,7 @@ class DfsFindPath extends GraphAlgorithm {
   }
 
   *run(graph: Graph, start_point: number): Generator<Step> {
-    graph.nodes().forEach(n => (n.datum.visited = 0, n.datum.sequence = -1));
+    graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.sequence = -1)));
     yield* this.dfs(0, AdjacencyMatrix.from(graph, true), start_point);
   }
 }
