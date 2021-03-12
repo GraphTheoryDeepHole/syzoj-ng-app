@@ -7,17 +7,16 @@ class BfsFindPath extends GraphAlgorithm {
     return {
       fillingColor: node => {
         if (node.datum.visited == 1) {
-          return "#00cf00";
+          return "#00df6f";
         } else if (node.datum.visited == 2) {
-          return "#00ff00";
+          return "#00ffff";
         } else if (node.datum.visited == 3) {
-          return "#0000cf";
+          return "#00ff00";
         } else {
           return undefined;
         }
       },
-      floatingData: node => `(${node.id},${node.datum.dist})`
-      //("ID: " + node.id + "Dist: " + ((node.datum.visited >= 1) ? node.datum.dist : "Inf"))
+      floatingData: node => `(id: ${node.id}, dist: ${node.datum.dist})`
     };
   }
 
@@ -45,7 +44,7 @@ class BfsFindPath extends GraphAlgorithm {
 
   *run(graph: Graph, start_point: number): Generator<Step> {
     graph = AdjacencyMatrix.from(graph, true);
-    graph.nodes().forEach(n => (n.datum.visited = 0));
+    graph.nodes().forEach(n => (n.datum.visited = 0, n.datum.dist = Infinity));
 
     let que = [start_point],
       fr = 0,
