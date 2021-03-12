@@ -18,17 +18,16 @@ class DMP extends GraphAlgorithm {
 
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      floatingData: node => node.datum.displayId,
-      borderColor: node => (node.datum.active ? undefined : "#cccccc"),
+      floatingData: node => node.datum.displayId || node.id,
+      borderColor: node => (node.datum.tag === 2 ? "#00ff00" : undefined),
       fillingColor: node => (node.datum.active ? undefined : "#eeeeee")
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
-      color: edge => (edge.datum.mark === 1 ? "#ff0000" : edge.datum.mark === -1 ? "#00ff00" : undefined),
-      floatingData: edge => `(${edge.datum.flow},${edge.datum.used})`
+      thickness: edge => (edge.datum.mark ? 5 : undefined),
+      color: edge => (edge.datum.mark ? "#ff0000" : edge.datum.tag === 2 ? "#00ff00" : undefined)
     };
   }
 
