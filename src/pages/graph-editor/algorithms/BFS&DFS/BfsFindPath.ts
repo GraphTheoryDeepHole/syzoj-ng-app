@@ -44,7 +44,7 @@ class BfsFindPath extends GraphAlgorithm {
 
   *run(graph: Graph, start_point: number): Generator<Step> {
     graph = AdjacencyMatrix.from(graph, true);
-    graph.nodes().forEach(n => (n.datum.visited = 0, n.datum.dist = Infinity));
+    graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.dist = Infinity)));
 
     let que = [start_point],
       fr = 0,
