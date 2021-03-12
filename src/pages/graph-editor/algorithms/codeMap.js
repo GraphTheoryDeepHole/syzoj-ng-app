@@ -459,8 +459,8 @@ module.exports = {
     pseudo: [
       "起始点Dist(st) = 0，并将其放入队列queue中；",
       "**while** 队列queue非空：",
-      ["取出队首元素v，并执行queue.pop()操作使v出队；"],
-      ["对于所有e(v, u)，更新Dist(u) = Dist(v) + 1，并将v放入队列queue中；"],
+      "   取出队首元素v，并执行queue.pop()操作使v出队；",
+      "   对于所有e(v, u)，更新Dist(u) = Dist(v) + 1，并将v放入队列queue中；",
       "算法结束；"
     ]
   },
