@@ -1,6 +1,6 @@
-import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
-import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
-import { AdjacencyMatrix, Edge, Graph } from "../GraphStructure";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
+import { AdjacencyMatrix, Edge, Graph } from "../../GraphStructure";
 
 class SalesmanPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {

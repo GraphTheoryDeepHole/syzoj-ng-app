@@ -1,5 +1,5 @@
 import { SalesmanCheaperAlgo } from "./SalesmanCheaperAlgo";
-import { AdjacencyMatrix } from "../GraphStructure";
+import { AdjacencyMatrix } from "../../GraphStructure";
 
 test("SalesmanCheaperAlgo", () => {
   let mat = [
@@ -21,7 +21,7 @@ test("SalesmanCheaperAlgo", () => {
     while (tmp.length < graph.nodes().length) {
       tmp.push("/");
     }
-    tmp.push(step.answer);
+    tmp.push(step.graph.nodes()[0].datum.answer);
     output.push(tmp);
   }
   console.table(output);

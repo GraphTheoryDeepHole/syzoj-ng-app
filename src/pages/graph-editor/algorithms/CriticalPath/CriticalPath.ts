@@ -1,6 +1,6 @@
-import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
-import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
-import { AdjacencyMatrix, Graph } from "../GraphStructure";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
+import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 class CriticalPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {

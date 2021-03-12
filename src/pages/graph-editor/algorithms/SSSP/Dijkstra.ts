@@ -1,6 +1,6 @@
-import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
-import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
-import { AdjacencyMatrix, Graph } from "../GraphStructure";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
+import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 type NodeState = "relaxing" | "updating" | "updated" | "relaxed" | string;
 const stateColorMap: Map<NodeState, string> = new Map([
@@ -23,7 +23,7 @@ class Dijkstra extends GraphAlgorithm {
   }
 
   id() {
-    return "dijkstra";
+    return "Dijkstra";
   }
 
   parameters(): ParameterDescriptor[] {
@@ -40,7 +40,7 @@ class Dijkstra extends GraphAlgorithm {
     ];
   }
 
-  *run(graph: Graph, startPoint: number) {
+  *run(graph: Graph, startPoint: number): Generator<Step> {
     let mat = AdjacencyMatrix.from(graph, true).mat.map(line => line.map(datum => (datum ? datum.weight || 1 : 0)));
     const getState = (id: number) => graph.nodes()[id].datum.state as NodeState;
     const setState = (id: number, state: NodeState = "") => (graph.nodes()[id].datum.state = state);
