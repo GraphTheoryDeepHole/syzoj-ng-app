@@ -1,7 +1,7 @@
-import { Kruskal } from "./Kruskal";
-import { AdjacencyMatrix } from "../GraphStructure";
+import { Prim } from "./Prim";
+import { AdjacencyMatrix } from "../../GraphStructure";
 
-test("Kruskal", () => {
+test("Prim", () => {
   let mat = [
     [0, 15, 0, 40, 25],
     [15, 0, 30, 20, 30],
@@ -11,7 +11,7 @@ test("Kruskal", () => {
   ];
   let graph = new AdjacencyMatrix(mat, false);
   let res = [];
-  for (let step of new Kruskal().run(graph)) {
+  for (let step of new Prim().run(graph)) {
     res.push(step.graph.edges().map(e => e.source + ", " + e.target + ", " + e.datum.chosen));
   }
   console.table(res);

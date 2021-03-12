@@ -1,6 +1,6 @@
-import { GraphAlgorithm, Step, ParameterDescriptor } from "../GraphAlgorithm";
-import { EdgeRenderHint, NodeRenderHint } from "../display/CanvasGraphRenderer";
-import { Graph } from "../GraphStructure";
+import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
+import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
+import { Graph } from "../../GraphStructure";
 
 class Prim extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {

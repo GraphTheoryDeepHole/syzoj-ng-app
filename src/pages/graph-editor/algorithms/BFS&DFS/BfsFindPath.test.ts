@@ -1,5 +1,5 @@
 import { BfsFindPath } from "./BfsFindPath";
-import { AdjacencyMatrix } from "../GraphStructure";
+import { AdjacencyMatrix } from "../../GraphStructure";
 
 test("BfsFindPath", () => {
   let mat = [

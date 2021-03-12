@@ -1,5 +1,5 @@
 import { CriticalPath } from "./CriticalPath";
-import { AdjacencyMatrix } from "../GraphStructure";
+import { AdjacencyMatrix } from "../../GraphStructure";
 
 test("CriticalPath", () => {
   let mat = [

@@ -1,5 +1,5 @@
 import { SalesmanPath } from "./TravelingSalesmanProb";
-import { AdjacencyMatrix } from "../GraphStructure";
+import { AdjacencyMatrix } from "../../GraphStructure";
 
 test("SalesmanPath", () => {
   let mat = [
@@ -18,7 +18,7 @@ test("SalesmanPath", () => {
         tmp.push([e.source + 1, e.target + 1]);
       }
     });
-    tmp.push(step.answer);
+    tmp.push(step.graph.nodes()[0].datum.answer);
     output.push(tmp);
   }
   console.table(output);
