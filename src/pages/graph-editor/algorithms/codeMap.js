@@ -448,9 +448,11 @@ module.exports = {
   },
   DFS: {
     pseudo: [
-      "Start with the given vertice;",
-      "Move forward to its successor;",
-      "Cannot move forward, move backward to its predecessor;"
+      "从给定的点开始DFS，转步骤2；",
+      "判断是否可以继续前进，若是转步骤3，否转步骤4，若已回退至起点转步骤5",
+      "前进至该节点的后继节点，转步骤2；",
+      "无法前进，回退至该节点的前驱，转步骤2；",
+      "算法结束；"
     ]
   },
   BFS: {
@@ -461,7 +463,7 @@ module.exports = {
         "取出队首元素v，并执行queue.pop()操作使v出队；",
         "对于所有e(v, u)，更新Dist(u) = Dist(v) + 1，并将v放入队列queue中；"
       ],
-      "算法结束"
+      "算法结束；"
     ]
   },
   CriticalPath: {

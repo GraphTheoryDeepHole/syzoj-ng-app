@@ -7,7 +7,7 @@ class BfsFindPath extends GraphAlgorithm {
     return {
       fillingColor: node => {
         if (node.datum.visited == 1) {
-          return "#808000";
+          return "#87ceeb";
         } else if (node.datum.visited == 2) {
           return "#ffff00";
         } else if (node.datum.visited == 3) {
@@ -35,7 +35,7 @@ class BfsFindPath extends GraphAlgorithm {
         parser: (text, graph) => {
           let x = parseInt(text);
           if (isNaN(x)) throw new Error(".input.error.nan");
-          if (x <= 0 || x > graph.nodes().length) throw new Error(".input.error.out_of_range");
+          if (x < 0 || x > graph.nodes().length) throw new Error(".input.error.out_of_range");
           return x;
         }
       }
@@ -44,17 +44,21 @@ class BfsFindPath extends GraphAlgorithm {
 
   *run(graph: Graph, start_point: number): Generator<Step> {
     graph = AdjacencyMatrix.from(graph, true);
-    graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.dist = Infinity)));
+    graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.dist = -1)));
 
     let que = [start_point],
       fr = 0,
       bk = 1;
-    Object.assign(graph.nodes()[start_point].datum, { visited: 1, dist: -1 });
+    Object.assign(graph.nodes()[start_point].datum, { visited: 1, dist: 0 });
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 0]])
     };
     while (fr != bk) {
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 1]])
+      };
       let cur_node = que[fr++],
         cur_data = graph.nodes()[cur_node].datum;
       graph.nodes()[cur_node].datum.visited = 2;
