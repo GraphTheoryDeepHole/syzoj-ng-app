@@ -6,17 +6,18 @@ class BfsFindPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: node => {
-        if (node.datum.visited == 0) {
-          return "#0f0f0f";
-        } else if (node.datum.visited == 1) {
-          return "#003f00";
+        if (node.datum.visited == 1) {
+          return "#00cf00";
         } else if (node.datum.visited == 2) {
           return "#00ff00";
         } else if (node.datum.visited == 3) {
-          return "#00003f";
+          return "#0000cf";
+        } else {
+          return undefined;
         }
       },
-      floatingData: node => ("ID: " + node.id + "Dist: " + (node.datum.visited >= 1) ? node.datum.dist : "Inf")
+      floatingData: node => `(${node.id},${node.datum.dist})`
+      //("ID: " + node.id + "Dist: " + ((node.datum.visited >= 1) ? node.datum.dist : "Inf"))
     };
   }
 
