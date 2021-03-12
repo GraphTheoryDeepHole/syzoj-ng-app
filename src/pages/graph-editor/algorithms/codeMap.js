@@ -465,7 +465,7 @@ module.exports = {
     ]
   },
   CriticalPath: {
-    pesudo: [
+    pseudo: [
       "for i = 1 to n:",
       ["v = findZeroDegreeVertice(); markTopoSequence(v);", "for u in [{Gamma ^ - }left( v \right)]: degree[u]--;"],
       "[pi left( {{v_1}'} \right) = 0];",
@@ -476,7 +476,7 @@ module.exports = {
     ]
   },
   Ford: {
-    pesudo: [
+    pseudo: [
       "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ];",
       "while data been updated:",
       [
@@ -488,13 +488,13 @@ module.exports = {
     ]
   },
   Kruskal: {
-    pesudo: [
+    pseudo: [
       "while [left| T \right| < n - 1] and [E \ne phi ]:",
       ["choose e as the shortest edge in E; E = E - e;", "T = T + e if no loop in T + e;"]
     ]
   },
   Prim: {
-    pesudo: [
+    pseudo: [
       "T = [phi ]; U = [left{ {{v_1}} \right}];",
       "while [U \ne V]:",
       [
@@ -504,14 +504,14 @@ module.exports = {
     ]
   },
   SalesmanProblem: {
-    pesudo: [
+    pseudo: [
       "sort edges by distance;",
       "while limit not reached:",
       ["choose enough edges and update the answer;", "delete edges chosen last;"]
     ]
   },
   SalesmanCheaperAlgorithm: {
-    pesudo: [
+    pseudo: [
       "[T = left( {1,1} \right)]; [overline S  = left{ {{v_2}, ldots ,{v_n}} \right}];",
       "while [overline S  \ne phi ]:",
       [
