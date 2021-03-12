@@ -439,28 +439,28 @@ module.exports = {
       ["$\\color\\red{\\bullet}$  **return** $planarity$."]
     ]
   },
-  dijkstra: {
+  Dijkstra: {
     pseudo: [
       "Let $\\bar{S}=\\{2,3,\\cdots ,n\\}, \\pi (1)=0, \\pi (i)=\\left\\{\\begin{array}{ll} w_i, i \\in \\Gamma^+_1 \\\\ \\infty, \\text{otherwise} \\\\ \\end{array} \\right.$",
       "In $\\bar{S}$，let $\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$. If $\\bar{S}=\\Phi$, end, otherwise, go to step 3.",
       "For all $i\\in \\bar{S}\\cap\\Gamma^+_j$, $\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$, go to step 2."
     ]
   },
-  dfsfindpath: {
+  DFS: {
     pseudo: [
       "Start with the given vertice;",
       "Move forward to its successor;",
       "Cannot move forward, move backward to its predecessor;"
     ]
   },
-  bfsfindpath: {
+  BFS: {
     pseudo: [
       "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ]; enqueue(startPoint);",
       "while queueNotEmpty():",
       ["v = dequeue();", "[pi left( u \right) = pi left( v \right) + 1,;u in {Gamma ^ + }left( v \right)];"]
     ]
   },
-  criticalpath: {
+  CriticalPath: {
     pesudo: [
       "for i = 1 to n:",
       ["v = findZeroDegreeVertice(); markTopoSequence(v);", "for u in [{Gamma ^ - }left( v \right)]: degree[u]--;"],
@@ -471,7 +471,7 @@ module.exports = {
       ]
     ]
   },
-  ford: {
+  Ford: {
     pesudo: [
       "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ];",
       "while data been updated:",
@@ -483,13 +483,13 @@ module.exports = {
       ]
     ]
   },
-  kruskal: {
+  Kruskal: {
     pesudo: [
       "while [left| T \right| < n - 1] and [E \ne phi ]:",
       ["choose e as the shortest edge in E; E = E - e;", "T = T + e if no loop in T + e;"]
     ]
   },
-  prim: {
+  Prim: {
     pesudo: [
       "T = [phi ]; U = [left{ {{v_1}} \right}];",
       "while [U \ne V]:",
@@ -499,14 +499,14 @@ module.exports = {
       ]
     ]
   },
-  salesmanprob: {
+  SalesmanProblem: {
     pesudo: [
       "sort edges by distance;",
       "while limit not reached:",
       ["choose enough edges and update the answer;", "delete edges chosen last;"]
     ]
   },
-  salesmancheaperalgo: {
+  SalesmanCheaperAlgorithm: {
     pesudo: [
       "[T = left( {1,1} \right)]; [overline S  = left{ {{v_2}, ldots ,{v_n}} \right}];",
       "while [overline S  \ne phi ]:",
