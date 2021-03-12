@@ -5,8 +5,18 @@ import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 class BfsFindPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      fillingColor: node => (node.datum.visited ? "#ff0000" : undefined),
-      floatingData: node => (node.datum.visited ? node.datum.dist : "")
+      fillingColor: node => {
+        if (node.datum.visited == 0) {
+          return "#0f0f0f";
+        } else if (node.datum.visited == 1) {
+          return "#003f00";
+        } else if (node.datum.visited == 2) {
+          return "#00ff00";
+        } else if (node.datum.visited == 3) {
+          return "#00003f";
+        }
+      },
+      floatingData: node => ("ID: " + node.id + "Dist: " + (node.datum.visited >= 1) ? node.datum.dist : "Inf")
     };
   }
 
@@ -63,6 +73,7 @@ class BfsFindPath extends GraphAlgorithm {
         graph: graph,
         codePosition: new Map<string, number>([["pseudo", 3]])
       };
+      graph.nodes()[cur_node].datum.visited = 3;
     }
   }
 }
