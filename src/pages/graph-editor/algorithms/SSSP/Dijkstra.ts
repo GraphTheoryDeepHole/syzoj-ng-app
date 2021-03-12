@@ -33,7 +33,7 @@ class Dijkstra extends GraphAlgorithm {
         parser: (text, graph) => {
           let x = parseInt(text);
           if (isNaN(x)) throw new Error(".input.error.nan");
-          if (x <= 0 || x > graph.nodes().length) throw new Error(".input.error.out_of_range");
+          if (x < 0 || x > graph.nodes().length) throw new Error(".input.error.out_of_range");
           return x;
         }
       }
