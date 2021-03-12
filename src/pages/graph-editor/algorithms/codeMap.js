@@ -455,9 +455,12 @@ module.exports = {
   },
   BFS: {
     pseudo: [
-      "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ]; enqueue(startPoint);",
-      "while queueNotEmpty():",
-      ["v = dequeue();", "[pi left( u \right) = pi left( v \right) + 1,;u in {Gamma ^ + }left( v \right)];"]
+      "起始点Dist(st) = 0，并将其放入队列queue中；",
+      "**while** 队列queue非空：",
+      [
+        "取出队首元素v，并执行queue.pop()操作使v出队；",
+        "对于所有e(v, u)，更新Dist(u) = Dist(v) + 1，并将v放入队列queue中；"
+      ]
     ]
   },
   CriticalPath: {
