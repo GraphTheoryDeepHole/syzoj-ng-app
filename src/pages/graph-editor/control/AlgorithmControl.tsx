@@ -49,6 +49,7 @@ class AlgorithmRunner {
     }
     this.stepGen = this.algorithm.run(args.graph, ...args.para);
     this.state = "running";
+    this.nextStep();
   }
 
   public previousStep() {
@@ -149,6 +150,11 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     runnerDispatch({ type: "clear" });
   }, [props.dataGraph]);
 
+  // Set displayGraph when currentStep changes
+  useEffect(() => {
+    props.setDisplayedGraph(steps[currentStep]?.graph);
+  }, [steps, currentStep, props.setDisplayedGraph]);
+
   // Utility functions
   const flipAuto = () => setAuto(!auto);
   const onAlgorithmChanged = (_, { value }) => {
@@ -164,18 +170,11 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       runnerDispatch({ type: "start", graph: props.dataGraph, para: parseResult });
     }
   };
-  const updateDisplayed = () => {
-    if (steps[currentStep]) {
-      props.setDisplayedGraph(steps[currentStep].graph);
-    }
-  };
   const previousStep = () => {
     runnerDispatch({ type: "previousStep" });
-    updateDisplayed();
   };
   const nextStep = () => {
     runnerDispatch({ type: "nextStep" });
-    updateDisplayed();
   };
 
   // UI helper

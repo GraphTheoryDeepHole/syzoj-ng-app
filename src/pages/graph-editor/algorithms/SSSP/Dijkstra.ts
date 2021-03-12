@@ -1,4 +1,4 @@
-import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
+import { GraphAlgorithm, ParameterDescriptor, Step } from "../../GraphAlgorithm";
 import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
@@ -66,6 +66,9 @@ class Dijkstra extends GraphAlgorithm {
       yield { graph };
 
       for (let j = 0; j < graph.nodes().length; j++) {
+        if (getState(j) == "relaxed") {
+          continue;
+        }
         if (mat[point][j]) {
           setState(j, "updating");
           yield { graph };
