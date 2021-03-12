@@ -57,11 +57,49 @@ module.exports = {
     }
   },
   algo: {
-    dijkstra: {
+    BFS: {
+      name: "图的遍历：BFS算法",
+      para: {
+        start_point: "起始点"
+      }
+    },
+    DFS: {
+      name: "图的遍历：DFS算法",
+      para: {
+        start_point: "起始点"
+      }
+    },
+    CriticalPath: {
+      name: "关键路径",
+      para: {}
+    },
+    Kruskal: {
+      name: "最小生成树：Kruskal算法",
+      para: {}
+    },
+    Prim: {
+      name: "最小生成树：Prim算法",
+      para: {}
+    },
+    Dijkstra: {
       name: "单源最短路：Dijkstra算法",
       para: {
         start_point: "起始点"
       }
+    },
+    Ford: {
+      name: "单源最短路：Ford算法",
+      para: {
+        start_point: "起始点"
+      }
+    },
+    SalesmanProblem: {
+      name: "旅行商问题：分支限界法",
+      para: {}
+    },
+    SalesmanCheaperAlgorithm: {
+      name: "旅行商问题：分支限界法",
+      para: {}
     },
     mf_ff: {
       name: "最大流：Ford-Fulkerson算法",
