@@ -466,13 +466,12 @@ module.exports = {
   },
   CriticalPath: {
     pseudo: [
-      "for i = 1 to n:",
-      ["v = findZeroDegreeVertice(); markTopoSequence(v);", "for u in [{Gamma ^ - }left( v \right)]: degree[u]--;"],
-      "[pi left( {{v_1}'} \right) = 0];",
-      "for i = 2 to n:",
-      [
-        "[pi left( {{v_i}'} \right) = mathop {max }limits_{{v_j}' in {Gamma ^ - }left( {{v_i}'} \right)} left( {pi left( {{v_j}'} \right) + wleft( {{v_j}',{v_i}'} \right)} \right)]"
-      ]
+      "寻找任一无入边或入边已被全部访问的点，记录其拓扑序，若有点仍未访问，转步骤2，否则转步骤3；",
+      "访问该节点的所有出边，转步骤1；",
+      "拓扑排序完成，令i的初始值为0，转步骤4开始计算关键路径长度",
+      "若i小于点的总数，转步骤5，否则转步骤6；",
+      "利用拓扑序为i的点更新其出边指向的点的路径长度，i←i+1，转步骤4；",
+      "算法结束，最长的路径长度即为关键路径长度；"
     ]
   },
   Ford: {
