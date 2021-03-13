@@ -10,9 +10,9 @@ class CriticalPath extends GraphAlgorithm {
           return "#87ceeb";
         } else if (node.datum.visited == 2) {
           return "#ffff00";
-        } else /*if (node.datum.visited == 3)*/ {
+        } /*if (node.datum.visited == 3)*/ else {
           return "#adff2f";
-         } /*else {
+        } /*else {
           return undefined;
         }*/
       },
