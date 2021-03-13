@@ -16,7 +16,10 @@ class DfsFindPath extends GraphAlgorithm {
           return undefined;
         }
       },
-      floatingData: node => `(id:${node.id},dfn:${node.datum.sequence})`
+      floatingData: node =>
+        node.datum.sequence == -1 || node.datum.sequence == undefined
+          ? `(${node.id},?)`
+          : `(${node.id},${node.datum.sequence})`
     };
   }
 

@@ -16,7 +16,8 @@ class BfsFindPath extends GraphAlgorithm {
           return undefined;
         }
       },
-      floatingData: node => `(id:${node.id},dist:${node.datum.dist})`
+      floatingData: node =>
+        node.datum.dist == -1 || node.datum.dist == undefined ? `(${node.id},?)` : `(${node.id},${node.datum.dist})`
     };
   }
 
