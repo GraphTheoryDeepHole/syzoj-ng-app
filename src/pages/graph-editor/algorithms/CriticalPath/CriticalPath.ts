@@ -10,14 +10,14 @@ class CriticalPath extends GraphAlgorithm {
           return "#87ceeb";
         } else if (node.datum.visited == 2) {
           return "#ffff00";
-        } else if (node.datum.visited == 3) {
+        } else /*if (node.datum.visited == 3)*/ {
           return "#adff2f";
-        } else {
+         } /*else {
           return undefined;
-        }
+        }*/
       },
       floatingData: node => {
-        if (this.step == 0) {
+        if (this.stage == 0) {
           if (node.datum.topoSequence == -1) {
             return `(${node.id},?)`;
           } else {
@@ -32,7 +32,7 @@ class CriticalPath extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.visited ? "#87ceeb" : undefined),
+      color: edge => (edge.datum.visited ? "#87ceeb" : "#ffff00"),
       floatingData: edge => edge.datum.weight
     };
   }
@@ -45,7 +45,7 @@ class CriticalPath extends GraphAlgorithm {
     return [];
   }
 
-  step = 0;
+  stage = 0;
 
   *run(graph: Graph): Generator<Step> {
     let mat = AdjacencyMatrix.from(graph, true).mat;
@@ -96,7 +96,7 @@ class CriticalPath extends GraphAlgorithm {
       }
     }
 
-    this.step = 1;
+    this.stage = 1;
     graph.edges().forEach(e => (e.datum.visited = false));
     yield {
       graph: graph,
