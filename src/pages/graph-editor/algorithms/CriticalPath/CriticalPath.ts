@@ -59,7 +59,7 @@ class CriticalPath extends GraphAlgorithm {
       n.datum.visited = 0;
     });
 
-    graph.edges().forEach(e => (e.datum = { weight: e.datum, visited: false }));
+    //graph.edges().forEach(e => (e.datum = { weight: e.datum, visited: false }));
 
     for (let edge of graph.edges()) {
       graph.nodes()[edge.target].datum.degree++;
@@ -80,11 +80,11 @@ class CriticalPath extends GraphAlgorithm {
           for (let j = 0; j < graph.nodes().length; j++) {
             if (mat[i][j] != 0) {
               graph.nodes()[j].datum.degree--;
-              graph.edges().forEach(edge => {
+              /*graph.edges().forEach(edge => {
                 if (edge.source == i && edge.target == j) {
                   edge.datum.visited = true;
                 }
-              });
+              });*/
             }
           }
 
@@ -114,11 +114,11 @@ class CriticalPath extends GraphAlgorithm {
         if (graph.nodes()[topo[i]].datum.weight < graph.nodes()[j].datum.weight + mat[j][topo[i]]) {
           graph.nodes()[topo[i]].datum.weight = graph.nodes()[j].datum.weight + mat[j][topo[i]];
         }
-        graph.edges().forEach(edge => {
+        /*graph.edges().forEach(edge => {
           if (edge.source == j && edge.target == topo[i]) {
             edge.datum.visited = true;
           }
-        });
+        });*/
       }
 
       yield {
