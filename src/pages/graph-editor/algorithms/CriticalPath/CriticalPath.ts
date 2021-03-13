@@ -18,7 +18,7 @@ class CriticalPath extends GraphAlgorithm {
       },
       floatingData: node => {
         if (this.stage == 0) {
-          if (node.datum.topoSequence == -1) {
+          if (node.datum.topoSequence == -1 || node.datum.topoSequence == undefined) {
             return `(${node.id},?)`;
           } else {
             return `(${node.id},${node.datum.topoSequence})`;
@@ -32,8 +32,8 @@ class CriticalPath extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.visited ? "#87ceeb" : "#ffff00"),
-      floatingData: edge => edge.datum.weight
+      /*color: edge => (edge.datum.visited ? "#87ceeb" : "#ffff00"),
+      floatingData: edge => edge.datum.weight*/
     };
   }
 
