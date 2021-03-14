@@ -1,10 +1,13 @@
 import { Button, Card, Dropdown, Form, Grid, Header, Segment } from "semantic-ui-react";
-import React, { Reducer, useEffect, useReducer, useState } from "react";
+import React, { Reducer, useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { algorithms, codeMap, newAlgorithm } from "@/pages/graph-editor/algorithms";
 import { useLocalizer } from "@/utils/hooks";
 import { GraphAlgorithm, ParameterDescriptor, Step } from "@/pages/graph-editor/GraphAlgorithm";
 import { Graph } from "@/pages/graph-editor/GraphStructure";
 import cloneDeep from "lodash.clonedeep";
+import MarkdownContent from "@/markdown/MarkdownContent";
+import { appState } from "@/appState";
+import { generateCodeFontEditorOptions } from "@/misc/fonts";
 
 interface AlgorithmControlProps {
   dataGraph: Graph;
@@ -295,10 +298,48 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   );
   // -----
 
+  // -----
+  const codeOption = useMemo(() => generateCodeFontEditorOptions(appState.locale), [appState.locale]);
+  const fallbackRenderer = (data: any) => (<span style={{
+    fontFamily: codeOption.fontFamily,
+    fontSize: codeOption.fontSize
+  }}>{JSON.stringify(data)}</span>);
+  const extraDataRenderer: Map<string, (data: any) => JSX.Element> = new Map();
+  const extraDataDisplay = () => {
+    const extraData = steps[currentStep]?.extraData;
+    if (extraData == null) return;
+    return (
+      <>
+        <Header as="h4" block attached="top" icon="database" content="extra data" />
+        <Segment attached="bottom">
+          {
+            extraData.map(([name, type, data]) => (
+              <Card key={name}>
+                <Card.Content>
+                  <Card.Header>
+                    <MarkdownContent content={name} />
+                  </Card.Header>
+                  <Card.Meta>
+                    {`Type: ${type}`}
+                  </Card.Meta>
+                </Card.Content>
+                <Card.Content>
+                  {(extraDataRenderer.get(type) ?? fallbackRenderer)(data)}
+                </Card.Content>
+              </Card>
+            ))
+          }
+        </Segment>
+      </>
+    );
+  };
+  // -----
+
   // Main component
   return (
     <>
       {mainController()}
+      {extraDataDisplay()}
       {parameterInputs()}
     </>
   );
