@@ -178,6 +178,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   };
 
   // UI helper
+  // -----
   const mapCodeLines = (outerIndexes: number[]) => (e, i) => (
     <Comment key={i}>
       {typeof e === "string" ? (
@@ -197,7 +198,31 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       )}
     </Comment>
   );
+  const stepDisplay = () => (
+    <Grid.Row>
+      <Grid.Column width={16}>
+        <Card fluid>
+          <Card.Content>
+            <Card.Header>Steps</Card.Header>
+          </Card.Content>
+          <Card.Content>
+            {algorithm && codeType ? (
+              <Comment.Group>{codeMap[algorithm.id()][codeType].map(mapCodeLines([]))}</Comment.Group>
+            ) : (
+              <Placeholder fluid>
+                {Array.from({ length: 7 }, (_, i) => (
+                  <Placeholder.Line key={i} />
+                ))}
+              </Placeholder>
+            )}
+          </Card.Content>
+        </Card>
+      </Grid.Column>
+    </Grid.Row>
+  );
+  // -----
 
+  // -----
   const parameterInputs = () => {
     if (descriptors == null || descriptors.length === 0) return null;
     const onChange = index => (_, { value }) => {
@@ -208,7 +233,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
         <Grid.Column width={16}>
           <Card>
             <Card.Content>
-              <Card.Header>Parameters</Card.Header>
+              <Card.Header>{_(".ui.parameters")}</Card.Header>
             </Card.Content>
             <Card.Content>
               <Form>
@@ -231,19 +256,78 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       </Grid.Row>
     );
   };
+  // -----
 
+  // -----
+  const algorithmSelector = () => (
+    <Dropdown
+      placeholder={_(".ui.select_algorithm")}
+      fluid
+      search
+      selection
+      options={[...algorithms.keys()].map(key => ({
+        key,
+        text: _(`.algo.${key}.name`),
+        value: key
+      }))}
+      onChange={onAlgorithmChanged}
+    />
+  );
+  const codeTypeSelector = () => (
+    <Dropdown
+      placeholder={_(".ui.select_code_type")}
+      fluid
+      search
+      selection
+      options={
+        algorithm
+          ? Object.keys(codeMap[algorithm.id()]).map(key => ({
+              key,
+              text: _(`.algo.code_type.${key}`),
+              value: key
+            }))
+          : []
+      }
+      onChange={onCodeTypeChanged}
+    />
+  );
   const middleButton = () => {
     const button = (icon, content, color, action?) => (
       <Button fluid labelPosition="left" icon={icon} content={content} color={color} onClick={action} />
     );
     if (parameterState === "ok") {
       return runnerState === "stop"
-        ? button("play", "Start", "green", runAlgorithm)
-        : button("sync", "Restart", "blue", runAlgorithm);
+        ? button("play", _(".ui.start"), "green", runAlgorithm)
+        : button("sync", _(".ui.restart"), "blue", runAlgorithm);
     } else {
-      return button("close", "Check input", "yellow");
+      return button("close", _(".ui.check_parameters"), "yellow");
     }
   };
+  const mainController = () => (
+    <>
+      <Grid.Row>
+        <Grid.Column width={6}>{algorithmSelector()}</Grid.Column>
+        <Grid.Column width={3}>{middleButton()}</Grid.Column>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Column width={6}>{codeTypeSelector()}</Grid.Column>
+        <Grid.Column width={3}>
+          {auto ? (
+            <Button fluid icon="pause" content={_(".ui.pause")} onClick={flipAuto} />
+          ) : (
+            <Button fluid icon="play" content={_(".ui.autorun")} onClick={flipAuto} />
+          )}
+        </Grid.Column>
+        <Grid.Column width={7}>
+          <Button.Group fluid>
+            <Button labelPosition="left" icon="left chevron" content={_(".ui.previous_step")} onClick={previousStep} />
+            <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
+          </Button.Group>
+        </Grid.Column>
+      </Grid.Row>
+    </>
+  );
+  // -----
 
   // Main component
   return (
@@ -251,77 +335,9 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
       <Segment attached="bottom">
         <Grid padded>
-          <Grid.Row>
-            <Grid.Column width={16}>
-              <Card fluid>
-                <Card.Content>
-                  <Card.Header>Steps</Card.Header>
-                </Card.Content>
-                <Card.Content>
-                  {algorithm && codeType ? (
-                    <Comment.Group>{codeMap[algorithm.id()][codeType].map(mapCodeLines([]))}</Comment.Group>
-                  ) : (
-                    <Placeholder fluid>
-                      {Array.from({ length: 7 }, (_, i) => (
-                        <Placeholder.Line key={i} />
-                      ))}
-                    </Placeholder>
-                  )}
-                </Card.Content>
-              </Card>
-            </Grid.Column>
-          </Grid.Row>
+          {mainController()}
+          {stepDisplay()}
           {parameterInputs()}
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <Dropdown
-                placeholder="Select Algorithm"
-                fluid
-                search
-                selection
-                options={[...algorithms.keys()].map(key => ({
-                  key,
-                  text: _(`.algo.${key}.name`),
-                  value: key
-                }))}
-                onChange={onAlgorithmChanged}
-              />
-            </Grid.Column>
-            <Grid.Column width={3}>{middleButton()}</Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <Dropdown
-                placeholder="Select Code Type"
-                fluid
-                search
-                selection
-                options={
-                  algorithm
-                    ? Object.keys(codeMap[algorithm.id()]).map(key => ({
-                        key,
-                        text: _(`.algo.code_type.${key}`),
-                        value: key
-                      }))
-                    : []
-                }
-                onChange={onCodeTypeChanged}
-              />
-            </Grid.Column>
-            <Grid.Column width={3}>
-              {auto ? (
-                <Button fluid icon="pause" content="Stop" onClick={flipAuto} />
-              ) : (
-                <Button fluid icon="play" content="Start" onClick={flipAuto} />
-              )}
-            </Grid.Column>
-            <Grid.Column width={7}>
-              <Button.Group fluid>
-                <Button labelPosition="left" icon="left chevron" content="Back" onClick={previousStep} />
-                <Button labelPosition="right" icon="right chevron" content="Forward" onClick={nextStep} />
-              </Button.Group>
-            </Grid.Column>
-          </Grid.Row>
         </Grid>
       </Segment>
     </>
