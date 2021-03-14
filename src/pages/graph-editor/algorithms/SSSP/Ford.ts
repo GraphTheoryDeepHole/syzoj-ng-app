@@ -6,7 +6,8 @@ class Ford extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: node => (node.datum.visited == true ? "#ffff00" : undefined),
-      floatingData: node => `(${node.id},${node.datum.dist != Infinity && node.datum.dist != undefined ? node.datum.dist : "?"})`
+      floatingData: node =>
+        `(${node.id},${node.datum.dist != Infinity && node.datum.dist != undefined ? node.datum.dist : "?"})`
     };
   }
 
