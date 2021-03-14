@@ -162,6 +162,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     paraDispatch({ type: "changeAlgorithm", name: value });
     runnerDispatch({ type: "changeAlgorithm", name: value });
     props.onAlgorithmChanged(value);
+    props.setDisplayedGraph(null);
   };
   const onCodeTypeChanged = (_, { value }) => {
     setCodeType(value);
