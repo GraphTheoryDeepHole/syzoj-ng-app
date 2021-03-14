@@ -114,7 +114,7 @@ class ParameterManager {
     try {
       this.parseResult[index] = this.descriptors[index].parser(text, this.graph);
       this.parseError[index] = null;
-      this.state = "ok";
+      if (this.parseError.every(e => e == null)) this.state = "ok";
     } catch (e) {
       this.parseError[index] = e.message;
       this.state = "error";
