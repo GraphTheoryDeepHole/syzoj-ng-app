@@ -42,7 +42,12 @@ class HamiltonPath extends GraphAlgorithm {
       }
     }
     Object.assign(graph.nodes()[this_node].datum, { visited: 2 });
-    if (this_node != 0) {
+    if (this_node == 0) {
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 0]])
+      };
+    } else {
       yield {
         graph: graph,
         codePosition: new Map<string, number>([["pseudo", 3]])
@@ -70,7 +75,7 @@ class HamiltonPath extends GraphAlgorithm {
     };
 
     for (let i = 0; i < graph.mat.length; i++) {
-      if ((!graph.nodes()[i].datum.visited || i == 0) && graph.get(this_node, i)) {
+      if (!graph.nodes()[i].datum.visited && graph.get(this_node, i)) {
         for (let edge of graph.edges()) {
           if (edge.source == this_node && edge.target == i) {
             edge.datum.chosen = true;
@@ -104,10 +109,6 @@ class HamiltonPath extends GraphAlgorithm {
 
   *run(graph: Graph): Generator<Step> {
     graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.sequence = -1)));
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };
     yield* this.dfs(AdjacencyMatrix.from(graph, true), 0, 0);
     for (let i = 0; i < graph.nodes().length; i++) {
       if (graph.nodes()[i].datum.visited == 2) {

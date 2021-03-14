@@ -91,7 +91,7 @@ module.exports = {
       para: {}
     },
     HamiltonPath: {
-      name: "哈密顿道路",
+      name: "哈密顿回路",
       para: {}
     },
     Kruskal: {
