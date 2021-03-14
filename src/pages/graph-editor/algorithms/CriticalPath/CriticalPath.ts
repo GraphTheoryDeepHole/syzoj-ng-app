@@ -27,15 +27,9 @@ class CriticalPath extends GraphAlgorithm {
     };
   }
 
-  edgeVisited = [];
-  mat = [];
-
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge =>
-        this.edgeVisited[edge.source] != undefined && this.edgeVisited[edge.source][edge.target] == true
-          ? "#ffff00"
-          : "#87ceeb",
+      color: edge => (edge.datum.visited == true ? "#ffff00" : "#87ceeb"),
       floatingData: edge => edge.datum.weight
     };
   }
@@ -56,17 +50,21 @@ class CriticalPath extends GraphAlgorithm {
       codePosition: new Map<string, number>([["pseudo", 0]])
     };*/
     graph = AdjacencyMatrix.from(graph, true);
-    this.mat = (graph as AdjacencyMatrix).mat;
+    let mat = (graph as AdjacencyMatrix).mat;
     let topo = [];
     let counter = 0;
 
-    console.log(this.mat);
+    console.log(mat);
 
     graph.nodes().forEach(n => {
       n.datum.degree = 0;
       n.datum.dist = 0;
       n.datum.topoSequence = -1;
       n.datum.visited = 0;
+    });
+
+    graph.edges().forEach(e => {
+      e.datum.visited = false;
     });
 
     yield {
@@ -86,16 +84,16 @@ class CriticalPath extends GraphAlgorithm {
       codePosition: new Map<string, number>([["pseudo", 0]])
     };
 
-    for (let i = 0; i < graph.nodes().length; i++) {
+    /*for (let i = 0; i < graph.nodes().length; i++) {
       this.edgeVisited[i] = [];
       for (let j = 0; j < graph.nodes().length; j++) {
         this.edgeVisited[i][j] = false;
       }
-    }
+    }*/
 
     for (let t = 0; t < graph.nodes().length; t++) {
       for (let i = 0; i < graph.nodes().length; i++) {
-        if (graph.nodes()[i].datum.topoSequence == -1 && graph.nodes()[i].datum.degree == 0) {
+        if (graph.nodes()[i].datum.visited == 0 && graph.nodes()[i].datum.degree == 0) {
           graph.nodes()[i].datum.topoSequence = counter;
           graph.nodes()[i].datum.visited = 1;
           topo[counter++] = i;
@@ -106,14 +104,15 @@ class CriticalPath extends GraphAlgorithm {
           };
 
           for (let j = 0; j < graph.nodes().length; j++) {
-            if ((graph as AdjacencyMatrix).get(i, j) != 0 && (graph as AdjacencyMatrix).get(i, j) != undefined) {
+            if (mat[i][j] != undefined) {
               graph.nodes()[j].datum.degree--;
-              this.edgeVisited[i][j] = true;
-              /*graph.edges().forEach(edge => {
+              graph.edges();
+              //this.edgeVisited[i][j] = true;
+              graph.edges().forEach(edge => {
                 if (edge.source == i && edge.target == j) {
-                  edge.datum += 1;
+                  edge.datum.visited = true;
                 }
-              });*/
+              });
             }
           }
           /*for (let j = 0; j < graph.nodes().length; j++) {
@@ -138,11 +137,14 @@ class CriticalPath extends GraphAlgorithm {
         e.datum -= 1;
       }
     });*/
-    for (let i = 0; i < graph.nodes().length; i++) {
+    /*for (let i = 0; i < graph.nodes().length; i++) {
       for (let j = 0; j < graph.nodes().length; j++) {
         this.edgeVisited[i][j] = false;
       }
-    }
+    }*/
+    graph.edges().forEach(e => {
+      e.datum.visited = false;
+    });
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 2]])
@@ -156,15 +158,20 @@ class CriticalPath extends GraphAlgorithm {
 
       graph.nodes()[topo[i]].datum.visited = 2;
       for (let j = i + 1; j < graph.nodes().length; j++) {
-        if (graph.nodes()[topo[i]].datum.dist + this.mat[topo[i]][topo[j]] > graph.nodes()[topo[j]].datum.dist) {
-          graph.nodes()[topo[j]].datum.dist = graph.nodes()[topo[i]].datum.dist + this.mat[topo[i]][topo[j]];
-        }
-        this.edgeVisited[topo[i]][topo[j]] = true;
-        /*graph.edges().forEach(edge => {
-          if (edge.source == j && edge.target == topo[i]) {
-            edge.datum += 1;
+        if (mat[topo[i]][topo[j]] != undefined) {
+          if (
+            graph.nodes()[topo[i]].datum.dist + mat[topo[i]][topo[j]].weight >
+            graph.nodes()[topo[j]].datum.dist
+          ) {
+            graph.nodes()[topo[j]].datum.dist = graph.nodes()[topo[i]].datum.dist + mat[topo[i]][topo[j]].weight;
           }
-        });*/
+        }
+        //this.edgeVisited[topo[i]][topo[j]] = true;
+        graph.edges().forEach(edge => {
+          if (edge.source == j && edge.target == topo[i]) {
+            edge.datum.visited = true;
+          }
+        });
       }
 
       //console.log(this.edgeVisited);
