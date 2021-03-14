@@ -52,6 +52,12 @@ module.exports = {
     },
     fwd_list: {
       name: "前向表"
+    },
+    network: {
+      name: "网络流图",
+      error: {
+        non_matrix: "输入非矩阵"
+      }
     }
   },
   input: {
@@ -70,7 +76,8 @@ module.exports = {
       directed: "有向图？",
       weighted: "加权图？",
       self_loop: "允许自环？",
-      multiple_edges: "允许重边？"
+      multiple_edges: "允许重边？",
+      have_cost: "费用流图？"
     }
   },
   algo: {

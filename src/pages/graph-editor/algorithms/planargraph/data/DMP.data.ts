@@ -94,11 +94,34 @@ let E = [
     [2, 5],
     [4, 1],
     [4, 3]
+  ],
+  [
+    [0, 1],
+    [0, 2],
+    [0, 3],
+    [1, 2],
+    [1, 3],
+    [2, 3],
+    [0, 0],
+    [1, 1],
+    [2, 2],
+    [3, 3],
+    [4, 4],
+    [5, 5],
+    [6, 6],
+    [7, 7],
+    [4, 5],
+    [4, 6],
+    [4, 7],
+    [5, 6],
+    [5, 7],
+    [6, 7],
+    [3, 7]
   ]
 ].map(edges => edges.map(([s, t]) => ({ source: s, target: t, datum: {} })));
-let V = [8, 18, 5, 5, 6, 6];
+let V = [8, 18, 5, 5, 6, 6, 8];
 let G: EdgeList[] = E.map((edges, i) => new EdgeList(V[i], edges));
-let A = [true, true, false, true, false, true];
+let A = [true, true, false, true, false, true, true];
 //  K4-K4, textbook, K5, K5 - e, K{3,3}, K{3,3} - e
 
 export { G, A };

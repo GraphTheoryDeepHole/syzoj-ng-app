@@ -28,20 +28,21 @@ class Dinic extends GraphAlgorithm {
 
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      borderColor: node => (node.datum.depth !== -1 ? "#cccccc" : undefined),
-      fillingColor: node => (node.datum.depth !== -1 ? "#eeeeee" : undefined)
+      borderColor: node => (node.datum.depth !== -1 ? "#77ff77" : "#bbbbbb"),
+      fillingColor: node => (node.datum.depth !== -1 ? "#bbffbb" : "#dddddd"),
+      floatingData: node => `(${node.id},${node.datum.depth || "?"})`
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : 3),
       color: edge => {
-        if (edge.datum.mark) return edge.datum.mark === 1 ? "#ff0000" : "#00ff00";
-        if (edge.datum.valid) return edge.datum.valid === 1 ? "#ffaaaa" : "#aaffaa";
-        return "#cccccc";
+        if (edge.datum.mark) return edge.datum.mark === 1 ? "#33ff33" : "#ff3333";
+        if (edge.datum.valid) return edge.datum.valid === 1 ? "#bbffbb" : "#ffbbbb";
+        return "#dddddd";
       },
-      floatingData: edge => `(${edge.datum.flow},${edge.datum.used})`
+      floatingData: edge => `(${edge.datum.flow || "?"},${edge.datum.used || "?"})`
     };
   }
 
