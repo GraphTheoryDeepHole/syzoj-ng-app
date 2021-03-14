@@ -32,8 +32,8 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
 
     for (let i = 0; i < graph.nodes().length; i++) {
       for (let j = 0; j < graph.nodes().length; j++) {
-        if (mat[i][j].weight == undefined) {
-          mat[i][j].weight = Infinity;
+        if (mat[i][j] == undefined) {
+          mat[i][j] = { weight: Infinity };
         }
       }
     }
