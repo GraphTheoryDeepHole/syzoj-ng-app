@@ -3,10 +3,16 @@ import { Edge, Graph, Node } from "../GraphStructure";
 import { SimulationLinkDatum, SimulationNodeDatum } from "d3-force";
 import { Header, Segment } from "semantic-ui-react";
 import { useResizeDetector } from "react-resize-detector";
-import CanvasGraphRenderer, { EdgeRenderHint, GeneralRenderHint, NodeRenderHint } from "./CanvasGraphRenderer";
+import CanvasGraphRenderer, {
+  EdgeRenderHint,
+  GeneralRenderHint,
+  GraphRenderType,
+  NodeRenderHint
+} from "./CanvasGraphRenderer";
 
 interface GraphDisplayProp {
   dataGraph: Graph;
+  renderType: GraphRenderType;
   displayedGraph?: Graph;
   generalRenderHint?: GeneralRenderHint;
   nodeRenderHint?: Partial<NodeRenderHint>;
@@ -30,7 +36,7 @@ function toD3EdgeDatum(edge: Edge): D3SimulationEdge {
 }
 
 let GraphDisplay: React.FC<GraphDisplayProp> = props => {
-  const { dataGraph, displayedGraph, generalRenderHint, nodeRenderHint, edgeRenderHint } = props;
+  const { dataGraph, renderType, displayedGraph, generalRenderHint, nodeRenderHint, edgeRenderHint } = props;
   const reducer = (renderer, action) => {
     renderer[action.type](action);
     return renderer;
@@ -38,6 +44,10 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
   const [renderer, dispatch] = useReducer(reducer, new CanvasGraphRenderer());
   const { width, ref: resizeRef } = useResizeDetector<HTMLDivElement>();
   const height = width * 0.625; // 16:10
+
+  useEffect(() => {
+    dispatch({ type: "updateRenderType", renderType: renderType });
+  }, [renderType]);
 
   useEffect(() => {
     dispatch({ type: "updateGraph", graph: dataGraph, newGraph: true });
