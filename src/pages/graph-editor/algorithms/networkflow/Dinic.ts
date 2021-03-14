@@ -2,7 +2,7 @@ import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../..
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge, v } from "./Common";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 class Dinic extends GraphAlgorithm {
   // constructor() {

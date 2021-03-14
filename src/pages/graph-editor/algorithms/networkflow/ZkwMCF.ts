@@ -2,7 +2,7 @@ import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../..
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge, v, iv } from "./Common";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 class ZkwMCF extends GraphAlgorithm {
   // constructor() {

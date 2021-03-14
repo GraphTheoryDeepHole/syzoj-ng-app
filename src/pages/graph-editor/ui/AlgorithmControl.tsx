@@ -1,17 +1,20 @@
-import { Button, Card, Comment, Dropdown, Form, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
-import React, { Reducer, useEffect, useReducer, useState } from "react";
+import { Button, Card, Dropdown, Form, Grid, Header, Segment } from "semantic-ui-react";
+import React, { Reducer, useEffect, useMemo, useReducer, useState } from "react";
 import { algorithms, codeMap, newAlgorithm } from "@/pages/graph-editor/algorithms";
-import MarkdownContent from "@/markdown/MarkdownContent";
 import { useLocalizer } from "@/utils/hooks";
 import { GraphAlgorithm, ParameterDescriptor, Step } from "@/pages/graph-editor/GraphAlgorithm";
 import { Graph } from "@/pages/graph-editor/GraphStructure";
 import cloneDeep from "lodash.clonedeep";
-import style from "./AlgorithmControl.module.less";
+import MarkdownContent from "@/markdown/MarkdownContent";
+import { appState } from "@/appState";
+import { generateCodeFontEditorOptions } from "@/misc/fonts";
 
 interface AlgorithmControlProps {
   dataGraph: Graph;
   setDisplayedGraph: (g: Graph) => void;
   onAlgorithmChanged: (algorithm: string) => void;
+  setCodeType: (type: string) => void;
+  setCodePosition: (pos: number) => void;
 }
 
 type RunningState = "stop" | "running" | "done";
@@ -25,7 +28,8 @@ class AlgorithmRunner {
   public stepCount: number;
   public result: any;
 
-  constructor(private setDisplayedGraph: (g: Graph) => void) {}
+  constructor(private setDisplayedGraph: (g: Graph) => void) {
+  }
 
   public clear() {
     Object.assign(this, {
@@ -65,6 +69,7 @@ class AlgorithmRunner {
       if (stepIter.done) {
         this.state = "done";
         this.stepCount = this.currentStep;
+        this.steps[this.currentStep] = this.steps[this.currentStep - 1];
         this.result = cloneDeep(stepIter.value);
       } else {
         this.steps[this.currentStep] = cloneDeep(stepIter.value);
@@ -82,7 +87,8 @@ class ParameterManager {
   public parseError: string[];
   public state: ParameterState;
 
-  constructor(private graph: Graph) {}
+  constructor(private graph: Graph) {
+  }
 
   clear() {
     Object.assign(this, {
@@ -156,6 +162,16 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     props.setDisplayedGraph(steps[currentStep]?.graph);
   }, [steps, currentStep, props.setDisplayedGraph]);
 
+  // Sync code type
+  useEffect(() => {
+    props.setCodeType(codeType);
+  }, [codeType, props.setCodePosition]);
+
+  // Sync code position
+  useEffect(() => {
+    props.setCodePosition(steps[currentStep]?.codePosition?.get(codeType));
+  }, [steps, currentStep, codeType, props.setCodePosition]);
+
   // Utility functions
   const flipAuto = () => setAuto(!auto);
   const onAlgorithmChanged = (_, { value }) => {
@@ -181,81 +197,31 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
 
   // UI helper
   // -----
-  const mapCodeLines = (outerIndexes: number[]) => (e, i) => (
-    <Comment key={i}>
-      {typeof e === "string" ? (
-        <>
-          <Comment.Text
-            className={
-              runnerState != "stop" && steps[currentStep]?.codePosition?.get(codeType) === i
-                ? style.currentStep
-                : style.step
-            }
-          >
-            <MarkdownContent content={e} />
-          </Comment.Text>
-        </>
-      ) : (
-        <Comment.Group>{e.map(mapCodeLines([...outerIndexes, i]))}</Comment.Group>
-      )}
-    </Comment>
-  );
-  const stepDisplay = () => (
-    <Grid.Row>
-      <Grid.Column width={16}>
-        <Card fluid>
-          <Card.Content>
-            <Card.Header>Steps</Card.Header>
-          </Card.Content>
-          <Card.Content>
-            {algorithm && codeType ? (
-              <Comment.Group>{codeMap[algorithm.id()][codeType].map(mapCodeLines([]))}</Comment.Group>
-            ) : (
-              <Placeholder fluid>
-                {Array.from({ length: 7 }, (_, i) => (
-                  <Placeholder.Line key={i} />
-                ))}
-              </Placeholder>
-            )}
-          </Card.Content>
-        </Card>
-      </Grid.Column>
-    </Grid.Row>
-  );
-  // -----
-
-  // -----
   const parameterInputs = () => {
     if (descriptors == null || descriptors.length === 0) return null;
     const onChange = index => (_, { value }) => {
       paraDispatch({ type: "changeText", index, text: value });
     };
     return (
-      <Grid.Row>
-        <Grid.Column width={16}>
-          <Card>
-            <Card.Content>
-              <Card.Header>{_(".ui.parameters")}</Card.Header>
-            </Card.Content>
-            <Card.Content>
-              <Form>
-                <Form.Group widths={"equal"}>
-                  {descriptors.map(({ name }, i) => (
-                    <Form.Input
-                      fluid
-                      key={name}
-                      label={_(`.algo.${algorithm.id()}.para.${name}`)}
-                      error={parseError[i] ? _(parseError[i]) : null}
-                      value={inputTexts[i]}
-                      onChange={onChange(i)}
-                    />
-                  ))}
-                </Form.Group>
-              </Form>
-            </Card.Content>
-          </Card>
-        </Grid.Column>
-      </Grid.Row>
+      <>
+        <Header as="h4" block attached="top" icon="crosshairs" content={_(".ui.parameters")} />
+        <Segment attached="bottom">
+          <Form>
+            <Form.Group widths={"equal"}>
+              {descriptors.map(({ name }, i) => (
+                <Form.Input
+                  fluid
+                  key={name}
+                  label={_(`.algo.${algorithm.id()}.para.${name}`)}
+                  error={parseError[i] ? _(parseError[i]) : null}
+                  value={inputTexts[i]}
+                  onChange={onChange(i)}
+                />
+              ))}
+            </Form.Group>
+          </Form>
+        </Segment>
+      </>
     );
   };
   // -----
@@ -284,10 +250,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       options={
         algorithm
           ? Object.keys(codeMap[algorithm.id()]).map(key => ({
-              key,
-              text: _(`.algo.code_type.${key}`),
-              value: key
-            }))
+            key,
+            text: _(`.algo.code_type.${key}`),
+            value: key
+          }))
           : []
       }
       onChange={onCodeTypeChanged}
@@ -297,7 +263,9 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     const button = (icon, content, color, action?) => (
       <Button fluid labelPosition="left" icon={icon} content={content} color={color} onClick={action} />
     );
-    if (parameterState === "ok") {
+    if (algorithm == null) {
+      return button("close", _(".ui.no_algorithm"), "yellow");
+    } else if (parameterState === "ok") {
       return runnerState === "stop"
         ? button("play", _(".ui.start"), "green", runAlgorithm)
         : button("sync", _(".ui.restart"), "blue", runAlgorithm);
@@ -305,43 +273,106 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       return button("close", _(".ui.check_parameters"), "yellow");
     }
   };
+  const runnerInfo = () => {
+    let infoStr = _(".ui.runner_" + runnerState);
+    if (runnerState == "running") {
+      infoStr += "  " + currentStep + _(".ui.step");
+    } else if (runnerState == "done") {
+      infoStr += `  ${currentStep}/${stepCount}` + _(".ui.step");
+    }
+    return infoStr;
+  };
   const mainController = () => (
     <>
-      <Grid.Row>
-        <Grid.Column width={6}>{algorithmSelector()}</Grid.Column>
-        <Grid.Column width={3}>{middleButton()}</Grid.Column>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column width={6}>{codeTypeSelector()}</Grid.Column>
-        <Grid.Column width={3}>
-          {auto ? (
-            <Button fluid icon="pause" content={_(".ui.pause")} onClick={flipAuto} />
-          ) : (
-            <Button fluid icon="play" content={_(".ui.autorun")} onClick={flipAuto} />
-          )}
-        </Grid.Column>
-        <Grid.Column width={7}>
-          <Button.Group fluid>
-            <Button labelPosition="left" icon="left chevron" content={_(".ui.previous_step")} onClick={previousStep} />
-            <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
-          </Button.Group>
-        </Grid.Column>
-      </Grid.Row>
+      <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
+      <Segment attached="bottom">
+        <Grid padded>
+          <Grid.Row>{algorithmSelector()}</Grid.Row>
+          <Grid.Row>{codeTypeSelector()}</Grid.Row>
+          <Grid.Row>{middleButton()}</Grid.Row>
+          <Grid.Row>
+            {auto ? (
+              <Button fluid icon="pause" content={_(".ui.pause")} onClick={flipAuto} />
+            ) : (
+              <Button fluid icon="play" content={_(".ui.autorun")} onClick={flipAuto} />
+            )}
+          </Grid.Row>
+          <Grid.Row>
+            <Button.Group fluid>
+              <Button labelPosition="left" icon="left chevron" content={_(".ui.previous_step")}
+                      onClick={previousStep} />
+              <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
+            </Button.Group>
+          </Grid.Row>
+          <Grid.Row>
+            <span style={{ width: "100%", textAlign: "center" }}>
+              {runnerInfo()}
+            </span>
+          </Grid.Row>
+        </Grid>
+      </Segment>
     </>
   );
+  // -----
+
+  // -----
+  const codeOption = useMemo(() => generateCodeFontEditorOptions(appState.locale), [appState.locale]);
+  const fallbackRenderer = (data: any) => (<span style={{
+    fontFamily: codeOption.fontFamily,
+    fontSize: codeOption.fontSize
+  }}>{JSON.stringify(data)}</span>);
+  const extraDataRenderer: Map<string, (data: any) => JSX.Element> = new Map();
+  const extraDataDisplay = () => {
+    const extraData = steps[currentStep]?.extraData;
+    if (extraData == null) return;
+    return (
+      <>
+        <Header as="h4" block attached="top" icon="database" content="extra data" />
+        <Segment attached="bottom">
+          {
+            extraData.map(([name, type, data]) => (
+              <Card key={name}>
+                <Card.Content>
+                  <Card.Header>
+                    <MarkdownContent content={name} />
+                  </Card.Header>
+                  <Card.Meta>
+                    {`Type: ${type}`}
+                  </Card.Meta>
+                </Card.Content>
+                <Card.Content>
+                  {(extraDataRenderer.get(type) ?? fallbackRenderer)(data)}
+                </Card.Content>
+              </Card>
+            ))
+          }
+        </Segment>
+      </>
+    );
+  };
+  const resultDisplay = () => {
+    if (result == null) return;
+    return (
+      <>
+        <Header as="h4" block attached="top" icon="check" content="result" />
+        <Segment color="green" attached="bottom">
+          <span style={{
+            fontFamily: codeOption.fontFamily,
+            fontSize: codeOption.fontSize
+          }}>{JSON.stringify(result)}</span>
+        </Segment>
+      </>
+    );
+  };
   // -----
 
   // Main component
   return (
     <>
-      <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
-      <Segment attached="bottom">
-        <Grid padded>
-          {mainController()}
-          {stepDisplay()}
-          {parameterInputs()}
-        </Grid>
-      </Segment>
+      {mainController()}
+      {resultDisplay()}
+      {extraDataDisplay()}
+      {parameterInputs()}
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { GraphAlgorithm, ParameterDescriptor, Step } from "../../GraphAlgorithm";
-import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "../../ui/CanvasGraphRenderer";
 import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 type NodeState = "relaxing" | "updating" | "updated" | "relaxed" | string;

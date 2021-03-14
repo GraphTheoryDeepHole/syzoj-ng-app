@@ -1,7 +1,7 @@
 import React from "react";
-import { MethodComponent } from "@/pages/graph-editor/input/GraphInputPanel";
+import { MethodComponent } from "@/pages/graph-editor/ui/GraphInputPanel";
 import { AdjacencyMatrix, Graph } from "@/pages/graph-editor/GraphStructure";
-import MatrixInputComponent from "@/pages/graph-editor/input/methods/MatrixInputComponent";
+import MatrixInputComponent from "@/pages/graph-editor/ui/input-methods/MatrixInputComponent";
 
 let AdjacencyMatrixComponent: MethodComponent = props => {
   let { graph, setGraph, setRenderType } = props;

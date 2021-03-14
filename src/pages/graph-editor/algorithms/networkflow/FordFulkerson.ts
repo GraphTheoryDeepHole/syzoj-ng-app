@@ -1,7 +1,7 @@
 import { GraphAlgorithm, Step, ParameterDescriptor, parseRangedInt } from "../../GraphAlgorithm";
 import { EdgeList, Graph, Node } from "../../GraphStructure";
 import { NetworkFlowBase, _Edge, v } from "./Common";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 class FordFulkerson extends GraphAlgorithm {
   // constructor() {

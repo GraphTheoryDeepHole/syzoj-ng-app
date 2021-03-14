@@ -1,7 +1,7 @@
 import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { Edge, Graph, Node, NodeEdgeList } from "../../GraphStructure";
 import { DMPGraph, Face, Fragment } from "./DMPGraph";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 function clear<type>(buf: type[], val: type, cnt: number) {
   for (let _ = 0; _ < cnt; ++_) buf[_] = val;

@@ -93,7 +93,6 @@ class CanvasGraphRenderer {
   public canvas: HTMLCanvasElement;
   public simulation: d3.Simulation<D3SimulationNode, D3SimulationEdge>;
   public patcher: DeepPartial<RenderHints>;
-  public hint: RenderHints = defaultRenderHints;
   public renderType: GraphRenderType = {
     directed: true,
     bipartite: false,
@@ -103,6 +102,19 @@ class CanvasGraphRenderer {
     width: number;
     height: number;
   };
+
+  hint(category: string, name: string, ...args: any[]) {
+    if (defaultRenderHints[category]?.[name] == null) {
+      console.log(`WARNING: Render hint not found [${category},${name}]`);
+      return undefined;
+    }
+    let renderHint = this.patcher?.[category]?.[name] || defaultRenderHints[category][name];
+    if (typeof renderHint === "function") {
+      return renderHint(...args) || defaultRenderHints[category][name](...args);
+    } else {
+      return renderHint;
+    }
+  }
 
   // update function
   // modify information and try to start/restart simulation and rendering
@@ -144,29 +156,7 @@ class CanvasGraphRenderer {
   }
 
   updateRenderHint(args: { patcher: DeepPartial<RenderHints> }) {
-    const { patcher } = args;
-    for (let prop in this.hint) {
-      if (patcher[prop] == null) {
-        this.hint[prop] = defaultRenderHints[prop];
-      } else {
-        for (let childProp in this.hint[prop]) {
-          if (patcher[prop][childProp] == null) {
-            this.hint[prop][childProp] = defaultRenderHints[prop][childProp];
-          } else {
-            if (typeof this.hint[prop][childProp] == "function") {
-              const functionWithDefault = (newFunc, defaultFunc) => (...args) =>
-                newFunc(...args) || defaultFunc(...args);
-              this.hint[prop][childProp] = functionWithDefault(
-                patcher[prop][childProp],
-                defaultRenderHints[prop][childProp]
-              );
-            } else {
-              this.hint[prop][childProp] = patcher[prop][childProp];
-            }
-          }
-        }
-      }
-    }
+    this.patcher = args.patcher;
     this.simulation.restart();
   }
 
@@ -221,16 +211,16 @@ class CanvasGraphRenderer {
   private xInRange(x: number): number {
     return CanvasGraphRenderer.makeInRange(
       x,
-      this.hint.general.nodeRadius,
-      this.size.width - this.hint.general.nodeRadius
+      this.hint("general", "nodeRadius"),
+      this.size.width - this.hint("general", "nodeRadius")
     );
   }
 
   private yInRange(y: number): number {
     return CanvasGraphRenderer.makeInRange(
       y,
-      this.hint.general.nodeRadius,
-      this.size.height - this.hint.general.nodeRadius
+      this.hint("general", "nodeRadius"),
+      this.size.height - this.hint("general", "nodeRadius")
     );
   }
 
@@ -244,15 +234,13 @@ class CanvasGraphRenderer {
   }
 
   initSimulation() {
-    const { simulationForceManyBodyStrength: mbForce } = this.hint.general;
-
     this.simulation = d3
       .forceSimulation(this.nodes)
       .force(
         "link",
         d3.forceLink(this.edges).distance(edge => edge.graphEdge.datum.weight || 30)
       ) // default id implement may work
-      .force("charge", d3.forceManyBody().strength(mbForce))
+      .force("charge", d3.forceManyBody().strength(this.hint("general", "simulationForceManyBodyStrength")))
       .on("tick", () => this.render())
       .stop();
   }
@@ -284,7 +272,7 @@ class CanvasGraphRenderer {
     if (this.canvas == null) return;
 
     const ctx = this.canvas.getContext("2d");
-    const { backgroundColor } = this.hint.general;
+    const backgroundColor = this.hint("general", "backgroundColor");
     const { width, height } = this.size;
 
     ctx.fillStyle = backgroundColor;
@@ -304,13 +292,12 @@ class CanvasGraphRenderer {
       target: { x: tx, y: ty },
       graphEdge
     } = edge;
-    const { nodeRadius, textColor } = this.hint.general;
-    const { color, thickness, floatingData } = this.hint.edge;
+    const nodeRadius = this.hint("general", "nodeRadius");
 
     // Draw line
     ctx.beginPath();
-    ctx.fillStyle = ctx.strokeStyle = color(graphEdge);
-    ctx.lineWidth = thickness(graphEdge);
+    ctx.fillStyle = ctx.strokeStyle = this.hint("edge", "color", graphEdge);
+    ctx.lineWidth = this.hint("edge", "thickness", graphEdge);
     ctx.moveTo(sx, sy);
     ctx.lineTo(tx, ty);
     ctx.stroke();
@@ -338,31 +325,30 @@ class CanvasGraphRenderer {
     }
 
     // Draw floating data
-    ctx.fillStyle = textColor;
+    ctx.fillStyle = this.hint("general", "textColor");
     ctx.lineWidth = 1;
-    ctx.fillText(floatingData(graphEdge), (sx + tx) / 2, (sy + ty) / 2);
+    ctx.fillText(this.hint("edge", "floatingData", graphEdge), (sx + tx) / 2, (sy + ty) / 2);
   }
 
   renderNode(ctx: CanvasRenderingContext2D, node: D3SimulationNode) {
     ctx.font = "20px " + getCodeFont();
-    const { nodeRadius, textColor } = this.hint.general;
-    const { borderThickness, borderColor, fillingColor, floatingData, popupData } = this.hint.node;
+    const nodeRadius = this.hint("general", "nodeRadius");
     const { x, y, graphNode } = node;
 
     ctx.beginPath();
 
-    ctx.strokeStyle = borderColor(graphNode);
-    ctx.lineWidth = borderThickness(graphNode);
+    ctx.strokeStyle = this.hint("node", "borderColor", graphNode);
+    ctx.lineWidth = this.hint("node", "borderThickness", graphNode);
     ctx.moveTo(x + nodeRadius, y);
     ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
     ctx.stroke();
 
-    ctx.fillStyle = fillingColor(graphNode);
+    ctx.fillStyle = this.hint("node", "fillingColor", graphNode);
     ctx.fill();
 
-    ctx.fillStyle = textColor;
+    ctx.fillStyle = this.hint("general", "textColor");
     ctx.lineWidth = 1;
-    ctx.fillText(floatingData(graphNode), x, y);
+    ctx.fillText(this.hint("node", "floatingData", graphNode), x, y);
 
     // TODO: Render popup data
   }

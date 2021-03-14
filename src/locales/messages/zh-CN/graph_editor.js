@@ -6,11 +6,16 @@ module.exports = {
     select_code_type: "选择代码类型",
     start: "启动",
     restart: "重新启动",
+    no_algorithm: "选择算法",
     check_parameters: "检查参数",
     autorun: "自动运行",
     pause: "暂停",
     previous_step: "上一步",
-    next_step: "下一步"
+    next_step: "下一步",
+    runner_stop: "未运行",
+    runner_running: "正在运行",
+    runner_done: "已完成",
+    step: "步"
   },
   graph: {
     random: {
