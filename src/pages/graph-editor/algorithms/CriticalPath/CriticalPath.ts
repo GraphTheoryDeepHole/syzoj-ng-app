@@ -33,7 +33,7 @@ class CriticalPath extends GraphAlgorithm {
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
       color: edge => (this.edgeVisited[edge.source][edge.target] ? "#ffff00" : "#87ceeb"),
-      floatingData: edge => (this.mat[edge.source][edge.target])
+      floatingData: edge => this.mat[edge.source][edge.target]
     };
   }
 
@@ -65,7 +65,7 @@ class CriticalPath extends GraphAlgorithm {
       n.datum.topoSequence = -1;
       n.datum.visited = 0;
     });
-    
+
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 0]])
@@ -153,12 +153,8 @@ class CriticalPath extends GraphAlgorithm {
 
       graph.nodes()[topo[i]].datum.visited = 2;
       for (let j = i + 1; j < graph.nodes().length; j++) {
-        if (
-          graph.nodes()[topo[i]].datum.dist + this.mat[topo[i]][topo[j]] >
-          graph.nodes()[topo[j]].datum.dist
-        ) {
-          graph.nodes()[topo[j]].datum.dist =
-            graph.nodes()[topo[i]].datum.dist + this.mat[topo[i]][topo[j]];
+        if (graph.nodes()[topo[i]].datum.dist + this.mat[topo[i]][topo[j]] > graph.nodes()[topo[j]].datum.dist) {
+          graph.nodes()[topo[j]].datum.dist = graph.nodes()[topo[i]].datum.dist + this.mat[topo[i]][topo[j]];
         }
         this.edgeVisited[topo[i]][topo[j]] = true;
         /*graph.edges().forEach(edge => {
