@@ -69,6 +69,7 @@ class AlgorithmRunner {
       if (stepIter.done) {
         this.state = "done";
         this.stepCount = this.currentStep;
+        this.steps[this.currentStep] = this.steps[this.currentStep - 1];
         this.result = cloneDeep(stepIter.value);
       } else {
         this.steps[this.currentStep] = cloneDeep(stepIter.value);
@@ -168,7 +169,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
 
   // Sync code position
   useEffect(() => {
-    props.setCodePosition(steps[currentStep]?.codePosition.get(codeType));
+    props.setCodePosition(steps[currentStep]?.codePosition?.get(codeType));
   }, [steps, currentStep, codeType, props.setCodePosition]);
 
   // Utility functions
@@ -272,6 +273,15 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       return button("close", _(".ui.check_parameters"), "yellow");
     }
   };
+  const runnerInfo = () => {
+    let infoStr = _(".ui.runner_" + runnerState);
+    if (runnerState == "running") {
+      infoStr += "  " + currentStep + _(".ui.step");
+    } else if (runnerState == "done") {
+      infoStr += `  ${currentStep}/${stepCount}` + _(".ui.step");
+    }
+    return infoStr;
+  };
   const mainController = () => (
     <>
       <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
@@ -293,6 +303,11 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
                       onClick={previousStep} />
               <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
             </Button.Group>
+          </Grid.Row>
+          <Grid.Row>
+            <span style={{ width: "100%", textAlign: "center" }}>
+              {runnerInfo()}
+            </span>
           </Grid.Row>
         </Grid>
       </Segment>

@@ -11,7 +11,11 @@ module.exports = {
     autorun: "自动运行",
     pause: "暂停",
     previous_step: "上一步",
-    next_step: "下一步"
+    next_step: "下一步",
+    runner_stop: "未运行",
+    runner_running: "正在运行",
+    runner_done: "已完成",
+    step: "步"
   },
   graph: {
     random: {
