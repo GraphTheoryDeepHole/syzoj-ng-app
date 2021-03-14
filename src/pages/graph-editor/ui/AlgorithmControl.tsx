@@ -199,31 +199,25 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       paraDispatch({ type: "changeText", index, text: value });
     };
     return (
-      <Grid.Row>
-        <Grid.Column width={16}>
-          <Card>
-            <Card.Content>
-              <Card.Header>{_(".ui.parameters")}</Card.Header>
-            </Card.Content>
-            <Card.Content>
-              <Form>
-                <Form.Group widths={"equal"}>
-                  {descriptors.map(({ name }, i) => (
-                    <Form.Input
-                      fluid
-                      key={name}
-                      label={_(`.algo.${algorithm.id()}.para.${name}`)}
-                      error={parseError[i] ? _(parseError[i]) : null}
-                      value={inputTexts[i]}
-                      onChange={onChange(i)}
-                    />
-                  ))}
-                </Form.Group>
-              </Form>
-            </Card.Content>
-          </Card>
-        </Grid.Column>
-      </Grid.Row>
+      <>
+        <Header as="h4" block attached="top" icon="crosshairs" content={_(".ui.parameters")} />
+        <Segment attached="bottom">
+          <Form>
+            <Form.Group widths={"equal"}>
+              {descriptors.map(({ name }, i) => (
+                <Form.Input
+                  fluid
+                  key={name}
+                  label={_(`.algo.${algorithm.id()}.para.${name}`)}
+                  error={parseError[i] ? _(parseError[i]) : null}
+                  value={inputTexts[i]}
+                  onChange={onChange(i)}
+                />
+              ))}
+            </Form.Group>
+          </Form>
+        </Segment>
+      </>
     );
   };
   // -----
