@@ -1,6 +1,6 @@
 import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
 import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
-import { AdjacencyMatrix, Graph } from "../../GraphStructure";
+import { AdjacencyList, AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 class CriticalPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
@@ -10,11 +10,12 @@ class CriticalPath extends GraphAlgorithm {
           return "#87ceeb";
         } else if (node.datum.visited == 2) {
           return "#ffff00";
-        } /*if (node.datum.visited == 3)*/ else {
+        }
+        if (node.datum.visited == 3) {
           return "#adff2f";
-        } /*else {
+        } else {
           return undefined;
-        }*/
+        }
       },
       floatingData: node => {
         if (this.stage == 0) {
@@ -32,8 +33,8 @@ class CriticalPath extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      /*color: edge => (edge.datum.visited ? "#87ceeb" : "#ffff00"),
-      floatingData: edge => edge.datum.weight*/
+      color: edge => (edge.datum & 1 ? "#87ceeb" : "#ffff00"),
+      floatingData: edge => String(edge.datum >> 1)
     };
   }
 
@@ -48,13 +49,13 @@ class CriticalPath extends GraphAlgorithm {
   stage = 0;
 
   *run(oriGraph: Graph): Generator<Step> {
-    let graph = AdjacencyMatrix.from(oriGraph, true);
+    let graph = AdjacencyList.from(oriGraph, true);
     console.log("0");
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 0]])
     };
-    let mat = graph.mat;
+    let mat = AdjacencyMatrix.from(oriGraph, true).mat;
     let topo = [];
     let counter = 0;
     console.log("1");
@@ -75,7 +76,9 @@ class CriticalPath extends GraphAlgorithm {
       codePosition: new Map<string, number>([["pseudo", 0]])
     };
 
-    graph.edges().forEach(e => (e.datum = { weight: e.datum, visited: false }));
+    graph.edges().forEach(e => {
+      e.datum <<= 1;
+    });
     console.log("3");
     yield {
       graph: graph,
@@ -108,7 +111,7 @@ class CriticalPath extends GraphAlgorithm {
               graph.nodes()[j].datum.degree--;
               graph.edges().forEach(edge => {
                 if (edge.source == i && edge.target == j) {
-                  edge.datum.visited = true;
+                  edge.datum += 1;
                 }
               });
             }
@@ -128,7 +131,7 @@ class CriticalPath extends GraphAlgorithm {
     };
 
     this.stage = 1;
-    graph.edges().forEach(e => (e.datum.visited = false));
+    graph.edges().forEach(e => (e.datum -= 1));
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 2]])
@@ -142,12 +145,12 @@ class CriticalPath extends GraphAlgorithm {
 
       graph.nodes()[topo[i]].datum.visited = 2;
       for (let j = 0; j < graph.nodes().length; j++) {
-        if (graph.nodes()[topo[i]].datum.weight < graph.nodes()[j].datum.weight + mat[j][topo[i]]) {
-          graph.nodes()[topo[i]].datum.weight = graph.nodes()[j].datum.weight + mat[j][topo[i]];
+        if (graph.nodes()[topo[i]].datum.dist < graph.nodes()[j].datum.dist + mat[j][topo[i]]) {
+          graph.nodes()[topo[i]].datum.dist = graph.nodes()[j].datum.dist + mat[j][topo[i]];
         }
         graph.edges().forEach(edge => {
           if (edge.source == j && edge.target == topo[i]) {
-            edge.datum.visited = true;
+            edge.datum += 1;
           }
         });
       }
