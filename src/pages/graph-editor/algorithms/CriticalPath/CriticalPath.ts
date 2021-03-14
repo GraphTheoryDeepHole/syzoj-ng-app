@@ -159,10 +159,7 @@ class CriticalPath extends GraphAlgorithm {
       graph.nodes()[topo[i]].datum.visited = 2;
       for (let j = i + 1; j < graph.nodes().length; j++) {
         if (mat[topo[i]][topo[j]] != undefined) {
-          if (
-            graph.nodes()[topo[i]].datum.dist + mat[topo[i]][topo[j]].weight >
-            graph.nodes()[topo[j]].datum.dist
-          ) {
+          if (graph.nodes()[topo[i]].datum.dist + mat[topo[i]][topo[j]].weight > graph.nodes()[topo[j]].datum.dist) {
             graph.nodes()[topo[j]].datum.dist = graph.nodes()[topo[i]].datum.dist + mat[topo[i]][topo[j]].weight;
           }
         }
