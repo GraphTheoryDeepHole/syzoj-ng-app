@@ -90,6 +90,10 @@ module.exports = {
       name: "关键路径",
       para: {}
     },
+    HamiltonPath: {
+      name: "哈密顿道路",
+      para: {}
+    },
     Kruskal: {
       name: "最小生成树：Kruskal算法",
       para: {}
@@ -115,7 +119,7 @@ module.exports = {
       para: {}
     },
     SalesmanCheaperAlgorithm: {
-      name: "旅行商问题：分支限界法",
+      name: "旅行商问题：便宜算法",
       para: {}
     },
     mf_ff: {

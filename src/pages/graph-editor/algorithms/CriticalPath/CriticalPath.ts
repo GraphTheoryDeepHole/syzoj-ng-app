@@ -59,11 +59,6 @@ class CriticalPath extends GraphAlgorithm {
       e.datum.visited = false;
     });
 
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };
-
     for (let edge of graph.edges()) {
       graph.nodes()[edge.target].datum.degree++;
     }
