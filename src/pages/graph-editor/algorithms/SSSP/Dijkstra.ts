@@ -4,10 +4,10 @@ import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 type NodeState = "relaxing" | "updating" | "updated" | "relaxed" | string;
 const stateColorMap: Map<NodeState, string> = new Map([
-  ["relaxing", "#fae52d"],
-  ["updating", "#59ffff"],
-  ["updated", "#107eff"],
-  ["relaxed", "#ff0000"]
+  ["relaxing", "#87ceeb"],
+  ["updating", "#ffff00"],
+  ["updated", "#adff2f"],
+  ["relaxed", "#fff0f5"]
 ]);
 
 class Dijkstra extends GraphAlgorithm {
@@ -17,7 +17,7 @@ class Dijkstra extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.visited ? "#00ff00" : undefined),
+      color: edge => (edge.datum.visited ? "#db70db" : undefined),
       floatingData: edge => edge.datum.dist
     };
   }

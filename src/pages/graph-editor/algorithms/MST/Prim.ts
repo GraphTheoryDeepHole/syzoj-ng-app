@@ -4,7 +4,10 @@ import { Graph } from "../../GraphStructure";
 
 class Prim extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
-    return {};
+    return {
+      fillingColor: undefined,
+      floatingData: undefined
+    };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {

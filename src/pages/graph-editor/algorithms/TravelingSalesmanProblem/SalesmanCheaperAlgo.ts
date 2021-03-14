@@ -5,15 +5,15 @@ import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 class SalesmanCheaperAlgo extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      fillingColor: node => (node.datum.chosen ? "#ff0000" : undefined),
-      floatingData: node => (node.id == 0 ? node.datum.answer : "")
+      fillingColor: undefined,
+      floatingData: node => (node.id == 0 ? `${node.id} ans=${node.datum.answer}` : undefined)
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.chosen ? "#00ff00" : undefined),
-      floatingData: edge => edge.datum.dist
+      color: edge => (edge.datum.chosen ? "#db70db" : undefined),
+      floatingData: edge => edge.datum.weight
     };
   }
 
@@ -25,19 +25,19 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
     return [];
   }
 
-  *salesmanCheaperAlgo(graph: Graph): Generator<Step> {
+  *run(graph: Graph): Generator<Step> {
     let nodes = [];
-    let mat = AdjacencyMatrix.from(graph, true).mat;
+    let mat = AdjacencyMatrix.from(graph, false).mat;
 
     for (let i = 0; i < graph.nodes().length; i++) {
-      mat[i][i] = 0;
+      mat[i][i] = { weight: 0 };
       nodes[i] = i;
       graph.nodes()[i].datum = { chosen: 0 };
     }
     graph.nodes()[0].datum.answer = 0;
 
     for (let i = 0; i < graph.edges().length; i++) {
-      graph.edges()[i].datum = { dist: graph.edges()[i].datum, chosen: 0 };
+      graph.edges()[i].datum.chosen = 0;
     }
 
     yield {
@@ -52,7 +52,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
       let mink = graph.nodes().length - 1;
       for (let j = 0; j <= i; j++) {
         for (let k = i + 1; k < graph.nodes().length; k++) {
-          if (mat[nodes[j]][nodes[k]] < mat[nodes[minj]][nodes[mink]]) {
+          if (mat[nodes[j]][nodes[k]].weight < mat[nodes[minj]][nodes[mink]].weight) {
             minj = j;
             mink = k;
           }
@@ -70,50 +70,41 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
       let tmp = nodes[mink];
       nodes[mink] = nodes[i + 1];
       nodes[i + 1] = tmp;
-      if (mat[preNode][insNode] < mat[postNode][insNode]) {
+      if (mat[preNode][insNode].weight < mat[postNode][insNode].weight) {
         for (let j = i + 1; j > minj; j--) {
           nodes[j] = nodes[j - 1];
         }
         nodes[minj] = tmp;
-        graph.nodes()[0].datum.answer += mat[preNode][insNode] + mat[insNode][curNode] - mat[preNode][curNode];
-        for (let edge of graph.edges()) {
-          if (
-            (edge.source == preNode && edge.target == insNode) ||
-            (edge.source == insNode && edge.target == curNode)
-          ) {
-            edge.datum.chosen = 1;
-          }
-          if (edge.source == preNode && edge.target == curNode) {
-            edge.datum.chosen = 0;
-          }
-        }
+        graph.nodes()[0].datum.answer +=
+          mat[preNode][insNode].weight + mat[insNode][curNode].weight - mat[preNode][curNode].weight;
       } else {
         for (let j = i + 1; j > minj + 1; j--) {
           nodes[j] = nodes[j - 1];
         }
         nodes[minj + 1] = tmp;
-        graph.nodes()[0].datum.answer += mat[postNode][insNode] + mat[insNode][curNode] - mat[postNode][curNode];
+        graph.nodes()[0].datum.answer +=
+          mat[postNode][insNode].weight + mat[insNode][curNode].weight - mat[postNode][curNode].weight;
+      }
+      graph.edges().forEach(e => (e.datum.chosen = 0));
+      for (let j = 0; j <= i + 1; j++) {
         for (let edge of graph.edges()) {
           if (
-            (edge.source == curNode && edge.target == insNode) ||
-            (edge.source == insNode && edge.target == postNode)
+            (edge.source == nodes[j] && edge.target == nodes[(j + 1) % (i + 2)]) ||
+            (edge.target == nodes[j] && edge.source == nodes[(j + 1) % (i + 2)])
           ) {
             edge.datum.chosen = 1;
-          }
-          if (edge.source == curNode && edge.target == postNode) {
-            edge.datum.chosen = 0;
           }
         }
       }
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 2]])
+        codePosition: new Map<string, number>([["pseudo", 1]])
       };
     }
-  }
-
-  run(graph: Graph) {
-    return this.salesmanCheaperAlgo(graph);
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 2]])
+    };
   }
 }
 

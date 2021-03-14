@@ -8,8 +8,8 @@ test("SalesmanCheaperAlgo", () => {
     [35, 23, 0, 17, 28],
     [25, 21, 17, 0, 24],
     [27, 19, 28, 24, 0]
-  ];
-  let graph = new AdjacencyMatrix(mat, true);
+  ].map(line => line.map(e => (e > 0 ? { weight: e } : undefined)));
+  let graph = new AdjacencyMatrix(mat, false);
   let output = [];
   for (let step of new SalesmanCheaperAlgo().run(graph)) {
     let tmp = [];
