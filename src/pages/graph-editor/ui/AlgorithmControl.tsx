@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown, Form, Grid, Header, Segment } from "semantic-ui-react";
-import React, { Reducer, useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import React, { Reducer, useEffect, useMemo, useReducer, useState } from "react";
 import { algorithms, codeMap, newAlgorithm } from "@/pages/graph-editor/algorithms";
 import { useLocalizer } from "@/utils/hooks";
 import { GraphAlgorithm, ParameterDescriptor, Step } from "@/pages/graph-editor/GraphAlgorithm";
@@ -333,12 +333,27 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       </>
     );
   };
+  const resultDisplay = () => {
+    if (result == null) return;
+    return (
+      <>
+        <Header as="h4" block attached="top" icon="check" content="result" />
+        <Segment color="green" attached="bottom">
+          <span style={{
+            fontFamily: codeOption.fontFamily,
+            fontSize: codeOption.fontSize
+          }}>{JSON.stringify(result)}</span>
+        </Segment>
+      </>
+    );
+  };
   // -----
 
   // Main component
   return (
     <>
       {mainController()}
+      {resultDisplay()}
       {extraDataDisplay()}
       {parameterInputs()}
     </>
