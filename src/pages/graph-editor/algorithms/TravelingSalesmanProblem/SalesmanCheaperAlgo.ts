@@ -6,7 +6,8 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: undefined,
-      floatingData: node => (node.id == 0 ? `${node.id} ans=${node.datum.answer}` : undefined)
+      floatingData: node =>
+        node.id == 0 && node.datum.answer != undefined ? `${node.id} ans=${node.datum.answer}` : undefined
     };
   }
 
@@ -28,6 +29,14 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
   *run(graph: Graph): Generator<Step> {
     let nodes = [];
     let mat = AdjacencyMatrix.from(graph, false).mat;
+
+    for (let i = 0; i < graph.nodes().length; i++) {
+      for (let j = 0; j < graph.nodes().length; j++) {
+        if (mat[i][j].weight == undefined) {
+          mat[i][j].weight = Infinity;
+        }
+      }
+    }
 
     for (let i = 0; i < graph.nodes().length; i++) {
       mat[i][i] = { weight: 0 };
@@ -85,6 +94,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
         graph.nodes()[0].datum.answer +=
           mat[postNode][insNode].weight + mat[insNode][curNode].weight - mat[postNode][curNode].weight;
       }
+
       graph.edges().forEach(e => (e.datum.chosen = 0));
       for (let j = 0; j <= i + 1; j++) {
         for (let edge of graph.edges()) {
@@ -101,6 +111,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
         codePosition: new Map<string, number>([["pseudo", 1]])
       };
     }
+
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 2]])
