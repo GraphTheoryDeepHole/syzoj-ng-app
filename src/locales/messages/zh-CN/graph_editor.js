@@ -44,7 +44,9 @@ module.exports = {
       nan: "输入并不能转化为数字",
       not_an_integer: "输入不是整数",
       zero_or_one: "无向图的边中只允许0或1",
-      out_of_range: "输入超出有效区间"
+      out_of_range: "输入超出有效区间",
+      invalid_row_count: "输入矩阵的函数无效",
+      non_matrix: "输入非矩阵"
     },
     props: {
       node_count: "节点数",

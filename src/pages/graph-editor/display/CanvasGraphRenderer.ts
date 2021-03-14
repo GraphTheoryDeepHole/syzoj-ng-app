@@ -3,9 +3,16 @@ import { Edge, Graph, Node } from "@/pages/graph-editor/GraphStructure";
 import * as d3 from "d3";
 import cloneDeep from "lodash.clonedeep";
 import isEqual from "lodash.isequal";
+import { availableCodeFonts } from "@/misc/fonts";
+import { appState } from "@/appState";
+
+export interface GraphRenderType {
+  directed: boolean;
+  bipartite: boolean;
+  dmp: boolean;
+}
 
 export interface GeneralRenderHint {
-  directed: boolean;
   nodeRadius: number;
   textColor: string;
   backgroundColor: string;
@@ -56,16 +63,15 @@ interface RenderHints {
 const cssProp = (key: string) => getComputedStyle(document.body).getPropertyValue(key);
 const defaultRenderHints: RenderHints = {
   general: {
-    directed: true,
     nodeRadius: 15,
     textColor: cssProp("--theme-foreground"),
     backgroundColor: cssProp("--theme-background"),
-    simulationForceManyBodyStrength: -500
+    simulationForceManyBodyStrength: -1000
   },
   edge: {
     thickness: () => 3,
     color: () => cssProp("--theme-hyperlink"),
-    floatingData: () => ""
+    floatingData: edge => String(edge.datum?.weight || "")
   },
   node: {
     borderThickness: () => 3,
@@ -76,6 +82,10 @@ const defaultRenderHints: RenderHints = {
   }
 };
 
+function getCodeFont() {
+  return appState.userPreference?.font?.codeFontFace || availableCodeFonts[0] || "monospace";
+}
+
 class CanvasGraphRenderer {
   public nodes: D3SimulationNode[];
   public edges: D3SimulationEdge[];
@@ -84,6 +94,11 @@ class CanvasGraphRenderer {
   public simulation: d3.Simulation<D3SimulationNode, D3SimulationEdge>;
   public patcher: DeepPartial<RenderHints>;
   public hint: RenderHints = defaultRenderHints;
+  public renderType: GraphRenderType = {
+    directed: true,
+    bipartite: false,
+    dmp: false
+  };
   public size: {
     width: number;
     height: number;
@@ -169,9 +184,32 @@ class CanvasGraphRenderer {
     if (width == this.size?.width && height == this.size?.height) return;
     this.size = args;
     this.simulation
-      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("center", d3.forceCenter(width / 2, height / 2).strength(0.05))
       .force("box", this.boxConstraint())
       .restart();
+  }
+
+  updateRenderType(args: { renderType: GraphRenderType }) {
+    if (args.renderType == null) {
+      return;
+    }
+    if (args.renderType.bipartite) {
+      const bipartiteForce: Force<any, any> = () => {
+        this.nodes.forEach(node => {
+          const side = node.graphNode.datum.side;
+          if (side == "left") node.x = this.size.width * 0.382;
+          if (side == "right") node.x = this.size.width * 0.618;
+        });
+      };
+      this.simulation.force("bipartite", bipartiteForce);
+    } else {
+      this.simulation.force("bipartite");
+    }
+    if (args.renderType.dmp) {
+      //TODO
+    }
+    Object.assign(this.renderType, args.renderType);
+    this.simulation.restart();
   }
 
   private static makeInRange(n: number, a: number, b: number): number {
@@ -227,16 +265,16 @@ class CanvasGraphRenderer {
       .subject(event => this.simulation.find(event.x, event.y))
       .on("start", event => {
         if (!event.active) this.simulation.alphaTarget(0.3).restart();
-        event.subject.fx = event.subject.x;
+        if (!this.renderType.bipartite) event.subject.fx = event.subject.x;
         event.subject.fy = event.subject.y;
       })
       .on("drag", event => {
-        event.subject.fx = this.xInRange(event.x);
+        if (!this.renderType.bipartite) event.subject.fx = this.xInRange(event.x);
         event.subject.fy = this.yInRange(event.y);
       })
       .on("end", event => {
         if (!event.active) this.simulation.alphaTarget(0);
-        event.subject.fx = null;
+        if (!this.renderType.bipartite) event.subject.fx = null;
         event.subject.fy = null;
       });
     d3.select<HTMLCanvasElement, any>(this.canvas).call(drag);
@@ -260,13 +298,13 @@ class CanvasGraphRenderer {
   }
 
   renderEdge(ctx: CanvasRenderingContext2D, edge: D3SimulationEdge) {
-    ctx.font = "15px monospace";
+    ctx.font = "15px " + getCodeFont();
     const {
       source: { x: sx, y: sy },
       target: { x: tx, y: ty },
       graphEdge
     } = edge;
-    const { nodeRadius, textColor, directed } = this.hint.general;
+    const { nodeRadius, textColor } = this.hint.general;
     const { color, thickness, floatingData } = this.hint.edge;
 
     // Draw line
@@ -278,7 +316,7 @@ class CanvasGraphRenderer {
     ctx.stroke();
 
     // Draw arrow
-    if (directed) {
+    if (this.renderType.directed) {
       const dx = tx - sx,
         dy = ty - sy;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -306,7 +344,7 @@ class CanvasGraphRenderer {
   }
 
   renderNode(ctx: CanvasRenderingContext2D, node: D3SimulationNode) {
-    ctx.font = "20px monospace";
+    ctx.font = "20px " + getCodeFont();
     const { nodeRadius, textColor } = this.hint.general;
     const { borderThickness, borderColor, fillingColor, floatingData, popupData } = this.hint.node;
     const { x, y, graphNode } = node;
