@@ -1,7 +1,7 @@
 import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
-import { NetworkFlowBase, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge, v } from "./Common";
 import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class Dinic extends GraphAlgorithm {
@@ -30,7 +30,7 @@ class Dinic extends GraphAlgorithm {
     return {
       borderColor: node => (node.datum.depth !== -1 ? "#77ff77" : "#bbbbbb"),
       fillingColor: node => (node.datum.depth !== -1 ? "#bbffbb" : "#dddddd"),
-      floatingData: node => `(${node.id},${node.datum.depth || "?"})`
+      floatingData: node => `(${node.id},${v(node.datum.depth)})`
     };
   }
 
@@ -42,7 +42,7 @@ class Dinic extends GraphAlgorithm {
         if (edge.datum.valid) return edge.datum.valid === 1 ? "#bbffbb" : "#ffbbbb";
         return "#dddddd";
       },
-      floatingData: edge => `(${edge.datum.flow || "?"},${edge.datum.used || "?"})`
+      floatingData: edge => `(${v(edge.datum.flow)},${v(edge.datum.used)})`
     };
   }
 
