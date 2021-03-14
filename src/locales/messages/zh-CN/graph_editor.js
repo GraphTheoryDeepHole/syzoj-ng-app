@@ -37,6 +37,9 @@ module.exports = {
         invalid_edge_directed: "有向图中，每一列应有且只有一个1和-1",
         invalid_edge_undirected: "无向图中，每一列应有且只有两个1"
       }
+    },
+    fwd_list: {
+      name: "前向表"
     }
   },
   input: {
