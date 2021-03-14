@@ -28,8 +28,7 @@ class AlgorithmRunner {
   public stepCount: number;
   public result: any;
 
-  constructor(private setDisplayedGraph: (g: Graph) => void) {
-  }
+  constructor(private setDisplayedGraph: (g: Graph) => void) {}
 
   public clear() {
     Object.assign(this, {
@@ -87,8 +86,7 @@ class ParameterManager {
   public parseError: string[];
   public state: ParameterState;
 
-  constructor(private graph: Graph) {
-  }
+  constructor(private graph: Graph) {}
 
   clear() {
     Object.assign(this, {
@@ -250,10 +248,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       options={
         algorithm
           ? Object.keys(codeMap[algorithm.id()]).map(key => ({
-            key,
-            text: _(`.algo.code_type.${key}`),
-            value: key
-          }))
+              key,
+              text: _(`.algo.code_type.${key}`),
+              value: key
+            }))
           : []
       }
       onChange={onCodeTypeChanged}
@@ -299,15 +297,17 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
           </Grid.Row>
           <Grid.Row>
             <Button.Group fluid>
-              <Button labelPosition="left" icon="left chevron" content={_(".ui.previous_step")}
-                      onClick={previousStep} />
+              <Button
+                labelPosition="left"
+                icon="left chevron"
+                content={_(".ui.previous_step")}
+                onClick={previousStep}
+              />
               <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
             </Button.Group>
           </Grid.Row>
           <Grid.Row>
-            <span style={{ width: "100%", textAlign: "center" }}>
-              {runnerInfo()}
-            </span>
+            <span style={{ width: "100%", textAlign: "center" }}>{runnerInfo()}</span>
           </Grid.Row>
         </Grid>
       </Segment>
@@ -317,10 +317,16 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
 
   // -----
   const codeOption = useMemo(() => generateCodeFontEditorOptions(appState.locale), [appState.locale]);
-  const fallbackRenderer = (data: any) => (<span style={{
-    fontFamily: codeOption.fontFamily,
-    fontSize: codeOption.fontSize
-  }}>{JSON.stringify(data)}</span>);
+  const fallbackRenderer = (data: any) => (
+    <span
+      style={{
+        fontFamily: codeOption.fontFamily,
+        fontSize: codeOption.fontSize
+      }}
+    >
+      {JSON.stringify(data)}
+    </span>
+  );
   const extraDataRenderer: Map<string, (data: any) => JSX.Element> = new Map();
   const extraDataDisplay = () => {
     const extraData = steps[currentStep]?.extraData;
@@ -329,23 +335,17 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       <>
         <Header as="h4" block attached="top" icon="database" content="extra data" />
         <Segment attached="bottom">
-          {
-            extraData.map(([name, type, data]) => (
-              <Card key={name}>
-                <Card.Content>
-                  <Card.Header>
-                    <MarkdownContent content={name} />
-                  </Card.Header>
-                  <Card.Meta>
-                    {`Type: ${type}`}
-                  </Card.Meta>
-                </Card.Content>
-                <Card.Content>
-                  {(extraDataRenderer.get(type) ?? fallbackRenderer)(data)}
-                </Card.Content>
-              </Card>
-            ))
-          }
+          {extraData.map(([name, type, data]) => (
+            <Card key={name}>
+              <Card.Content>
+                <Card.Header>
+                  <MarkdownContent content={name} />
+                </Card.Header>
+                <Card.Meta>{`Type: ${type}`}</Card.Meta>
+              </Card.Content>
+              <Card.Content>{(extraDataRenderer.get(type) ?? fallbackRenderer)(data)}</Card.Content>
+            </Card>
+          ))}
         </Segment>
       </>
     );
@@ -356,10 +356,14 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       <>
         <Header as="h4" block attached="top" icon="check" content="result" />
         <Segment color="green" attached="bottom">
-          <span style={{
-            fontFamily: codeOption.fontFamily,
-            fontSize: codeOption.fontSize
-          }}>{JSON.stringify(result)}</span>
+          <span
+            style={{
+              fontFamily: codeOption.fontFamily,
+              fontSize: codeOption.fontSize
+            }}
+          >
+            {JSON.stringify(result)}
+          </span>
         </Segment>
       </>
     );

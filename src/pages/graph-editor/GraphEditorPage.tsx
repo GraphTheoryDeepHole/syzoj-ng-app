@@ -71,18 +71,14 @@ let GraphEditor: React.FC = props => {
             nodeRenderHint={nodeRenderHint}
             edgeRenderHint={edgeRenderHint}
           />
-          <AlgorithmSteps
-            algorithmName={algorithmName}
-            codeType={codeType}
-            codePosition={codePosition}
-          />
+          <AlgorithmSteps algorithmName={algorithmName} codeType={codeType} codePosition={codePosition} />
         </Grid.Column>
         <Grid.Column width={5}>
           <AlgorithmControl
             dataGraph={controlGraph}
             setDisplayedGraph={g => setDisplayGraph(g)}
-            setCodeType = {type => setCodeType(type)}
-            setCodePosition = {pos => setCodePosition(pos)}
+            setCodeType={type => setCodeType(type)}
+            setCodePosition={pos => setCodePosition(pos)}
             onAlgorithmChanged={onAlgorithmChanged}
           />
         </Grid.Column>

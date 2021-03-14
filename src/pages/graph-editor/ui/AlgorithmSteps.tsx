@@ -5,9 +5,9 @@ import style from "./AlgorithmSteps.module.less";
 import { codeMap } from "@/pages/graph-editor/algorithms";
 
 interface AlgorithmStepsProps {
-  algorithmName: string,
-  codeType: string
-  codePosition: number,
+  algorithmName: string;
+  codeType: string;
+  codePosition: number;
 }
 
 const AlgorithmSteps: React.FC<AlgorithmStepsProps> = props => {
@@ -17,11 +17,7 @@ const AlgorithmSteps: React.FC<AlgorithmStepsProps> = props => {
     <Comment key={i}>
       {typeof e === "string" ? (
         <>
-          <Comment.Text
-            className={
-              codePosition === i ? style.currentStep : style.step
-            }
-          >
+          <Comment.Text className={codePosition === i ? style.currentStep : style.step}>
             <MarkdownContent content={e} />
           </Comment.Text>
         </>
