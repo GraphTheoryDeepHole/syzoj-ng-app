@@ -4,10 +4,10 @@ import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 type NodeState = "relaxing" | "updating" | "updated" | "relaxed" | string;
 const stateColorMap: Map<NodeState, string> = new Map([
-  ["relaxing", "#fae52d"],
-  ["updating", "#59ffff"],
-  ["updated", "#107eff"],
-  ["relaxed", "#ff0000"]
+  ["relaxing", "#87ceeb"],
+  ["updating", "#ffff00"],
+  ["updated", "#adff2f"],
+  ["relaxed", "#fff0f5"]
 ]);
 
 class Dijkstra extends GraphAlgorithm {
@@ -29,7 +29,7 @@ class Dijkstra extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.visited ? "#00ff00" : undefined),
+      color: edge => (edge.datum.visited ? "#db70db" : undefined),
       floatingData: edge => edge.datum.dist
     };
   }
@@ -75,7 +75,10 @@ class Dijkstra extends GraphAlgorithm {
         }
       }
       setState(point, "relaxing");
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 0]])
+      };
 
       for (let j = 0; j < graph.nodes().length; j++) {
         if (getState(j) == "relaxed") {
@@ -83,14 +86,20 @@ class Dijkstra extends GraphAlgorithm {
         }
         if (mat[point][j]) {
           setState(j, "updating");
-          yield { graph };
+          yield {
+            graph: graph,
+            codePosition: new Map<string, number>([["pseudo", 1]])
+          };
           if (getDist(point) + mat[point][j] < getDist(j)) {
             setDist(j, getDist(point) + mat[point][j]);
             setState(j, "updated");
           } else {
             setState(j);
           }
-          yield { graph };
+          yield {
+            graph: graph,
+            codePosition: new Map<string, number>([["pseudo", 2]])
+          };
         }
         for (let k = 0; k < graph.edges().length; k++) {
           if (graph.edges()[k].source == point && graph.edges()[k].target == j) {
@@ -98,12 +107,24 @@ class Dijkstra extends GraphAlgorithm {
           }
         }
       }
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 1]])
+      };
 
       for (let j = 0; j < graph.nodes().length; j++) {
         setState(j, j == point || getState(j) == "relaxed" ? "relaxed" : "");
       }
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 3]])
+      };
     }
+
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 4]])
+    };
   }
 }
 

@@ -493,21 +493,22 @@ module.exports = {
   },
   Dijkstra: {
     pseudo: [
-      "Let $\\bar{S}=\\{2,3,\\cdots ,n\\}, \\pi (1)=0, \\pi (i)=\\left\\{\\begin{array}{ll} w_i, i \\in \\Gamma^+_1 \\\\ \\infty, \\text{otherwise} \\\\ \\end{array} \\right.$",
-      "In $\\bar{S}$，let $\\pi (j)=\\min_{i\\in\\bar{S}} \\pi (i)$，$\\bar{S}\\leftarrow\\bar{S} - \\{j\\}$. If $\\bar{S}=\\Phi$, end, otherwise, go to step 3.",
-      "For all $i\\in \\bar{S}\\cap\\Gamma^+_j$, $\\pi (i)\\leftarrow\\min (\\pi (i), \\pi (j)+w_{ji})$, go to step 2."
+      "(1)选择dist值最小的节点，转步骤2；",
+      "(2)依次访问该节点的所有后继，转步骤3，若访问完毕转步骤4",
+      "(3)更新该节点后继的dist值，转步骤2；",
+      "(4)该节点访问完毕，此后不会再被访问，若所有点都已被访问则转步骤5，否则转步骤1",
+      "(5)算法结束；",
+      "**重要提示：请务必输入带权有向简单图，否则不保证算法能正确运行！**"
     ]
   },
   Ford: {
     pseudo: [
-      "[pi left( {{\rm{startPoint}}} \right) = 0]; [pi left( {\rm{i}} \right) = infty ];",
-      "while data been updated:",
-      [
-        "for i = 2 to n:",
-        [
-          "[pi left( {\rm{i}} \right) = min left[ {pi left( {\rm{i}} \right),mathop {min }limits_{j in {Gamma ^ - }left( i \right)} left( {pi left( {\rm{j}} \right) + {w_{ji}}} \right)} \right]];"
-        ]
-      ]
+      "(1)初始时，仅起点dist值为0，转步骤2；",
+      "(2)依次遍历每一条边，转步骤3，若遍历完毕转步骤4；",
+      "(3)对于边e(u,v)，dist(v) = min(dist(u) + e(u,v), dist(v))，转步骤2；",
+      "(4)若遍历过程中未更新任何节点的dist值，转步骤5，否则转步骤2；",
+      "(5)算法结束；",
+      "**重要提示：请务必输入带权有向简单图，否则不保证算法能正确运行！**"
     ]
   },
   Kruskal: {
@@ -538,11 +539,11 @@ module.exports = {
   },
   SalesmanCheaperAlgorithm: {
     pseudo: [
-      "[T = left( {1,1} \right)]; [overline S  = left{ {{v_2}, ldots ,{v_n}} \right}];",
-      "while [overline S  \ne phi ]:",
-      [
-        "find [eleft( {u,v} \right),wleft( {u,v} \right) = min left[ {wleft( {{v_i},{v_j}} \right)} \right],u in overline S ,v in V - overline S ], insert u into T as v's predecessor or successor; [overline S  = overline S  - u];"
-      ]
+      "(1)开始时，回路仅包含0号点，转步骤2；",
+      "(2)寻找与回路最近的点，并将其加入与其距离最近的点旁边的合适位置使得扩大后的回路尽可能小，若已形成哈密顿回路，转步骤3；",
+      "(3)算法结束；",
+      "**重要提示：请务必输入带权无向简单图，否则不保证算法能正确运行！**",
+      "**重要提示：请务必输入完全图，否则不保证算法能正确运行！**"
     ]
   }
 };
