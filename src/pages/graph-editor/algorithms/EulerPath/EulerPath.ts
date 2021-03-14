@@ -15,13 +15,15 @@ class EulerPath extends GraphAlgorithm {
         } else {
           return undefined;
         }
-      }
+      },
+      floatingData: undefined
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.visited == true ? "#db70db" : undefined)
+      color: edge => (edge.datum.visited == true ? "#db70db" : undefined),
+      floatingData: undefined
     };
   }
 

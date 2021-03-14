@@ -22,7 +22,10 @@ class BfsFindPath extends GraphAlgorithm {
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
-    return {};
+    return {
+      color: undefined,
+      floatingData: undefined
+    };
   }
 
   id() {
