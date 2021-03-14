@@ -35,6 +35,7 @@ class EulerPath extends GraphAlgorithm {
 
   nodeList = [];
   ptr: number;
+  start: number;
 
   addNode(id: number) {
     for (let i = this.nodeList.length - 1; i > this.ptr; i--) {
@@ -48,12 +49,13 @@ class EulerPath extends GraphAlgorithm {
       graph.nodes()[i].datum.visited = 0;
     }
     Object.assign(graph.nodes()[this_node].datum, { visited: 1 });
-    if (this_node == 0) {
+    if (this.start == 0) {
       yield {
         graph: graph,
         codePosition: new Map<string, number>([["pseudo", 0]]),
         extraData: [["回路序列", "list", this.nodeList.concat()]]
       };
+      this.start = 1;
     } else {
       yield {
         graph: graph,
@@ -97,7 +99,11 @@ class EulerPath extends GraphAlgorithm {
     graph.edges().forEach(e => (e.datum.visited = false));
     this.nodeList = [0];
     this.ptr = 0;
+    this.start = 0;
     yield* this.dfs(AdjacencyMatrix.from(graph, true), 0);
+    for (let i = 0; i < graph.nodes().length; i++) {
+      graph.nodes()[i].datum.visited = 0;
+    }
     yield {
       graph: graph,
       codePosition: new Map<string, number>([["pseudo", 4]]),

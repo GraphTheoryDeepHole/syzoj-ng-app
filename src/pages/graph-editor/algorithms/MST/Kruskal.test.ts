@@ -8,7 +8,7 @@ test("Kruskal", () => {
     [0, 30, 0, 10, 15],
     [40, 20, 10, 0, 10],
     [25, 30, 15, 10, 0]
-  ];
+  ].map(line => line.map(e => (e > 0 ? { weight: e } : undefined)));
   let graph = new AdjacencyMatrix(mat, false);
   let res = [];
   for (let step of new Kruskal().run(graph)) {
