@@ -5,15 +5,15 @@ import { AdjacencyMatrix, Edge, Graph } from "../../GraphStructure";
 class SalesmanPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      fillingColor: node => (node.datum.chosen ? "#ff0000" : undefined),
-      floatingData: node => (node.id == 0 ? node.datum.answer : "")
+      fillingColor: undefined,
+      floatingData: node => (node.id == 0 ? node.datum.answer : undefined)
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.chosen ? "#00ff00" : undefined),
-      floatingData: edge => edge.datum.dist
+      color: edge => (edge.datum.chosen ? "#db70db" : undefined),
+      floatingData: edge => edge.datum.weight
     };
   }
 
@@ -72,33 +72,23 @@ class SalesmanPath extends GraphAlgorithm {
 
     //所有边初始时均为未选中状态
     for (let i = 0; i < edges.length; i++) {
-      edges[i].datum = { dist: edges[i].datum, chosen: 0 };
+      edges[i].datum.chosen = 0;
     }
     graph.nodes()[0].datum.answer = Infinity;
 
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };
-
     while (node >= 0) {
       //选择足够的边
-      while (chosenCnt < 5) {
+      while (chosenCnt < graph.nodes().length) {
         edges[node].datum.chosen = 1;
-        now += edges[node].datum.dist;
+        now += edges[node].datum.weight;
         node++;
         chosenCnt++;
       }
 
-      //选择了新边，记录选边情况
-      graph.edges().forEach(cur_edge => {
-        cur_edge.datum = { chosen: 0 };
-        for (let edge of edges) {
-          if (edge.datum.chosen == 1 && cur_edge.source == edge.source && cur_edge.target == edge.target) {
-            cur_edge.datum = { chosen: 1 };
-          }
-        }
-      });
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 0]])
+      };
 
       //判断选择是否合法
       let judRes = now >= graph.nodes()[0].datum.answer ? 1 : this.judge(graph, edges);
@@ -110,7 +100,7 @@ class SalesmanPath extends GraphAlgorithm {
       }
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 2]])
+        codePosition: new Map<string, number>([["pseudo", 1]])
       };
 
       //退栈
@@ -120,44 +110,47 @@ class SalesmanPath extends GraphAlgorithm {
             break;
           } else {
             edges[node].datum.chosen = 0;
-            now -= edges[node].datum.dist;
+            now -= edges[node].datum.weight;
             chosenCnt--;
           }
         }
-        yield {
-          graph: graph,
-          codePosition: new Map<string, number>([["pseudo", 3]])
-        };
       }
 
       //继续深探
       while (--node >= 0) {
         if (edges[node].datum.chosen == 1) {
           edges[node].datum.chosen = 0;
-          now -= edges[node].datum.dist;
+          now -= edges[node].datum.weight;
           node++;
           chosenCnt--;
           break;
         }
       }
+
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
+      };
     }
   }
 
-  run(graph: Graph) {
-    let edges = [];
-    Object.assign(edges, AdjacencyMatrix.from(graph, true).edges());
-
+  *run(graph: Graph): Generator<Step> {
+    let edges = AdjacencyMatrix.from(graph, false).edges().concat();
     //排序（冒泡排序）
     for (let i = 0; i < edges.length; i++) {
       for (let j = 0; j < edges.length - 1; j++) {
-        if (edges[j].datum > edges[j + 1].datum) {
+        if (edges[j].datum.weight > edges[j + 1].datum.weight) {
           let tmp = edges[j];
           edges[j] = edges[j + 1];
           edges[j + 1] = tmp;
         }
       }
     }
-    return this.salesmanProb(graph, edges);
+    yield* this.salesmanProb(graph, edges);
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 3]])
+    };
   }
 }
 

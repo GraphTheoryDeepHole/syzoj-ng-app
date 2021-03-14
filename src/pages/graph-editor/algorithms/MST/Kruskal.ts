@@ -9,8 +9,18 @@ class Kruskal extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.chosen == 0 ? "#ff0000" : edge.datum.chosen == 1 ? "#00ff00" : "#0000ff"),
-      floatingData: edge => edge.datum.dist
+      color: edge => {
+        if (edge.datum.chosen == 1) {
+          return "#db70db";
+        } else if (edge.datum.chosen == 2) {
+          return "#ffff00";
+        } else if (edge.datum.chosen == 3) {
+          return "#adff2f";
+        } else {
+          return undefined;
+        }
+      },
+      floatingData: edge => edge.datum.weight
     };
   }
 
@@ -40,13 +50,13 @@ class Kruskal extends GraphAlgorithm {
     //排序（冒泡排序）
     for (let i = 0; i < edges.length; i++) {
       for (let j = 0; j < edges.length - 1; j++) {
-        if (edges[j].datum > edges[j + 1].datum) {
+        if (edges[j].datum.weight > edges[j + 1].datum.weight) {
           let tmp = edges[j];
           edges[j] = edges[j + 1];
           edges[j + 1] = tmp;
         }
       }
-      graph.edges()[i].datum = { dist: graph.edges()[i].datum, chosen: 0 };
+      graph.edges()[i].datum.chosen = 0;
     }
 
     //并查集初始化
@@ -64,7 +74,7 @@ class Kruskal extends GraphAlgorithm {
 
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 1]])
+        codePosition: new Map<string, number>([["pseudo", 0]])
       };
 
       this.father[edges[i].source] = this.getFather(edges[i].source);
@@ -81,19 +91,24 @@ class Kruskal extends GraphAlgorithm {
 
       for (let j = 0; j < graph.edges().length; j++) {
         if (graph.edges()[j].datum.chosen == 2) {
-          graph.edges()[j].datum.chosen = 0;
+          graph.edges()[j].datum.chosen = 3;
         }
       }
 
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 2]])
+        codePosition: new Map<string, number>([["pseudo", 1]])
       };
 
       if (counter == graph.nodes().length - 1) {
         break;
       }
     }
+
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 2]])
+    };
   }
 }
 

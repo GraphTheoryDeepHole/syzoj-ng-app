@@ -1,14 +1,10 @@
 import { Graph } from "./GraphStructure";
 import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
-export function isInteger(v: number): boolean {
-  return Math.floor(v) === v;
-}
-
 // check if res = Number(text) is an integer and res \in [lowerbound, upperbound)
 export function parseRangedInt(text: string, lowerbound: number, upperbound: number): number {
   let res = Number(text);
-  if (isNaN(res) || !isInteger(res)) throw new Error(".input.error.not_an_integer");
+  if (res !== parseInt(text) || isNaN(res)) throw new Error(".input.error.not_an_integer");
   if (res < lowerbound || res >= upperbound) throw new Error(".input.error.out_of_range");
   return res;
 }

@@ -9,8 +9,8 @@ class Prim extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.chosen ? "#00ff00" : "#0000ff"),
-      floatingData: edge => edge.datum.dist
+      color: edge => (edge.datum.chosen ? "#db70db" : undefined),
+      floatingData: edge => edge.datum.weight
     };
   }
 
@@ -29,7 +29,7 @@ class Prim extends GraphAlgorithm {
     }
 
     for (let i = 0; i < graph.edges().length; i++) {
-      graph.edges()[i].datum = { dist: graph.edges()[i].datum, chosen: 0 };
+      graph.edges()[i].datum.chosen = 0;
     }
 
     //Prim
@@ -47,17 +47,12 @@ class Prim extends GraphAlgorithm {
           (graph.nodes()[graph.edges()[i].source].datum.visited ^
             graph.nodes()[graph.edges()[i].target].datum.visited) ==
             1 &&
-          graph.edges()[i].datum.dist < minl
+          graph.edges()[i].datum.weight < minl
         ) {
           tarIdx = i;
-          minl = graph.edges()[i].datum.dist;
+          minl = graph.edges()[i].datum.weight;
         }
       }
-
-      yield {
-        graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 2]])
-      };
 
       graph.nodes()[graph.edges()[tarIdx].source].datum.visited = true;
       graph.nodes()[graph.edges()[tarIdx].target].datum.visited = true;
@@ -65,9 +60,18 @@ class Prim extends GraphAlgorithm {
 
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 3]])
+        codePosition: new Map<string, number>([["pseudo", 1]])
+      };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 2]])
       };
     }
+
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 3]])
+    };
   }
 }
 

@@ -52,6 +52,12 @@ module.exports = {
     },
     fwd_list: {
       name: "前向表"
+    },
+    network: {
+      name: "网络流图",
+      error: {
+        non_matrix: "输入非矩阵"
+      }
     }
   },
   input: {
@@ -70,7 +76,8 @@ module.exports = {
       directed: "有向图？",
       weighted: "加权图？",
       self_loop: "允许自环？",
-      multiple_edges: "允许重边？"
+      multiple_edges: "允许重边？",
+      have_cost: "费用流图？"
     }
   },
   algo: {
@@ -88,6 +95,14 @@ module.exports = {
     },
     CriticalPath: {
       name: "关键路径",
+      para: {}
+    },
+    EulerPath: {
+      name: "欧拉回路",
+      para: {}
+    },
+    HamiltonPath: {
+      name: "哈密顿回路",
       para: {}
     },
     Kruskal: {
@@ -115,7 +130,7 @@ module.exports = {
       para: {}
     },
     SalesmanCheaperAlgorithm: {
-      name: "旅行商问题：分支限界法",
+      name: "旅行商问题：便宜算法",
       para: {}
     },
     mf_ff: {

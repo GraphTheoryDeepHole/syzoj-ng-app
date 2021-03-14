@@ -1,9 +1,11 @@
 import { DMP } from "./DMP";
-import { EdgeList, Graph } from "../../GraphStructure";
+import { Graph } from "../../GraphStructure";
 import { G, A } from "./data/DMP.data";
 
+let testCases: number[] = [7];
+
 test("DMP", () => {
-  for (let i = 1, cases = G.length; i < cases; ++i) {
+  for (let i in testCases) {
     let algo = new DMP().run(G[i]);
     let step: any;
 
@@ -14,8 +16,8 @@ test("DMP", () => {
 
     while (!(step = algo.next()).done) {
       ++count;
-      //resG = step.value.graph;
-      //console.table(resG.nodes().map(n => n.datum.displayId));
+      resG = step.value.graph;
+      console.table(resG.nodes().map(n => n.datum.displayId));
       //resV.push(resG.nodes().map(n => n.datum.match));
       //resE.push(resG.edges().map(e => (e.datum.marked ? 1 : 0) + (e.datum.matched ? 2 : 0)));
     }

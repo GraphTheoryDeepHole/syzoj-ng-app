@@ -1,7 +1,7 @@
 import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
-import { NetworkFlowBase, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge, v, iv } from "./Common";
 import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class MinCostFlow extends GraphAlgorithm {
@@ -39,20 +39,21 @@ class MinCostFlow extends GraphAlgorithm {
 
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      borderColor: node => (node.datum.dist !== Infinity ? "#cccccc" : undefined),
-      fillingColor: node => (node.datum.dist !== Infinity ? "#eeeeee" : undefined)
+      borderColor: node => (node.datum.dist !== Infinity ? "#77ff77" : "#bbbbbb"),
+      fillingColor: node => (node.datum.dist !== Infinity ? "#bbffbb" : "#dddddd"),
+      floatingData: node => `(${node.id},${iv(node.datum.dist)})`
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      thickness: edge => (edge.datum.mark !== 0 ? 5 : undefined),
+      thickness: edge => (edge.datum.mark !== 0 ? 5 : 3),
       color: edge => {
-        if (edge.datum.mark) return edge.datum.mark === 1 ? "#ff0000" : "#00ff00";
-        if (edge.datum.valid) return "#ffaaaa";
-        return "#cccccc";
+        if (edge.datum.mark) return edge.datum.mark === 1 ? "#33ff33" : "#ff3333";
+        if (edge.datum.valid) return "#bbffbb";
+        return "#dddddd";
       },
-      floatingData: edge => `(${edge.datum.flow},${edge.datum.used}),${edge.datum.cost}`
+      floatingData: edge => `(${v(edge.datum.flow)},${v(edge.datum.used)}),${v(edge.datum.cost)}`
     };
   }
 
