@@ -1,6 +1,6 @@
 import { GraphAlgorithm, Step, ParameterDescriptor, parseRangedInt } from "../../GraphAlgorithm";
 import { EdgeList, Graph, Node } from "../../GraphStructure";
-import { NetworkFlowBase, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge, v } from "./Common";
 import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class FordFulkerson extends GraphAlgorithm {
@@ -35,7 +35,7 @@ class FordFulkerson extends GraphAlgorithm {
     return {
       thickness: edge => (edge.datum.mark !== 0 ? 5 : 3),
       color: edge => (edge.datum.mark === 1 ? "#33ff33" : edge.datum.mark === -1 ? "#ff3333" : "#dddddd"),
-      floatingData: edge => `(${edge.datum.flow || "?"},${edge.datum.used || "?"})`
+      floatingData: edge => `(${v(edge.datum.flow)},${v(edge.datum.used)})`
     };
   }
 

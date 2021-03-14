@@ -3,6 +3,8 @@ import { Edge, EdgeList, Graph } from "@/pages/graph-editor/GraphStructure";
 import MatrixInputComponent from "@/pages/graph-editor/input/methods/MatrixInputComponent";
 import React from "react";
 
+let v = x => x ?? "?";
+
 let NetworkGraphComponent: MethodComponent = props => {
   let { graph, setGraph, setRenderType } = props;
   let options: [string, boolean][] = [["have_cost", false]];
@@ -12,8 +14,8 @@ let NetworkGraphComponent: MethodComponent = props => {
       .edges()
       .map(edge =>
         haveCost
-          ? `${edge.source} ${edge.target} ${edge.datum.flow || "?"} ${edge.datum.cost || "?"}`
-          : `${edge.source} ${edge.target} ${edge.datum.flow || "?"}`
+          ? `${edge.source} ${edge.target} ${v(edge.datum.flow)} ${v(edge.datum.cost)}`
+          : `${edge.source} ${edge.target} ${v(edge.datum.flow)}`
       )
       .join("\n");
   };

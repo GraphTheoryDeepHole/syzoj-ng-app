@@ -1,5 +1,9 @@
 import { Graph, Edge, hasSelfLoop } from "../../GraphStructure";
 
+let v = x => x ?? "?";
+let iv = x => (x === Infinity ? "∞" : v(x));
+export { v, iv };
+
 export class _Edge {
   public mark: boolean = false;
 

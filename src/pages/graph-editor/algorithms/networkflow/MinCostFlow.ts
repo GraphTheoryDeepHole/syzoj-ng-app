@@ -1,7 +1,7 @@
 import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../../GraphAlgorithm";
 import { Edge, EdgeList, Graph, Node } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
-import { NetworkFlowBase, _Edge } from "./Common";
+import { NetworkFlowBase, _Edge, v, iv } from "./Common";
 import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 class MinCostFlow extends GraphAlgorithm {
@@ -41,7 +41,7 @@ class MinCostFlow extends GraphAlgorithm {
     return {
       borderColor: node => (node.datum.dist !== Infinity ? "#77ff77" : "#bbbbbb"),
       fillingColor: node => (node.datum.dist !== Infinity ? "#bbffbb" : "#dddddd"),
-      floatingData: node => `(${node.id},${(node.datum.dist !== Infinity ? node.datum.dist : "∞") || "?"})`
+      floatingData: node => `(${node.id},${iv(node.datum.dist)})`
     };
   }
 
@@ -53,7 +53,7 @@ class MinCostFlow extends GraphAlgorithm {
         if (edge.datum.valid) return "#bbffbb";
         return "#dddddd";
       },
-      floatingData: edge => `(${edge.datum.flow || "?"},${edge.datum.used || "?"}),${edge.datum.cost || "?"}`
+      floatingData: edge => `(${v(edge.datum.flow)},${v(edge.datum.used)}),${v(edge.datum.cost)}`
     };
   }
 
