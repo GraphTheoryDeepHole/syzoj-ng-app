@@ -88,7 +88,8 @@ class ParameterManager {
     Object.assign(this, {
       parseResult: [],
       inputTexts: [],
-      parseError: []
+      parseError: [],
+      state: "ok"
     });
     if (this.descriptors) {
       for (let i = 0; i < this.descriptors.length; i++) {
