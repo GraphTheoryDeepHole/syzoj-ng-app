@@ -90,6 +90,10 @@ module.exports = {
       name: "关键路径",
       para: {}
     },
+    EulerPath: {
+      name: "欧拉回路",
+      para: {}
+    },
     HamiltonPath: {
       name: "哈密顿回路",
       para: {}

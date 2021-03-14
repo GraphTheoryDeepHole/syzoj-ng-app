@@ -4,6 +4,7 @@ import codeMap from "./codeMap";
 import { BfsFindPath } from "@/pages/graph-editor/algorithms/BFS&DFS/BfsFindPath";
 import { DfsFindPath } from "@/pages/graph-editor/algorithms/BFS&DFS/DfsFindPath";
 import { CriticalPath } from "@/pages/graph-editor/algorithms/CriticalPath/CriticalPath";
+import { EulerPath } from "@/pages/graph-editor/algorithms/EulerPath/EulerPath";
 import { HamiltonPath } from "@/pages/graph-editor/algorithms/HamiltonPath/HamiltonPath";
 import { Kruskal } from "@/pages/graph-editor/algorithms/MST/Kruskal";
 import { Prim } from "@/pages/graph-editor/algorithms/MST/Prim";
@@ -26,6 +27,7 @@ const algorithms = new Map<string, () => GraphAlgorithm>([
   ["BFS", () => new BfsFindPath()],
   ["DFS", () => new DfsFindPath()],
   ["CriticalPath", () => new CriticalPath()],
+  ["EulerPath", () => new EulerPath()],
   ["HamiltonPath", () => new HamiltonPath()],
   ["Kruskal", () => new Kruskal()],
   ["Prim", () => new Prim()],

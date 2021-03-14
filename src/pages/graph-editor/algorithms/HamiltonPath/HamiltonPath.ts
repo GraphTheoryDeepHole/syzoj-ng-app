@@ -109,6 +109,7 @@ class HamiltonPath extends GraphAlgorithm {
 
   *run(graph: Graph): Generator<Step> {
     graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.sequence = -1)));
+    graph.edges().forEach(e => (e.datum.chosen = false));
     yield* this.dfs(AdjacencyMatrix.from(graph, true), 0, 0);
     for (let i = 0; i < graph.nodes().length; i++) {
       if (graph.nodes()[i].datum.visited == 2) {
