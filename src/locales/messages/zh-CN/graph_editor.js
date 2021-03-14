@@ -1,5 +1,17 @@
 module.exports = {
   title: "图编辑器",
+  ui: {
+    parameters: "算法参数",
+    select_algorithm: "选择算法",
+    select_code_type: "选择代码类型",
+    start: "启动",
+    restart: "重新启动",
+    check_parameters: "检查参数",
+    autorun: "自动运行",
+    pause: "暂停",
+    previous_step: "上一步",
+    next_step: "下一步"
+  },
   graph: {
     random: {
       name: "随机图"
