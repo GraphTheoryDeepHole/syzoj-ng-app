@@ -1,5 +1,5 @@
 import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
-import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "../../ui/CanvasGraphRenderer";
 import { AdjacencyMatrix, Edge, Graph } from "../../GraphStructure";
 
 class SalesmanPath extends GraphAlgorithm {

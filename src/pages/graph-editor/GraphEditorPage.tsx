@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocalizer } from "@/utils/hooks";
 import { appState } from "@/appState";
-import GraphDisplay from "./display/GraphDisplay";
-import GraphInputPanel from "./input/GraphInputPanel";
+import GraphDisplay from "./ui/GraphDisplay";
+import GraphInputPanel from "./ui/GraphInputPanel";
 import { fromRandom, Graph } from "@/pages/graph-editor/GraphStructure";
-import AlgorithmControl from "@/pages/graph-editor/control/AlgorithmControl";
+import AlgorithmControl from "@/pages/graph-editor/ui/AlgorithmControl";
 import { route } from "navi";
 import { newAlgorithm } from "@/pages/graph-editor/algorithms";
 import cloneDeep from "lodash.clonedeep";
@@ -13,7 +13,8 @@ import {
   GeneralRenderHint,
   GraphRenderType,
   NodeRenderHint
-} from "@/pages/graph-editor/display/CanvasGraphRenderer";
+} from "@/pages/graph-editor/ui/CanvasGraphRenderer";
+import { Grid } from "semantic-ui-react";
 
 let GraphEditor: React.FC = props => {
   let g = fromRandom(10, 15, true, false, false, false);
@@ -48,25 +49,31 @@ let GraphEditor: React.FC = props => {
 
   return (
     <>
-      <GraphInputPanel
-        graph={dataGraph}
-        renderType={renderType}
-        setRenderType={rt => setRenderType(rt)}
-        setGraph={g => setDataGraph(g)}
-      />
-      <GraphDisplay
-        dataGraph={dataGraph}
-        renderType={renderType}
-        displayedGraph={displayGraph}
-        generalRenderHint={generalRenderHint}
-        nodeRenderHint={nodeRenderHint}
-        edgeRenderHint={edgeRenderHint}
-      />
-      <AlgorithmControl
-        dataGraph={controlGraph}
-        setDisplayedGraph={g => setDisplayGraph(g)}
-        onAlgorithmChanged={onAlgorithmChanged}
-      />
+      <Grid>
+        <Grid.Column width={11}>
+          <GraphInputPanel
+            graph={dataGraph}
+            renderType={renderType}
+            setRenderType={rt => setRenderType(rt)}
+            setGraph={g => setDataGraph(g)}
+          />
+          <GraphDisplay
+            dataGraph={dataGraph}
+            renderType={renderType}
+            displayedGraph={displayGraph}
+            generalRenderHint={generalRenderHint}
+            nodeRenderHint={nodeRenderHint}
+            edgeRenderHint={edgeRenderHint}
+          />
+        </Grid.Column>
+        <Grid.Column width={5}>
+          <AlgorithmControl
+            dataGraph={controlGraph}
+            setDisplayedGraph={g => setDisplayGraph(g)}
+            onAlgorithmChanged={onAlgorithmChanged}
+          />
+        </Grid.Column>
+      </Grid>
     </>
   );
 };

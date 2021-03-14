@@ -1,4 +1,4 @@
-import { MethodComponent } from "@/pages/graph-editor/input/GraphInputPanel";
+import { MethodComponent } from "@/pages/graph-editor/ui/GraphInputPanel";
 import { Form, Message } from "semantic-ui-react";
 import React, { useState } from "react";
 import { useLocalizer } from "@/utils/hooks";

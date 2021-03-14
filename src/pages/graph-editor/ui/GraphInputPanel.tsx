@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Header, Menu, Segment } from "semantic-ui-react";
 import { Graph } from "@/pages/graph-editor/GraphStructure";
-import methods from "@/pages/graph-editor/input/methods";
+import methods from "@/pages/graph-editor/ui/input-methods";
 import { useLocalizer } from "@/utils/hooks";
-import { GraphRenderType } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { GraphRenderType } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 interface GraphInputPanelProps {
   graph: Graph;

@@ -1,6 +1,6 @@
-import { MethodComponent } from "@/pages/graph-editor/input/GraphInputPanel";
+import { MethodComponent } from "@/pages/graph-editor/ui/GraphInputPanel";
 import { Edge, EdgeList, Graph } from "@/pages/graph-editor/GraphStructure";
-import MatrixInputComponent from "@/pages/graph-editor/input/methods/MatrixInputComponent";
+import MatrixInputComponent from "@/pages/graph-editor/ui/input-methods/MatrixInputComponent";
 import React from "react";
 
 let EdgeListComponent: MethodComponent = props => {

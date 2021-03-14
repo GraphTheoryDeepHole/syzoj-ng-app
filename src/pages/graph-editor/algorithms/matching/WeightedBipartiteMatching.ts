@@ -1,7 +1,7 @@
 import { Queue } from "../../utils/DataStructure";
 import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { BipartiteMatrix, Node, Edge, Graph, NodeEdgeList } from "../../GraphStructure";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 class KuhnMunkres extends GraphAlgorithm {
   // constructor() {

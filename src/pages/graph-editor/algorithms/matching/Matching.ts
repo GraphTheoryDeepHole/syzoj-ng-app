@@ -1,7 +1,7 @@
 import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { AdjacencyList, hasMultipleEdges, hasSelfLoop, Edge, Graph, Node, NodeEdgeList } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 class Gabow extends GraphAlgorithm {
   // constructor() {

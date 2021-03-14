@@ -1,6 +1,6 @@
 import { GraphAlgorithm, Step } from "../../GraphAlgorithm";
 import { AdjacencyList, BipartiteGraph, Edge, Graph, Node, NodeEdgeList } from "../../GraphStructure";
-import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 class HungarianDFS extends GraphAlgorithm {
   // constructor() {
