@@ -78,7 +78,7 @@ class SalesmanPath extends GraphAlgorithm {
 
     while (node >= 0) {
       //选择足够的边
-      while (chosenCnt < 5) {
+      while (chosenCnt < graph.nodes().length) {
         edges[node].datum.chosen = 1;
         now += edges[node].datum.weight;
         node++;
