@@ -60,11 +60,11 @@ class Prim extends GraphAlgorithm {
 
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 2]])
+        codePosition: new Map<string, number>([["pseudo", 1]])
       };
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 1]])
+        codePosition: new Map<string, number>([["pseudo", 2]])
       };
     }
 
