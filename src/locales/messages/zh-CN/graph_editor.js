@@ -1,5 +1,17 @@
 module.exports = {
   title: "图编辑器",
+  ui: {
+    parameters: "算法参数",
+    select_algorithm: "选择算法",
+    select_code_type: "选择代码类型",
+    start: "启动",
+    restart: "重新启动",
+    check_parameters: "检查参数",
+    autorun: "自动运行",
+    pause: "暂停",
+    previous_step: "上一步",
+    next_step: "下一步"
+  },
   graph: {
     random: {
       name: "随机图"
@@ -37,6 +49,9 @@ module.exports = {
         invalid_edge_directed: "有向图中，每一列应有且只有一个1和-1",
         invalid_edge_undirected: "无向图中，每一列应有且只有两个1"
       }
+    },
+    fwd_list: {
+      name: "前向表"
     }
   },
   input: {
@@ -44,7 +59,9 @@ module.exports = {
       nan: "输入并不能转化为数字",
       not_an_integer: "输入不是整数",
       zero_or_one: "无向图的边中只允许0或1",
-      out_of_range: "输入超出有效区间"
+      out_of_range: "输入超出有效区间",
+      invalid_row_count: "输入矩阵的函数无效",
+      non_matrix: "输入非矩阵"
     },
     props: {
       node_count: "节点数",

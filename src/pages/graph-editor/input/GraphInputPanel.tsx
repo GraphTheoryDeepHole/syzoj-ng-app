@@ -3,18 +3,16 @@ import { Header, Menu, Segment } from "semantic-ui-react";
 import { Graph } from "@/pages/graph-editor/GraphStructure";
 import methods from "@/pages/graph-editor/input/methods";
 import { useLocalizer } from "@/utils/hooks";
-
-export interface MethodComponentProps {
-  graph: Graph;
-  setGraph: (g: Graph) => void;
-}
-
-export interface MethodComponent extends React.FC<MethodComponentProps> {}
+import { GraphRenderType } from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 interface GraphInputPanelProps {
   graph: Graph;
   setGraph: (g: Graph) => void;
+  renderType: GraphRenderType;
+  setRenderType: (renderType: GraphRenderType) => void;
 }
+
+export interface MethodComponent extends React.FC<GraphInputPanelProps> {}
 
 let GraphInputPanel: React.FC<GraphInputPanelProps> = props => {
   const _ = useLocalizer("graph_editor");
@@ -38,12 +36,7 @@ let GraphInputPanel: React.FC<GraphInputPanelProps> = props => {
             </Menu.Item>
           ))}
         </Menu>
-        <Segment attached="bottom">
-          {React.createElement(methods.get(selectedMethod), {
-            graph: props.graph,
-            setGraph: g => props.setGraph(g)
-          })}
-        </Segment>
+        <Segment attached="bottom">{React.createElement(methods.get(selectedMethod), props)}</Segment>
       </Segment>
     </>
   );
