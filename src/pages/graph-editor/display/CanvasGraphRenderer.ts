@@ -71,7 +71,7 @@ const defaultRenderHints: RenderHints = {
   edge: {
     thickness: () => 3,
     color: () => cssProp("--theme-hyperlink"),
-    floatingData: edge => String(edge.datum?.weight || "")
+    floatingData: edge => String(edge.datum?.weight ?? "")
   },
   node: {
     borderThickness: () => 3,
