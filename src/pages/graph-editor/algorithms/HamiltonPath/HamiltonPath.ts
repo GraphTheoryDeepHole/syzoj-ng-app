@@ -45,17 +45,23 @@ class HamiltonPath extends GraphAlgorithm {
     ];
   }
 
-  successFlag = 0;
-  nodeNum = 0;
-
-  *dfs(graph: AdjacencyMatrix, this_node: number): Generator<Step> {
+  *dfs(graph: AdjacencyMatrix, this_node: number, nodeNum: number, successFlag: number): Generator<Step> {
     for (let i = 0; i < graph.nodes().length; i++) {
       if (graph.nodes()[i].datum.visited == 2 || graph.nodes()[i].datum.visited == 3) {
         graph.nodes()[i].datum.visited = 1;
       }
     }
     Object.assign(graph.nodes()[this_node].datum, { visited: 2 });
-    this.nodeNum++;
+    nodeNum++;
+    if (nodeNum == graph.nodes().length && graph.get(this_node, 0)) {
+      successFlag = 1;
+      for (let edge of graph.edges()) {
+        if (edge.source == this_node && edge.target == 0) {
+          edge.datum.chosen = true;
+        }
+      }
+      return;
+    }
     if (this_node == 0) {
       yield {
         graph: graph,
@@ -73,7 +79,21 @@ class HamiltonPath extends GraphAlgorithm {
     };
     for (let i = 0; i < graph.mat.length; i++) {
       if ((!graph.nodes()[i].datum.visited || i == 0) && graph.get(this_node, i)) {
-        yield* this.dfs(graph, i);
+        for (let edge of graph.edges()) {
+          if (edge.source == this_node && edge.target == i) {
+            edge.datum.chosen = true;
+          }
+        }
+        yield* this.dfs(graph, i, nodeNum, successFlag);
+        if (successFlag == 1) {
+          return;
+        } else {
+          for (let edge of graph.edges()) {
+            if (edge.source == this_node && edge.target == i) {
+              edge.datum.chosen = true;
+            }
+          }
+        }
         for (let i = 0; i < graph.nodes().length; i++) {
           if (graph.nodes()[i].datum.visited == 2 || graph.nodes()[i].datum.visited == 3) {
             graph.nodes()[i].datum.visited = 1;
@@ -90,12 +110,14 @@ class HamiltonPath extends GraphAlgorithm {
         };
       }
     }
+    Object.assign(graph.nodes()[this_node].datum, { visited: 0 });
+    nodeNum--;
   }
 
   *run(graph: Graph, start_point: number): Generator<Step> {
     //this.dfn = 0;
     graph.nodes().forEach(n => ((n.datum.visited = 0), (n.datum.sequence = -1)));
-    yield* this.dfs(AdjacencyMatrix.from(graph, true), start_point);
+    yield* this.dfs(AdjacencyMatrix.from(graph, true), start_point, 0, 0);
     for (let i = 0; i < graph.nodes().length; i++) {
       if (graph.nodes()[i].datum.visited == 2 || graph.nodes()[i].datum.visited == 3) {
         graph.nodes()[i].datum.visited = 1;
