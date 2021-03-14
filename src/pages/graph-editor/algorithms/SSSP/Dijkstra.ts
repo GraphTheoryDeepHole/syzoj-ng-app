@@ -12,7 +12,19 @@ const stateColorMap: Map<NodeState, string> = new Map([
 
 class Dijkstra extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
-    return { fillingColor: node => stateColorMap.get(node.datum.state) };
+    return {
+      fillingColor: node => stateColorMap.get(node.datum.state),
+      floatingData: node => {
+        let distStr = "?",
+          dist = node.datum.dist;
+        if (dist === Infinity) {
+          distStr = "∞";
+        } else if (dist != null) {
+          distStr = String(dist);
+        }
+        return `(${node.id},${distStr})`;
+      }
+    };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
@@ -45,13 +57,13 @@ class Dijkstra extends GraphAlgorithm {
     const getState = (id: number) => graph.nodes()[id].datum.state as NodeState;
     const setState = (id: number, state: NodeState = "") => (graph.nodes()[id].datum.state = state);
     const getDist = (id: number) => graph.nodes()[id].datum.dist as number;
-    const setDist = (id: number, dist: number = 0) => (graph.nodes()[id].datum.dist = dist);
+    const setDist = (id: number, dist: number) => (graph.nodes()[id].datum.dist = dist);
 
     graph.nodes().forEach(n => {
       n.datum.state = "" as NodeState;
       n.datum.dist = Infinity;
     });
-    setDist(startPoint);
+    setDist(startPoint, 0);
 
     for (let i = 0; i < graph.nodes().length; i++) {
       let minDist = Infinity;
