@@ -1,6 +1,6 @@
 import { GraphAlgorithm, Step, ParameterDescriptor } from "../../GraphAlgorithm";
 import { EdgeRenderHint, NodeRenderHint } from "../../display/CanvasGraphRenderer";
-import { AdjacencyList, AdjacencyMatrix, Graph } from "../../GraphStructure";
+import { AdjacencyMatrix, Graph } from "../../GraphStructure";
 
 class CriticalPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
@@ -32,8 +32,11 @@ class CriticalPath extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (this.edgeVisited[edge.source][edge.target] ? "#ffff00" : "#87ceeb"),
-      floatingData: edge => this.mat[edge.source][edge.target]
+      color: edge =>
+        this.edgeVisited[edge.source] != undefined && this.edgeVisited[edge.source][edge.target] == true
+          ? "#ffff00"
+          : "#87ceeb",
+      floatingData: edge => edge.datum.weight
     };
   }
 
