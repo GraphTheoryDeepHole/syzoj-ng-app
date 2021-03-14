@@ -1,17 +1,17 @@
-import { Button, Card, Comment, Dropdown, Form, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
+import { Button, Card, Dropdown, Form, Grid, Header, Segment } from "semantic-ui-react";
 import React, { Reducer, useEffect, useReducer, useState } from "react";
 import { algorithms, codeMap, newAlgorithm } from "@/pages/graph-editor/algorithms";
-import MarkdownContent from "@/markdown/MarkdownContent";
 import { useLocalizer } from "@/utils/hooks";
 import { GraphAlgorithm, ParameterDescriptor, Step } from "@/pages/graph-editor/GraphAlgorithm";
 import { Graph } from "@/pages/graph-editor/GraphStructure";
 import cloneDeep from "lodash.clonedeep";
-import style from "./AlgorithmControl.module.less";
 
 interface AlgorithmControlProps {
   dataGraph: Graph;
   setDisplayedGraph: (g: Graph) => void;
   onAlgorithmChanged: (algorithm: string) => void;
+  setCodeType: (type: string) => void;
+  setCodePosition: (pos: number) => void;
 }
 
 type RunningState = "stop" | "running" | "done";
@@ -25,7 +25,8 @@ class AlgorithmRunner {
   public stepCount: number;
   public result: any;
 
-  constructor(private setDisplayedGraph: (g: Graph) => void) {}
+  constructor(private setDisplayedGraph: (g: Graph) => void) {
+  }
 
   public clear() {
     Object.assign(this, {
@@ -82,7 +83,8 @@ class ParameterManager {
   public parseError: string[];
   public state: ParameterState;
 
-  constructor(private graph: Graph) {}
+  constructor(private graph: Graph) {
+  }
 
   clear() {
     Object.assign(this, {
@@ -156,6 +158,16 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     props.setDisplayedGraph(steps[currentStep]?.graph);
   }, [steps, currentStep, props.setDisplayedGraph]);
 
+  // Sync code type
+  useEffect(() => {
+    props.setCodeType(codeType);
+  }, [codeType, props.setCodePosition]);
+
+  // Sync code position
+  useEffect(() => {
+    props.setCodePosition(steps[currentStep]?.codePosition.get(codeType));
+  }, [steps, currentStep, codeType, props.setCodePosition]);
+
   // Utility functions
   const flipAuto = () => setAuto(!auto);
   const onAlgorithmChanged = (_, { value }) => {
@@ -180,50 +192,6 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   };
 
   // UI helper
-  // -----
-  const mapCodeLines = (outerIndexes: number[]) => (e, i) => (
-    <Comment key={i}>
-      {typeof e === "string" ? (
-        <>
-          <Comment.Text
-            className={
-              runnerState != "stop" && steps[currentStep]?.codePosition?.get(codeType) === i
-                ? style.currentStep
-                : style.step
-            }
-          >
-            <MarkdownContent content={e} />
-          </Comment.Text>
-        </>
-      ) : (
-        <Comment.Group>{e.map(mapCodeLines([...outerIndexes, i]))}</Comment.Group>
-      )}
-    </Comment>
-  );
-  const stepDisplay = () => (
-    <Grid.Row>
-      <Grid.Column width={16}>
-        <Card fluid>
-          <Card.Content>
-            <Card.Header>Steps</Card.Header>
-          </Card.Content>
-          <Card.Content>
-            {algorithm && codeType ? (
-              <Comment.Group>{codeMap[algorithm.id()][codeType].map(mapCodeLines([]))}</Comment.Group>
-            ) : (
-              <Placeholder fluid>
-                {Array.from({ length: 7 }, (_, i) => (
-                  <Placeholder.Line key={i} />
-                ))}
-              </Placeholder>
-            )}
-          </Card.Content>
-        </Card>
-      </Grid.Column>
-    </Grid.Row>
-  );
-  // -----
-
   // -----
   const parameterInputs = () => {
     if (descriptors == null || descriptors.length === 0) return null;
@@ -284,10 +252,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       options={
         algorithm
           ? Object.keys(codeMap[algorithm.id()]).map(key => ({
-              key,
-              text: _(`.algo.code_type.${key}`),
-              value: key
-            }))
+            key,
+            text: _(`.algo.code_type.${key}`),
+            value: key
+          }))
           : []
       }
       onChange={onCodeTypeChanged}
@@ -338,7 +306,6 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       <Segment attached="bottom">
         <Grid padded>
           {mainController()}
-          {stepDisplay()}
           {parameterInputs()}
         </Grid>
       </Segment>

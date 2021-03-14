@@ -15,10 +15,12 @@ import {
   NodeRenderHint
 } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 import { Grid } from "semantic-ui-react";
+import AlgorithmSteps from "@/pages/graph-editor/ui/AlgorithmSteps";
 
 let GraphEditor: React.FC = props => {
   let g = fromRandom(10, 15, true, false, false, false);
 
+  // TODO: use context
   const [dataGraph, setDataGraph] = useState(g);
   const [controlGraph, setControlGraph] = useState(g);
   const [displayGraph, setDisplayGraph] = useState<Graph>();
@@ -26,6 +28,9 @@ let GraphEditor: React.FC = props => {
   const [generalRenderHint, setGeneralRenderHint] = useState<GeneralRenderHint>();
   const [nodeRenderHint, setNodeRenderHint] = useState<Partial<NodeRenderHint>>();
   const [edgeRenderHint, setEdgeRenderHint] = useState<Partial<EdgeRenderHint>>();
+  const [algorithmName, setAlgorithmName] = useState<string>();
+  const [codeType, setCodeType] = useState<string>();
+  const [codePosition, setCodePosition] = useState<number>();
 
   const _ = useLocalizer("graph_editor");
 
@@ -43,6 +48,7 @@ let GraphEditor: React.FC = props => {
 
   const onAlgorithmChanged = newName => {
     const algo = newAlgorithm(newName);
+    setAlgorithmName(newName);
     setNodeRenderHint(algo.nodeRenderPatcher());
     setEdgeRenderHint(algo.edgeRenderPatcher());
   };
@@ -65,11 +71,18 @@ let GraphEditor: React.FC = props => {
             nodeRenderHint={nodeRenderHint}
             edgeRenderHint={edgeRenderHint}
           />
+          <AlgorithmSteps
+            algorithmName={algorithmName}
+            codeType={codeType}
+            codePosition={codePosition}
+          />
         </Grid.Column>
         <Grid.Column width={5}>
           <AlgorithmControl
             dataGraph={controlGraph}
             setDisplayedGraph={g => setDisplayGraph(g)}
+            setCodeType = {type => setCodeType(type)}
+            setCodePosition = {pos => setCodePosition(pos)}
             onAlgorithmChanged={onAlgorithmChanged}
           />
         </Grid.Column>
