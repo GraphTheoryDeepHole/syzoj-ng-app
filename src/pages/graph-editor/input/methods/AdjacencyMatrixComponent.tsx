@@ -4,10 +4,10 @@ import { AdjacencyMatrix, Graph } from "@/pages/graph-editor/GraphStructure";
 import MatrixInputComponent from "@/pages/graph-editor/input/methods/MatrixInputComponent";
 
 let AdjacencyMatrixComponent: MethodComponent = props => {
-  let { graph, setGraph } = props;
+  let { graph, setGraph, setRenderType } = props;
   let options: [string, boolean][] = [
-    ["directed", true],
-    ["weighted", false]
+    ["directed", props.renderType?.directed || true],
+    ["weighted", graph.edges()[0]?.datum.weight != null]
   ];
   const toString = (g: Graph) => {
     let graph = AdjacencyMatrix.from(g, options[0][1]);
@@ -40,6 +40,11 @@ let AdjacencyMatrixComponent: MethodComponent = props => {
     );
     let graph = new AdjacencyMatrix(mat, options[0]);
     setGraph(graph);
+    setRenderType({
+      directed: options[0],
+      bipartite: false,
+      dmp: false
+    });
   };
 
   return <MatrixInputComponent initContent={content} initError={error} options={options} onSync={onSync} />;

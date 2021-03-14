@@ -7,15 +7,19 @@ import { fromRandom, Graph } from "@/pages/graph-editor/GraphStructure";
 import AlgorithmControl from "@/pages/graph-editor/control/AlgorithmControl";
 import { route } from "navi";
 import { newAlgorithm } from "@/pages/graph-editor/algorithms";
-import { EdgeRenderHint, GeneralRenderHint, NodeRenderHint } from "@/pages/graph-editor/display/CanvasGraphRenderer";
+import {
+  EdgeRenderHint,
+  GeneralRenderHint,
+  GraphRenderType,
+  NodeRenderHint
+} from "@/pages/graph-editor/display/CanvasGraphRenderer";
 
 let GraphEditor: React.FC = props => {
   let g = fromRandom(10, 15, true, false, false, false);
 
-  const cssProp = (key: string) => getComputedStyle(document.body).getPropertyValue(key);
-
   const [dataGraph, setDataGraph] = useState(g);
   const [displayGraph, setDisplayGraph] = useState<Graph>();
+  const [renderType, setRenderType] = useState<GraphRenderType>();
   const [generalRenderHint, setGeneralRenderHint] = useState<GeneralRenderHint>();
   const [nodeRenderHint, setNodeRenderHint] = useState<Partial<NodeRenderHint>>();
   const [edgeRenderHint, setEdgeRenderHint] = useState<Partial<EdgeRenderHint>>();
@@ -34,9 +38,15 @@ let GraphEditor: React.FC = props => {
 
   return (
     <>
-      <GraphInputPanel graph={dataGraph} setGraph={g => setDataGraph(g)} />
+      <GraphInputPanel
+        graph={dataGraph}
+        renderType={renderType}
+        setRenderType={rt => setRenderType(rt)}
+        setGraph={g => setDataGraph(g)}
+      />
       <GraphDisplay
         dataGraph={dataGraph}
+        renderType={renderType}
         displayedGraph={displayGraph}
         generalRenderHint={generalRenderHint}
         nodeRenderHint={nodeRenderHint}
