@@ -49,9 +49,19 @@ class CriticalPath extends GraphAlgorithm {
 
   *run(oriGraph: Graph): Generator<Step> {
     let graph = AdjacencyMatrix.from(oriGraph, true);
+    console.log("0");
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
     let mat = graph.mat;
     let topo = [];
     let counter = 0;
+    console.log("1");
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     graph.nodes().forEach(n => {
       n.datum.degree = 0;
@@ -59,12 +69,27 @@ class CriticalPath extends GraphAlgorithm {
       n.datum.topoSequence = -1;
       n.datum.visited = 0;
     });
+    console.log("2");
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     graph.edges().forEach(e => (e.datum = { weight: e.datum, visited: false }));
+    console.log("3");
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     for (let edge of graph.edges()) {
       graph.nodes()[edge.target].datum.degree++;
     }
+    console.log("4");
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     for (let t = 0; t < graph.nodes().length; t++) {
       for (let i = 0; i < graph.nodes().length; i++) {
@@ -96,6 +121,11 @@ class CriticalPath extends GraphAlgorithm {
         }
       }
     }
+    console.log("5");
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 0]])
+    };
 
     this.stage = 1;
     graph.edges().forEach(e => (e.datum.visited = false));
