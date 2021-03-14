@@ -14,18 +14,19 @@ class Gabow extends GraphAlgorithm {
 
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
-      borderColor: node => (node.datum.label === 0 ? undefined : node.datum.label === 1 ? "#33ff33" : "#3333ff"),
-      fillingColor: node => (node.datum.label === 0 ? "#cccccc" : "#ffffff")
+      borderColor: node => (node.datum.label === 0 ? "#333333" : node.datum.label === 1 ? "#77ff77" : "#7777ff"),
+      fillingColor: node => (node.datum.label === 0 ? "#cccccc" : "#ffffff"),
+      floatingData: node => node.id.toString()
     };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      thickness: edge => (edge.datum.matched || edge.datum.marked ? 5 : undefined),
+      thickness: edge => (edge.datum.matched || edge.datum.marked ? 5 : 3),
       color: edge => {
-        if (edge.datum.matched) return "#000000";
-        if (edge.datum.marked) return "#ff0000";
-        return undefined;
+        if (edge.datum.matched) return "#333333";
+        if (edge.datum.marked) return "#ff3333";
+        return "#cccccc";
       }
     };
   }
