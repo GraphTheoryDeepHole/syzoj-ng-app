@@ -29,7 +29,7 @@ class CriticalPath extends GraphAlgorithm {
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
     return {
-      color: edge => (edge.datum.visited == true ? "#ffff00" : "#87ceeb"),
+      color: edge => (edge.datum.visited == true ? "#db70db" : undefined),
       floatingData: edge => edge.datum.weight
     };
   }
@@ -43,18 +43,10 @@ class CriticalPath extends GraphAlgorithm {
   }
 
   *run(graph: Graph): Generator<Step> {
-    //let graph = AdjacencyList.from(oriGraph, true);
-    /*console.log("0");
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };*/
     graph = AdjacencyMatrix.from(graph, true);
     let mat = (graph as AdjacencyMatrix).mat;
     let topo = [];
     let counter = 0;
-
-    console.log(mat);
 
     graph.nodes().forEach(n => {
       n.datum.degree = 0;
@@ -75,21 +67,6 @@ class CriticalPath extends GraphAlgorithm {
     for (let edge of graph.edges()) {
       graph.nodes()[edge.target].datum.degree++;
     }
-    /*for (let i = 0; i < graph.nodes().length; i++) {
-      console.log(i, graph.nodes()[i].datum.degree);
-    }
-    console.log("4");*/
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };
-
-    /*for (let i = 0; i < graph.nodes().length; i++) {
-      this.edgeVisited[i] = [];
-      for (let j = 0; j < graph.nodes().length; j++) {
-        this.edgeVisited[i][j] = false;
-      }
-    }*/
 
     for (let t = 0; t < graph.nodes().length; t++) {
       for (let i = 0; i < graph.nodes().length; i++) {
@@ -106,8 +83,6 @@ class CriticalPath extends GraphAlgorithm {
           for (let j = 0; j < graph.nodes().length; j++) {
             if (mat[i][j] != undefined) {
               graph.nodes()[j].datum.degree--;
-              graph.edges();
-              //this.edgeVisited[i][j] = true;
               graph.edges().forEach(edge => {
                 if (edge.source == i && edge.target == j) {
                   edge.datum.visited = true;
@@ -115,9 +90,6 @@ class CriticalPath extends GraphAlgorithm {
               });
             }
           }
-          /*for (let j = 0; j < graph.nodes().length; j++) {
-            console.log(j, graph.nodes()[j].datum.degree);
-          }*/
 
           yield {
             graph: graph,
@@ -126,22 +98,7 @@ class CriticalPath extends GraphAlgorithm {
         }
       }
     }
-    console.log("5");
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
-    };
 
-    /*graph.edges().forEach(e => {
-      if (e.datum & 1) {
-        e.datum -= 1;
-      }
-    });*/
-    /*for (let i = 0; i < graph.nodes().length; i++) {
-      for (let j = 0; j < graph.nodes().length; j++) {
-        this.edgeVisited[i][j] = false;
-      }
-    }*/
     graph.edges().forEach(e => {
       e.datum.visited = false;
     });
@@ -163,15 +120,12 @@ class CriticalPath extends GraphAlgorithm {
             graph.nodes()[topo[j]].datum.dist = graph.nodes()[topo[i]].datum.dist + mat[topo[i]][topo[j]].weight;
           }
         }
-        //this.edgeVisited[topo[i]][topo[j]] = true;
         graph.edges().forEach(edge => {
-          if (edge.source == j && edge.target == topo[i]) {
+          if (edge.source == topo[i] && edge.target == topo[j]) {
             edge.datum.visited = true;
           }
         });
       }
-
-      //console.log(this.edgeVisited);
 
       yield {
         graph: graph,
