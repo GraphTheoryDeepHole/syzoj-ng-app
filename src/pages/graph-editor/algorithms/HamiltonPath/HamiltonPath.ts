@@ -15,7 +15,7 @@ class HamiltonPath extends GraphAlgorithm {
         } else {
           return undefined;
         }
-      },
+      }
       /*floatingData: node =>
         node.datum.sequence == -1 || node.datum.sequence == undefined
           ? `(${node.id},?)`

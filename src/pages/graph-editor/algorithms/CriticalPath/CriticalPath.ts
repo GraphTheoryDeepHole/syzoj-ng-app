@@ -167,9 +167,11 @@ class CriticalPath extends GraphAlgorithm {
       graph.nodes()[topo[i]].datum.visited = 2;
       for (let j = i + 1; j < graph.nodes().length; j++) {
         if (
-          graph.nodes()[topo[i]].datum.dist + (graph as AdjacencyMatrix).get(topo[i], topo[j]) > graph.nodes()[topo[j]].datum.dist
+          graph.nodes()[topo[i]].datum.dist + (graph as AdjacencyMatrix).get(topo[i], topo[j]) >
+          graph.nodes()[topo[j]].datum.dist
         ) {
-          graph.nodes()[topo[j]].datum.dist = graph.nodes()[topo[i]].datum.dist + (graph as AdjacencyMatrix).get(topo[i], topo[j]);
+          graph.nodes()[topo[j]].datum.dist =
+            graph.nodes()[topo[i]].datum.dist + (graph as AdjacencyMatrix).get(topo[i], topo[j]);
         }
         this.edgeVisited[topo[i]][topo[j]] = true;
         /*graph.edges().forEach(edge => {
