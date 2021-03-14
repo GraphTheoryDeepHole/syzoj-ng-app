@@ -6,7 +6,7 @@ class SalesmanPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: undefined,
-      floatingData: node => (node.id == 0 ? `${node.id} ans=${node.datum.answer}` : undefined)
+      floatingData: node => (node.id == 0 && node.datum.answer != undefined ? `${node.id} ans=${node.datum.answer}` : undefined)
     };
   }
 
