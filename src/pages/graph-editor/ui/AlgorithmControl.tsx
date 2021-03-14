@@ -262,7 +262,9 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     const button = (icon, content, color, action?) => (
       <Button fluid labelPosition="left" icon={icon} content={content} color={color} onClick={action} />
     );
-    if (parameterState === "ok") {
+    if (algorithm == null) {
+      return button("close", _(".ui.no_algorithm"), "yellow");
+    } else if (parameterState === "ok") {
       return runnerState === "stop"
         ? button("play", _(".ui.start"), "green", runAlgorithm)
         : button("sync", _(".ui.restart"), "blue", runAlgorithm);
