@@ -12,7 +12,11 @@ const stateColorMap: Map<NodeState, string> = new Map([
 
 class Dijkstra extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
-    return { fillingColor: node => stateColorMap.get(node.datum.state) };
+    return {
+      fillingColor: node => stateColorMap.get(node.datum.state),
+      floatingData: node =>
+        `(${node.id},${node.datum.dist != Infinity && node.datum.dist != undefined ? node.datum.dist : "?"})`
+    };
   }
 
   edgeRenderPatcher(): Partial<EdgeRenderHint> {
@@ -63,7 +67,10 @@ class Dijkstra extends GraphAlgorithm {
         }
       }
       setState(point, "relaxing");
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 0]])
+      };
 
       for (let j = 0; j < graph.nodes().length; j++) {
         if (getState(j) == "relaxed") {
@@ -71,14 +78,20 @@ class Dijkstra extends GraphAlgorithm {
         }
         if (mat[point][j]) {
           setState(j, "updating");
-          yield { graph };
+          yield {
+            graph: graph,
+            codePosition: new Map<string, number>([["pseudo", 1]])
+          };
           if (getDist(point) + mat[point][j] < getDist(j)) {
             setDist(j, getDist(point) + mat[point][j]);
             setState(j, "updated");
           } else {
             setState(j);
           }
-          yield { graph };
+          yield {
+            graph: graph,
+            codePosition: new Map<string, number>([["pseudo", 2]])
+          };
         }
         for (let k = 0; k < graph.edges().length; k++) {
           if (graph.edges()[k].source == point && graph.edges()[k].target == j) {
@@ -86,12 +99,24 @@ class Dijkstra extends GraphAlgorithm {
           }
         }
       }
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 1]])
+      };
 
       for (let j = 0; j < graph.nodes().length; j++) {
         setState(j, j == point || getState(j) == "relaxed" ? "relaxed" : "");
       }
-      yield { graph };
+      yield {
+        graph: graph,
+        codePosition: new Map<string, number>([["pseudo", 3]])
+      };
     }
+
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 4]])
+    };
   }
 }
 
