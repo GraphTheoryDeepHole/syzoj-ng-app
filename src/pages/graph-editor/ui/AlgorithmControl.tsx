@@ -275,26 +275,28 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   };
   const mainController = () => (
     <>
-      <Grid.Row>
-        <Grid.Column width={6}>{algorithmSelector()}</Grid.Column>
-        <Grid.Column width={3}>{middleButton()}</Grid.Column>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column width={6}>{codeTypeSelector()}</Grid.Column>
-        <Grid.Column width={3}>
-          {auto ? (
-            <Button fluid icon="pause" content={_(".ui.pause")} onClick={flipAuto} />
-          ) : (
-            <Button fluid icon="play" content={_(".ui.autorun")} onClick={flipAuto} />
-          )}
-        </Grid.Column>
-        <Grid.Column width={7}>
-          <Button.Group fluid>
-            <Button labelPosition="left" icon="left chevron" content={_(".ui.previous_step")} onClick={previousStep} />
-            <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
-          </Button.Group>
-        </Grid.Column>
-      </Grid.Row>
+      <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
+      <Segment attached="bottom">
+        <Grid padded>
+          <Grid.Row>{algorithmSelector()}</Grid.Row>
+          <Grid.Row>{codeTypeSelector()}</Grid.Row>
+          <Grid.Row>{middleButton()}</Grid.Row>
+          <Grid.Row>
+            {auto ? (
+              <Button fluid icon="pause" content={_(".ui.pause")} onClick={flipAuto} />
+            ) : (
+              <Button fluid icon="play" content={_(".ui.autorun")} onClick={flipAuto} />
+            )}
+          </Grid.Row>
+          <Grid.Row>
+            <Button.Group fluid>
+              <Button labelPosition="left" icon="left chevron" content={_(".ui.previous_step")}
+                      onClick={previousStep} />
+              <Button labelPosition="right" icon="right chevron" content={_(".ui.next_step")} onClick={nextStep} />
+            </Button.Group>
+          </Grid.Row>
+        </Grid>
+      </Segment>
     </>
   );
   // -----
@@ -302,13 +304,8 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   // Main component
   return (
     <>
-      <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
-      <Segment attached="bottom">
-        <Grid padded>
-          {mainController()}
-          {parameterInputs()}
-        </Grid>
-      </Segment>
+      {mainController()}
+      {parameterInputs()}
     </>
   );
 };
