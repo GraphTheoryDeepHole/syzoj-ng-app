@@ -1,0 +1,4 @@
+.ui.dropdown > .clear.icon:before {
+    content: "\f00d";
+    font-family: "Icons";
+}

@@ -8,6 +8,7 @@ import cloneDeep from "lodash.clonedeep";
 import MarkdownContent from "@/markdown/MarkdownContent";
 import { appState } from "@/appState";
 import { generateCodeFontEditorOptions } from "@/misc/fonts";
+import "./FomanticClearableDropdownPatcher.css";
 
 interface AlgorithmControlProps {
   dataGraph: Graph;
