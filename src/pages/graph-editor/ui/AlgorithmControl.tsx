@@ -76,6 +76,14 @@ class AlgorithmRunner {
       }
     }
   }
+
+  public autoNext(args: { timerId: number }) {
+    if (this.state === "running") {
+      this.nextStep();
+    } else {
+      window.clearInterval(args.timerId);
+    }
+  }
 }
 
 type ParameterState = "ok" | "error";
@@ -147,7 +155,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   );
   const { state: runnerState, steps, algorithm, stepGen, currentStep, stepCount, result } = runner;
   const { parseResult, descriptors, inputTexts, parseError, state: parameterState } = para;
-  const [auto, setAuto] = useState(false);
+  const [autoHandler, setAutoHandler] = useState<number>(null);
   const [codeType, setCodeType] = useState<string>();
 
   // Clear states when graph changes
@@ -172,8 +180,18 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   }, [steps, currentStep, codeType, props.setCodePosition]);
 
   // Utility functions
-  const flipAuto = () => setAuto(!auto);
+  const startAutoTimer = () => {
+    let timerId = window.setInterval(() => {
+      runnerDispatch({ type: "autoNext", timerId });
+    }, 1000);
+    setAutoHandler(timerId);
+  };
+  const stopAutoTimer = () => {
+    window.clearInterval(autoHandler);
+    setAutoHandler(null);
+  };
   const onAlgorithmChanged = (_, { value }) => {
+    if (autoHandler) stopAutoTimer();
     paraDispatch({ type: "changeAlgorithm", name: value });
     runnerDispatch({ type: "changeAlgorithm", name: value });
     props.onAlgorithmChanged(value);
@@ -183,14 +201,17 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     setCodeType(value);
   };
   const runAlgorithm = () => {
+    if (autoHandler) stopAutoTimer();
     if (parameterState != "error") {
       runnerDispatch({ type: "start", graph: props.dataGraph, para: parseResult });
     }
   };
   const previousStep = () => {
+    if (autoHandler) stopAutoTimer();
     runnerDispatch({ type: "previousStep" });
   };
   const nextStep = () => {
+    if (autoHandler) stopAutoTimer();
     runnerDispatch({ type: "nextStep" });
   };
 
@@ -260,10 +281,10 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       onChange={onCodeTypeChanged}
     />
   );
+  const button = (icon, content, color, action?) => (
+    <Button fluid labelPosition="left" icon={icon} content={content} color={color} onClick={action} />
+  );
   const middleButton = () => {
-    const button = (icon, content, color, action?) => (
-      <Button fluid labelPosition="left" icon={icon} content={content} color={color} onClick={action} />
-    );
     if (algorithm == null) {
       return button("close", _(".ui.no_algorithm"), "yellow");
     } else if (parameterState === "ok") {
@@ -272,6 +293,13 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
         : button("sync", _(".ui.restart"), "blue", runAlgorithm);
     } else {
       return button("close", _(".ui.check_parameters"), "yellow");
+    }
+  };
+  const autoButton = () => {
+    if (autoHandler) {
+      return button("pause", _(".ui.pause"), "pink", stopAutoTimer);
+    } else {
+      return button("paper plane", _(".ui.autorun"), "olive", startAutoTimer);
     }
   };
   const runnerInfo = () => {
@@ -291,13 +319,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
           <Grid.Row>{algorithmSelector()}</Grid.Row>
           <Grid.Row>{codeTypeSelector()}</Grid.Row>
           <Grid.Row>{middleButton()}</Grid.Row>
-          <Grid.Row>
-            {auto ? (
-              <Button fluid icon="pause" content={_(".ui.pause")} onClick={flipAuto} />
-            ) : (
-              <Button fluid icon="play" content={_(".ui.autorun")} onClick={flipAuto} />
-            )}
-          </Grid.Row>
+          {runnerState === "running" && <Grid.Row>{autoButton()}</Grid.Row>}
           <Grid.Row>
             <Button.Group fluid>
               <Button
