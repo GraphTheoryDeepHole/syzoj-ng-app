@@ -21,8 +21,7 @@ let GraphEditor: React.FC = props => {
   let g = fromRandom(10, 15, true, false, false, false);
 
   // TODO: use context
-  const [dataGraph, setDataGraph] = useState(g);
-  const [controlGraph, setControlGraph] = useState(g);
+  const [dataGraph, setDataGraph] = useState<Graph>(cloneDeep(g));
   const [displayGraph, setDisplayGraph] = useState<Graph>();
   const [renderType, setRenderType] = useState<GraphRenderType>();
   const [generalRenderHint, setGeneralRenderHint] = useState<GeneralRenderHint>();
@@ -38,14 +37,6 @@ let GraphEditor: React.FC = props => {
     appState.enterNewPage(_(".title"), "graph_editor");
   }, [appState.locale]);
 
-  useEffect(() => {
-    setControlGraph(cloneDeep(dataGraph));
-  }, [dataGraph]);
-
-  useEffect(() => {
-    if (displayGraph == null) setControlGraph(cloneDeep(dataGraph));
-  }, [displayGraph]);
-
   const onAlgorithmChanged = newName => {
     const algo = newAlgorithm(newName);
     setAlgorithmName(newName);
@@ -58,61 +49,52 @@ let GraphEditor: React.FC = props => {
     }
   };
 
+  const onGraphInput = useCallback(graph => setDataGraph(cloneDeep(graph)), [setDataGraph]);
+  const onAlgorithmGraph = useCallback(graph => setDisplayGraph(cloneDeep(graph)), [setDisplayGraph]);
+
   const isNarrowScreen = useScreenWidthWithin(0, 1024);
+
+  const graphInputPanel = () => (
+    <GraphInputPanel graph={dataGraph} renderType={renderType} setRenderType={setRenderType} setGraph={onGraphInput} />
+  );
+  const graphDisplay = () => (
+    <GraphDisplay
+      dataGraph={dataGraph}
+      renderType={renderType}
+      displayedGraph={displayGraph}
+      generalRenderHint={generalRenderHint}
+      nodeRenderHint={nodeRenderHint}
+      edgeRenderHint={edgeRenderHint}
+    />
+  );
+  const algorithmControl = () => (
+    <AlgorithmControl
+      dataGraph={dataGraph}
+      setDisplayedGraph={onAlgorithmGraph}
+      setCodeType={setCodeType}
+      setCodePosition={setCodePosition}
+      onAlgorithmChanged={onAlgorithmChanged}
+    />
+  );
+  const algorithmSteps = () => (
+    <AlgorithmSteps algorithmName={algorithmName} codeType={codeType} codePosition={codePosition} />
+  );
 
   return isNarrowScreen ? (
     <>
-      <GraphInputPanel
-        graph={dataGraph}
-        renderType={renderType}
-        setRenderType={rt => setRenderType(rt)}
-        setGraph={g => setDataGraph(g)}
-      />
-      <GraphDisplay
-        dataGraph={dataGraph}
-        renderType={renderType}
-        displayedGraph={displayGraph}
-        generalRenderHint={generalRenderHint}
-        nodeRenderHint={nodeRenderHint}
-        edgeRenderHint={edgeRenderHint}
-      />
-      <AlgorithmControl
-        dataGraph={controlGraph}
-        setDisplayedGraph={g => setDisplayGraph(g)}
-        setCodeType={type => setCodeType(type)}
-        setCodePosition={pos => setCodePosition(pos)}
-        onAlgorithmChanged={onAlgorithmChanged}
-      />
-      <AlgorithmSteps algorithmName={algorithmName} codeType={codeType} codePosition={codePosition} />
+      {graphInputPanel()}
+      {graphDisplay()}
+      {algorithmControl()}
+      {algorithmSteps()}
     </>
   ) : (
     <Grid>
       <Grid.Column width={11}>
-        <GraphInputPanel
-          graph={dataGraph}
-          renderType={renderType}
-          setRenderType={rt => setRenderType(rt)}
-          setGraph={g => setDataGraph(g)}
-        />
-        <GraphDisplay
-          dataGraph={dataGraph}
-          renderType={renderType}
-          displayedGraph={displayGraph}
-          generalRenderHint={generalRenderHint}
-          nodeRenderHint={nodeRenderHint}
-          edgeRenderHint={edgeRenderHint}
-        />
-        <AlgorithmSteps algorithmName={algorithmName} codeType={codeType} codePosition={codePosition} />
+        {graphInputPanel()}
+        {graphDisplay()}
+        {algorithmSteps()}
       </Grid.Column>
-      <Grid.Column width={5}>
-        <AlgorithmControl
-          dataGraph={controlGraph}
-          setDisplayedGraph={g => setDisplayGraph(g)}
-          setCodeType={type => setCodeType(type)}
-          setCodePosition={pos => setCodePosition(pos)}
-          onAlgorithmChanged={onAlgorithmChanged}
-        />
-      </Grid.Column>
+      <Grid.Column width={5}>{algorithmControl()}</Grid.Column>
     </Grid>
   );
 };
