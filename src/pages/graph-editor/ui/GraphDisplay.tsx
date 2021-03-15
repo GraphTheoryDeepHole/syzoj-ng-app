@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer } from "react";
 import { Edge, Graph, Node } from "../GraphStructure";
 import { SimulationLinkDatum, SimulationNodeDatum } from "d3-force";
-import { Header, Segment } from "semantic-ui-react";
+import { Card, Header, Segment } from "semantic-ui-react";
 import { useResizeDetector } from "react-resize-detector";
 import CanvasGraphRenderer, {
   EdgeRenderHint,
@@ -9,8 +9,10 @@ import CanvasGraphRenderer, {
   GraphRenderType,
   NodeRenderHint
 } from "./CanvasGraphRenderer";
+import legends from "../algorithms/legends.js";
 
 interface GraphDisplayProp {
+  algorithmName: string
   dataGraph: Graph;
   renderType: GraphRenderType;
   displayedGraph?: Graph;
@@ -36,7 +38,15 @@ function toD3EdgeDatum(edge: Edge): D3SimulationEdge {
 }
 
 let GraphDisplay: React.FC<GraphDisplayProp> = props => {
-  const { dataGraph, renderType, displayedGraph, generalRenderHint, nodeRenderHint, edgeRenderHint } = props;
+  const {
+    algorithmName,
+    dataGraph,
+    renderType,
+    displayedGraph,
+    generalRenderHint,
+    nodeRenderHint,
+    edgeRenderHint
+  } = props;
   const reducer = (renderer, action) => {
     renderer[action.type](action);
     return renderer;
@@ -79,6 +89,22 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
         <div style={{ width: "100%" }} ref={resizeRef}>
           <canvas width={width} height={String(height)} ref={onCanvasMount} />
         </div>
+        {
+          legends[algorithmName] && (
+            <Card fluid>
+              <Card.Content>
+                <Card.Header>图例</Card.Header>
+                <Card.Description>
+                <pre>
+                  {
+                    legends[algorithmName]
+                  }
+                </pre>
+                </Card.Description>
+              </Card.Content>
+            </Card>
+          )
+        }
       </Segment>
     </>
   );

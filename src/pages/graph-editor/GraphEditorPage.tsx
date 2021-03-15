@@ -65,6 +65,7 @@ let GraphEditor: React.FC = props => {
   );
   const graphDisplay = () => (
     <GraphDisplay
+      algorithmName={algorithmName}
       dataGraph={dataGraph}
       renderType={renderType}
       displayedGraph={displayGraph}
