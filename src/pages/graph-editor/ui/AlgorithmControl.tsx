@@ -140,8 +140,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
 
   // States
   const reducer = (state, action) => {
-    let newState = Object.assign({}, state);
-    Reflect.setPrototypeOf(newState, Reflect.getPrototypeOf(state));
+    let newState = cloneDeep(state);
     newState[action.type](action);
     return newState;
   };
@@ -153,7 +152,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     reducer,
     new ParameterManager(props.dataGraph)
   );
-  const { state: runnerState, steps, algorithm, stepGen, currentStep, stepCount, result } = runner;
+  const { state: runnerState, steps, algorithm, currentStep, stepCount, result } = runner;
   const { parseResult, descriptors, inputTexts, parseError, state: parameterState } = para;
   const [autoHandler, setAutoHandler] = useState<number>(null);
   const [codeType, setCodeType] = useState<string>();
