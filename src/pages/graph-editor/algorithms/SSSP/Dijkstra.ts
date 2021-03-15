@@ -52,7 +52,7 @@ class Dijkstra extends GraphAlgorithm {
     ];
   }
 
-  *run(graph: Graph, startPoint: number): Generator<Step> {
+  * run(graph: Graph, startPoint: number): Generator<Step> {
     let mat = AdjacencyMatrix.from(graph, true).mat.map(line => line.map(datum => (datum ? datum.weight || 1 : 0)));
     const getState = (id: number) => graph.nodes()[id].datum.state as NodeState;
     const setState = (id: number, state: NodeState = "") => (graph.nodes()[id].datum.state = state);
@@ -67,12 +67,15 @@ class Dijkstra extends GraphAlgorithm {
 
     for (let i = 0; i < graph.nodes().length; i++) {
       let minDist = Infinity;
-      let point = 0;
+      let point = -1;
       for (let j = 0; j < graph.nodes().length; j++) {
         if (getState(j) != "relaxed" && getDist(j) < minDist) {
           point = j;
           minDist = getDist(j);
         }
+      }
+      if (point < 0) {
+        return;
       }
       setState(point, "relaxing");
       yield {
