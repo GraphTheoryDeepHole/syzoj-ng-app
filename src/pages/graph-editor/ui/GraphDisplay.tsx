@@ -12,7 +12,7 @@ import CanvasGraphRenderer, {
 import legends from "../algorithms/legends.js";
 
 interface GraphDisplayProp {
-  algorithmName: string
+  algorithmName: string;
   dataGraph: Graph;
   renderType: GraphRenderType;
   displayedGraph?: Graph;
@@ -89,22 +89,16 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
         <div style={{ width: "100%" }} ref={resizeRef}>
           <canvas width={width} height={String(height)} ref={onCanvasMount} />
         </div>
-        {
-          legends[algorithmName] && (
-            <Card fluid>
-              <Card.Content>
-                <Card.Header>图例</Card.Header>
-                <Card.Description>
-                <pre>
-                  {
-                    legends[algorithmName]
-                  }
-                </pre>
-                </Card.Description>
-              </Card.Content>
-            </Card>
-          )
-        }
+        {legends[algorithmName] && (
+          <Card fluid>
+            <Card.Content>
+              <Card.Header>图例</Card.Header>
+              <Card.Description>
+                <pre>{legends[algorithmName]}</pre>
+              </Card.Description>
+            </Card.Content>
+          </Card>
+        )}
       </Segment>
     </>
   );
