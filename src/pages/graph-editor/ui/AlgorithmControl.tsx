@@ -103,7 +103,7 @@ class ParameterManager {
   }
 
   public changeAlgorithm(args: { name: string }) {
-    this.descriptors = newAlgorithm(args.name)?.parameters() && [];
+    this.descriptors = newAlgorithm(args.name)?.parameters();
     this.clear();
   }
 
