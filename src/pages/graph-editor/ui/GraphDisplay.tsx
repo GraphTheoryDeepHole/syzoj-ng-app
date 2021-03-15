@@ -10,6 +10,8 @@ import CanvasGraphRenderer, {
   NodeRenderHint
 } from "./CanvasGraphRenderer";
 import legends from "../algorithms/legends.js";
+import headerStyle from "@/pages/graph-editor/ui/HeaderIconSizePatcher";
+import { useLocalizer } from "@/utils/hooks";
 
 interface GraphDisplayProp {
   algorithmName: string;
@@ -38,6 +40,7 @@ function toD3EdgeDatum(edge: Edge): D3SimulationEdge {
 }
 
 let GraphDisplay: React.FC<GraphDisplayProp> = props => {
+  const _ = useLocalizer("graph_editor");
   const {
     algorithmName,
     dataGraph,
@@ -84,7 +87,7 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
 
   return (
     <>
-      <Header as="h4" block attached="top" icon="search" content="editor" />
+      <Header as="h4" className={headerStyle} block attached="top" icon="search" content={_(".ui.graph_display")} />
       <Segment attached="bottom">
         <div style={{ width: "100%" }} ref={resizeRef}>
           <canvas width={width} height={String(height)} ref={onCanvasMount} />

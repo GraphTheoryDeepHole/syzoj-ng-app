@@ -4,6 +4,7 @@ import { Graph } from "@/pages/graph-editor/GraphStructure";
 import methods from "@/pages/graph-editor/ui/input-methods";
 import { useLocalizer, useScreenWidthWithin } from "@/utils/hooks";
 import { GraphRenderType } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
+import headerStyle from "./HeaderIconSizePatcher";
 
 interface GraphInputPanelProps {
   graph: Graph;
@@ -26,7 +27,7 @@ let GraphInputPanel: React.FC<GraphInputPanelProps> = props => {
   const isNarrowScreen = useScreenWidthWithin(0, 1024);
   return (
     <>
-      <Header as="h4" block attached="top" icon="edit" content="图的表示方法" />
+      <Header as="h4" className={headerStyle} block attached="top" icon="edit" content={_(".ui.input_panel")} />
       <Segment attached="bottom">
         {isNarrowScreen ? (
           <Dropdown

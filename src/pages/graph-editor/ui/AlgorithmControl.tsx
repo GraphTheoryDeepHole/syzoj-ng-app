@@ -9,6 +9,7 @@ import MarkdownContent from "@/markdown/MarkdownContent";
 import { appState } from "@/appState";
 import { generateCodeFontEditorOptions } from "@/misc/fonts";
 import "./FomanticClearableDropdownPatcher.css";
+import headerStyle from "@/pages/graph-editor/ui/HeaderIconSizePatcher";
 
 interface AlgorithmControlProps {
   dataGraph: Graph;
@@ -223,7 +224,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     };
     return (
       <>
-        <Header as="h4" block attached="top" icon="crosshairs" content={_(".ui.parameters")} />
+        <Header as="h4" className={headerStyle} block attached="top" icon="crosshairs" content={_(".ui.parameters")} />
         <Segment attached="bottom">
           <Form>
             <Form.Group widths={"equal"}>
@@ -312,7 +313,14 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   };
   const mainController = () => (
     <>
-      <Header as="h4" block attached="top" icon="terminal" content="algorithm" />
+      <Header
+        as="h4"
+        className={headerStyle}
+        block
+        attached="top"
+        icon="terminal"
+        content={_(".ui.algorithm_control")}
+      />
       <Segment attached="bottom">
         <Grid padded>
           <Grid.Row>{algorithmSelector()}</Grid.Row>
@@ -357,7 +365,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     if (extraData == null) return;
     return (
       <>
-        <Header as="h4" block attached="top" icon="database" content="extra data" />
+        <Header as="h4" className={headerStyle} block attached="top" icon="database" content={_(".ui.extra_data")} />
         <Segment attached="bottom">
           {extraData.map(([name, type, data]) => (
             <Card key={name}>
@@ -378,7 +386,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
     if (result == null) return;
     return (
       <>
-        <Header as="h4" block attached="top" icon="check" content="result" />
+        <Header as="h4" className={headerStyle} block attached="top" icon="check" content="result" />
         <Segment color="green" attached="bottom">
           <span
             style={{

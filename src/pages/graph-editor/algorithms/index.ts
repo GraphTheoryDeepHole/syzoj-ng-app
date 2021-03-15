@@ -29,10 +29,10 @@ const algorithms = new Map<string, () => GraphAlgorithm>([
   ["CriticalPath", () => new CriticalPath()],
   ["EulerPath", () => new EulerPath()],
   ["HamiltonPath", () => new HamiltonPath()],
-  // ["Kruskal", () => new Kruskal()],
-  // ["Prim", () => new Prim()],
+  ["Kruskal", () => new Kruskal()],
+  ["Prim", () => new Prim()],
   ["Dijkstra", () => new Dijkstra()],
-  // ["Ford", () => new Ford()],
+  ["Ford", () => new Ford()],
   ["SalesmanProblem", () => new SalesmanPath()],
   ["SalesmanCheaperAlgorithm", () => new SalesmanCheaperAlgo()]
   // ["mf_ff", () => new FordFulkerson()],

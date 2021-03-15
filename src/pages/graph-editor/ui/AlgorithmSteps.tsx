@@ -4,6 +4,7 @@ import React from "react";
 import style from "./AlgorithmSteps.module.less";
 import { codeMap } from "@/pages/graph-editor/algorithms";
 import { useLocalizer } from "@/utils/hooks";
+import headerStyle from "@/pages/graph-editor/ui/HeaderIconSizePatcher";
 
 interface AlgorithmStepsProps {
   algorithmName: string;
@@ -31,7 +32,7 @@ const AlgorithmSteps: React.FC<AlgorithmStepsProps> = props => {
 
   return (
     <>
-      <Header as="h4" block attached="top" icon="code" content="code" />
+      <Header as="h4" className={headerStyle} block attached="top" icon="code" content={_(".ui.code_display")} />
       <Segment attached="bottom">
         {algorithmName && codeType ? (
           <Comment.Group>{codeMap[algorithmName][codeType].map(mapCodeLines([]))}</Comment.Group>

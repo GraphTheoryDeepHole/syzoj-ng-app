@@ -16,7 +16,12 @@ module.exports = {
     runner_stop: "未运行",
     runner_running: "正在运行",
     runner_done: "已完成",
-    step: "步"
+    step: "步",
+    input_panel: "输入图",
+    algorithm_control: "算法控制中心",
+    extra_data: "算法附加数据",
+    code_display: "代码显示器",
+    graph_display: "图渲染器"
   },
   graph: {
     random: {
