@@ -21,7 +21,7 @@ test("SalesmanCheaperAlgo", () => {
     while (tmp.length < graph.nodes().length) {
       tmp.push("/");
     }
-    tmp.push(step.graph.nodes()[0].datum.answer);
+    tmp.push(step.extraData[0][2]);
     output.push(tmp);
   }
   console.table(output);

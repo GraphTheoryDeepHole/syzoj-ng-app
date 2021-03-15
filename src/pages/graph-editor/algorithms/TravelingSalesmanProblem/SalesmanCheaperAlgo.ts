@@ -6,8 +6,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: undefined,
-      floatingData: node =>
-        node.id == 0 && node.datum.answer != undefined ? `${node.id} ans=${node.datum.answer}` : undefined
+      floatingData: undefined
     };
   }
 
@@ -29,6 +28,7 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
   *run(graph: Graph): Generator<Step> {
     let nodes = [];
     let mat = AdjacencyMatrix.from(graph, false).mat;
+    let answer = 0;
 
     for (let i = 0; i < graph.nodes().length; i++) {
       for (let j = 0; j < graph.nodes().length; j++) {
@@ -43,7 +43,6 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
       nodes[i] = i;
       graph.nodes()[i].datum = { chosen: 0 };
     }
-    graph.nodes()[0].datum.answer = 0;
 
     for (let i = 0; i < graph.edges().length; i++) {
       graph.edges()[i].datum.chosen = 0;
@@ -51,7 +50,8 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
 
     yield {
       graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 0]])
+      codePosition: new Map<string, number>([["pseudo", 0]]),
+      extraData: [["当前最佳答案", "list", [answer]]]
     };
 
     //共进行n-1次操作
@@ -84,15 +84,13 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
           nodes[j] = nodes[j - 1];
         }
         nodes[minj] = tmp;
-        graph.nodes()[0].datum.answer +=
-          mat[preNode][insNode].weight + mat[insNode][curNode].weight - mat[preNode][curNode].weight;
+        answer += mat[preNode][insNode].weight + mat[insNode][curNode].weight - mat[preNode][curNode].weight;
       } else {
         for (let j = i + 1; j > minj + 1; j--) {
           nodes[j] = nodes[j - 1];
         }
         nodes[minj + 1] = tmp;
-        graph.nodes()[0].datum.answer +=
-          mat[postNode][insNode].weight + mat[insNode][curNode].weight - mat[postNode][curNode].weight;
+        answer += mat[postNode][insNode].weight + mat[insNode][curNode].weight - mat[postNode][curNode].weight;
       }
 
       graph.edges().forEach(e => (e.datum.chosen = 0));
@@ -108,13 +106,15 @@ class SalesmanCheaperAlgo extends GraphAlgorithm {
       }
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 1]])
+        codePosition: new Map<string, number>([["pseudo", 1]]),
+        extraData: [["当前最佳答案", "list", [answer]]]
       };
     }
 
     yield {
       graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 2]])
+      codePosition: new Map<string, number>([["pseudo", 2]]),
+      extraData: [["当前最佳答案", "list", [answer]]]
     };
   }
 }

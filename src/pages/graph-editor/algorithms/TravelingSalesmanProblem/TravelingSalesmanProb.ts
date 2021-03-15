@@ -6,8 +6,7 @@ class SalesmanPath extends GraphAlgorithm {
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
       fillingColor: undefined,
-      floatingData: node =>
-        node.id == 0 && node.datum.answer != undefined ? `${node.id} ans=${node.datum.answer}` : undefined
+      floatingData: undefined
     };
   }
 
@@ -70,17 +69,20 @@ class SalesmanPath extends GraphAlgorithm {
     let node = 0;
     let chosenCnt = 0;
     let now = 0;
+    let edgesDisplay = [];
+    let answer = Infinity;
 
     //所有边初始时均为未选中状态
     for (let i = 0; i < edges.length; i++) {
       edges[i].datum.chosen = 0;
+      edgesDisplay[i] = edges[i].datum.weight;
     }
-    graph.nodes()[0].datum.answer = Infinity;
 
     while (node >= 0) {
       //选择足够的边
       while (chosenCnt < graph.nodes().length) {
         edges[node].datum.chosen = 1;
+        edgesDisplay[node] = -edgesDisplay[node];
         now += edges[node].datum.weight;
         node++;
         chosenCnt++;
@@ -88,20 +90,28 @@ class SalesmanPath extends GraphAlgorithm {
 
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 0]])
+        codePosition: new Map<string, number>([["pseudo", 0]]),
+        extraData: [
+          ["当前最佳答案", "list", [answer]],
+          ["当前选边情况", "list", edgesDisplay.concat()]
+        ]
       };
 
       //判断选择是否合法
-      let judRes = now >= graph.nodes()[0].datum.answer ? 1 : this.judge(graph, edges);
+      let judRes = now >= answer ? 1 : this.judge(graph, edges);
       //更新答案
       if (judRes == 2) {
-        if (now < graph.nodes()[0].datum.answer) {
-          graph.nodes()[0].datum.answer = now;
+        if (now < answer) {
+          answer = now;
         }
       }
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 1]])
+        codePosition: new Map<string, number>([["pseudo", 1]]),
+        extraData: [
+          ["当前最佳答案", "list", [answer]],
+          ["当前选边情况", "list", edgesDisplay.concat()]
+        ]
       };
 
       //退栈
@@ -111,6 +121,7 @@ class SalesmanPath extends GraphAlgorithm {
             break;
           } else {
             edges[node].datum.chosen = 0;
+            edgesDisplay[node] = -edgesDisplay[node];
             now -= edges[node].datum.weight;
             chosenCnt--;
           }
@@ -121,6 +132,7 @@ class SalesmanPath extends GraphAlgorithm {
       while (--node >= 0) {
         if (edges[node].datum.chosen == 1) {
           edges[node].datum.chosen = 0;
+          edgesDisplay[node] = -edgesDisplay[node];
           now -= edges[node].datum.weight;
           node++;
           chosenCnt--;
@@ -130,9 +142,22 @@ class SalesmanPath extends GraphAlgorithm {
 
       yield {
         graph: graph,
-        codePosition: new Map<string, number>([["pseudo", 2]])
+        codePosition: new Map<string, number>([["pseudo", 2]]),
+        extraData: [
+          ["当前最佳答案", "list", [answer]],
+          ["当前选边情况", "list", edgesDisplay.concat()]
+        ]
       };
     }
+
+    yield {
+      graph: graph,
+      codePosition: new Map<string, number>([["pseudo", 3]]),
+      extraData: [
+        ["当前最佳答案", "list", [answer]],
+        ["当前选边情况", "list", edgesDisplay.concat()]
+      ]
+    };
   }
 
   *run(graph: Graph): Generator<Step> {
@@ -148,10 +173,6 @@ class SalesmanPath extends GraphAlgorithm {
       }
     }
     yield* this.salesmanProb(graph, edges);
-    yield {
-      graph: graph,
-      codePosition: new Map<string, number>([["pseudo", 3]])
-    };
   }
 }
 

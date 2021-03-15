@@ -18,7 +18,7 @@ test("SalesmanPath", () => {
         tmp.push([e.source + 1, e.target + 1]);
       }
     });
-    tmp.push(step.graph.nodes()[0].datum.answer);
+    tmp.push(step.extraData[0][2], step.extraData[1][2]);
     output.push(tmp);
   }
   console.table(output);
