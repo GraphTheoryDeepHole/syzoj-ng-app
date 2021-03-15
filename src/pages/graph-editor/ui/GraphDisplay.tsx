@@ -50,12 +50,12 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
   }, [renderType]);
 
   useEffect(() => {
-    if (displayedGraph) {
-      dispatch({ type: "updateGraph", graph: displayedGraph, newGraph: false });
-    } else {
-      dispatch({ type: "updateGraph", graph: dataGraph, newGraph: true });
-    }
-  }, [dataGraph, displayedGraph]);
+    dispatch({ type: "updateGraph", graph: dataGraph, newGraph: true });
+  }, [dataGraph]);
+
+  useEffect(() => {
+    if (displayedGraph) dispatch({ type: "updateGraph", graph: displayedGraph, newGraph: false });
+  }, [displayedGraph]);
 
   useEffect(() => {
     dispatch({

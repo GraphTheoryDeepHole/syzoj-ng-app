@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocalizer, useScreenWidthWithin } from "@/utils/hooks";
 import { appState } from "@/appState";
 import GraphDisplay from "./ui/GraphDisplay";
@@ -22,6 +22,7 @@ let GraphEditor: React.FC = props => {
 
   // TODO: use context
   const [dataGraph, setDataGraph] = useState<Graph>(cloneDeep(g));
+  const [backupGraph, setBackupGraph] = useState<Graph>(cloneDeep(g));
   const [displayGraph, setDisplayGraph] = useState<Graph>();
   const [renderType, setRenderType] = useState<GraphRenderType>();
   const [generalRenderHint, setGeneralRenderHint] = useState<GeneralRenderHint>();
@@ -37,6 +38,10 @@ let GraphEditor: React.FC = props => {
     appState.enterNewPage(_(".title"), "graph_editor");
   }, [appState.locale]);
 
+  useEffect(() => {
+    setBackupGraph(cloneDeep(dataGraph));
+  }, [dataGraph]);
+
   const onAlgorithmChanged = newName => {
     const algo = newAlgorithm(newName);
     setAlgorithmName(newName);
@@ -47,6 +52,7 @@ let GraphEditor: React.FC = props => {
       setNodeRenderHint({});
       setEdgeRenderHint({});
     }
+    setDataGraph(backupGraph);
   };
 
   const onGraphInput = useCallback(graph => setDataGraph(cloneDeep(graph)), [setDataGraph]);

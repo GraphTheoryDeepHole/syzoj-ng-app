@@ -158,7 +158,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
 
   // Set displayGraph when currentStep changes
   useEffect(() => {
-    props.setDisplayedGraph(steps[currentStep]?.graph);
+    props.setDisplayedGraph(cloneDeep(steps[currentStep]?.graph));
   }, [steps, currentStep, props.setDisplayedGraph]);
 
   // Sync code type
