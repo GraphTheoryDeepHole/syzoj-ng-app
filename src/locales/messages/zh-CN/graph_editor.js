@@ -7,6 +7,7 @@ module.exports = {
     start: "启动",
     restart: "重新启动",
     no_algorithm: "选择算法",
+    no_codetype: "请选择算法与代码类型",
     check_parameters: "检查参数",
     autorun: "自动运行",
     pause: "暂停",

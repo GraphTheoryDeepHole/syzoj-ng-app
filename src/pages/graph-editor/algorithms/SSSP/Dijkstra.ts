@@ -52,7 +52,7 @@ class Dijkstra extends GraphAlgorithm {
     ];
   }
 
-  * run(graph: Graph, startPoint: number): Generator<Step> {
+  *run(graph: Graph, startPoint: number): Generator<Step> {
     let mat = AdjacencyMatrix.from(graph, true).mat.map(line => line.map(datum => (datum ? datum.weight || 1 : 0)));
     const getState = (id: number) => graph.nodes()[id].datum.state as NodeState;
     const setState = (id: number, state: NodeState = "") => (graph.nodes()[id].datum.state = state);

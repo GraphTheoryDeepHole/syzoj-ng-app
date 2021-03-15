@@ -1,8 +1,9 @@
-import { Comment, Header, Placeholder, Segment } from "semantic-ui-react";
+import { Comment, Header, Icon, Segment } from "semantic-ui-react";
 import MarkdownContent from "@/markdown/MarkdownContent";
-import React, { useState } from "react";
+import React from "react";
 import style from "./AlgorithmSteps.module.less";
 import { codeMap } from "@/pages/graph-editor/algorithms";
+import { useLocalizer } from "@/utils/hooks";
 
 interface AlgorithmStepsProps {
   algorithmName: string;
@@ -11,6 +12,7 @@ interface AlgorithmStepsProps {
 }
 
 const AlgorithmSteps: React.FC<AlgorithmStepsProps> = props => {
+  const _ = useLocalizer("graph_editor");
   const { algorithmName, codeType, codePosition } = props;
 
   const mapCodeLines = (outerIndexes: number[]) => (e, i) => (
@@ -34,11 +36,12 @@ const AlgorithmSteps: React.FC<AlgorithmStepsProps> = props => {
         {algorithmName != null && codeType != null ? (
           <Comment.Group>{codeMap[algorithmName][codeType].map(mapCodeLines([]))}</Comment.Group>
         ) : (
-          <Placeholder fluid>
-            {Array.from({ length: 7 }, (_, i) => (
-              <Placeholder.Line key={i} />
-            ))}
-          </Placeholder>
+          <Segment placeholder>
+            <Header icon>
+              <Icon name="question circle outline" />
+              {_(".ui.no_codetype")}
+            </Header>
+          </Segment>
         )}
       </Segment>
     </>
