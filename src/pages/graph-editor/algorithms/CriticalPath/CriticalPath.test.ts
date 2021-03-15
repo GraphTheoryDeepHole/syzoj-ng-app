@@ -3,150 +3,18 @@ import { AdjacencyMatrix } from "../../GraphStructure";
 
 test("CriticalPath", () => {
   let mat = [
-    [
-      undefined,
-      { weight: 15 },
-      { weight: 15 },
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      { weight: 5 },
-      { weight: 5 },
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 5 },
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 4 }
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 3 },
-      undefined,
-      undefined,
-      { weight: 3 },
-      undefined,
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 4 },
-      undefined,
-      undefined,
-      { weight: 4 },
-      undefined,
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 2 },
-      { weight: 2 },
-      undefined,
-      undefined,
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 2 }
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 3 }
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 3 },
-      { weight: 3 },
-      undefined,
-      undefined,
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { weight: 4 },
-      { weight: 4 },
-      undefined,
-      undefined,
-      undefined
-    ],
-    [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined
-    ]
-  ];
+    [0, 15, 15, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 5, 5, 0, 0, 0, 0, 5, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4],
+    [0, 0, 0, 0, 0, 3, 0, 0, 3, 0, 0],
+    [0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 0],
+    [0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  ].map(line => line.map(weight => (weight == 0 ? undefined : { weight: weight })));
   let graph = new AdjacencyMatrix(mat, true);
   let topoSeq: number[][] = [];
   let dist: number[][] = [];
