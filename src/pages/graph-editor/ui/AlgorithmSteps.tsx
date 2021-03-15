@@ -33,7 +33,7 @@ const AlgorithmSteps: React.FC<AlgorithmStepsProps> = props => {
     <>
       <Header as="h4" block attached="top" icon="code" content="code" />
       <Segment attached="bottom">
-        {algorithmName != null && codeType != null ? (
+        {algorithmName && codeType ? (
           <Comment.Group>{codeMap[algorithmName][codeType].map(mapCodeLines([]))}</Comment.Group>
         ) : (
           <Segment placeholder>

@@ -46,6 +46,6 @@ const algorithms = new Map<string, () => GraphAlgorithm>([
   ["pt_dmp", () => new DMP()]
 ]);
 
-const newAlgorithm = name => algorithms.get(name)();
+const newAlgorithm = name => algorithms.get(name)?.();
 
 export { algorithms, codeMap, newAlgorithm };

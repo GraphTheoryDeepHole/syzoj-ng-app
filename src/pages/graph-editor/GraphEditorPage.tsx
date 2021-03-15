@@ -49,8 +49,13 @@ let GraphEditor: React.FC = props => {
   const onAlgorithmChanged = newName => {
     const algo = newAlgorithm(newName);
     setAlgorithmName(newName);
-    setNodeRenderHint(algo.nodeRenderPatcher());
-    setEdgeRenderHint(algo.edgeRenderPatcher());
+    if (algo) {
+      setNodeRenderHint(algo.nodeRenderPatcher());
+      setEdgeRenderHint(algo.edgeRenderPatcher());
+    } else {
+      setNodeRenderHint({});
+      setEdgeRenderHint({});
+    }
   };
 
   const isNarrowScreen = useScreenWidthWithin(0, 1024);

@@ -103,7 +103,7 @@ class ParameterManager {
   }
 
   public changeAlgorithm(args: { name: string }) {
-    this.descriptors = newAlgorithm(args.name).parameters();
+    this.descriptors = newAlgorithm(args.name)?.parameters() && [];
     this.clear();
   }
 
@@ -231,6 +231,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       fluid
       search
       selection
+      clearable
       options={[...algorithms.keys()].map(key => ({
         key,
         text: _(`.algo.${key}.name`),
@@ -245,6 +246,7 @@ let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
       fluid
       search
       selection
+      clearable
       options={
         algorithm
           ? Object.keys(codeMap[algorithm.id()]).map(key => ({
