@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Header, Menu, Segment } from "semantic-ui-react";
+import { Dropdown, Header, Menu, Segment } from "semantic-ui-react";
 import { Graph } from "@/pages/graph-editor/GraphStructure";
 import methods from "@/pages/graph-editor/ui/input-methods";
-import { useLocalizer } from "@/utils/hooks";
+import { useLocalizer, useScreenWidthWithin } from "@/utils/hooks";
 import { GraphRenderType } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
 
 interface GraphInputPanelProps {
@@ -20,23 +20,43 @@ let GraphInputPanel: React.FC<GraphInputPanelProps> = props => {
   const onMenuItemClicked = (_, { name }) => {
     setSelectedMethods(name);
   };
+  const onDropdownSelected = (_, { value }) => {
+    setSelectedMethods(value);
+  };
+  const isNarrowScreen = useScreenWidthWithin(0, 1024);
   return (
     <>
       <Header as="h4" block attached="top" icon="edit" content="图的表示方法" />
       <Segment attached="bottom">
-        <Menu attached="top" tabular>
-          {Array.from(methods.keys(), methodName => (
-            <Menu.Item
-              key={methodName}
-              name={methodName}
-              active={selectedMethod === methodName}
-              onClick={onMenuItemClicked}
-            >
-              {_(`.graph.${methodName}.name`)}
-            </Menu.Item>
-          ))}
-        </Menu>
-        <Segment attached="bottom">{React.createElement(methods.get(selectedMethod), props)}</Segment>
+        {isNarrowScreen ? (
+          <Dropdown
+            defaultValue="random"
+            fluid
+            selection
+            options={[...methods.keys()].map(name => ({
+              key: name,
+              text: _(`.graph.${name}.name`),
+              value: name
+            }))}
+            onChange={onDropdownSelected}
+          />
+        ) : (
+          <Menu attached="top" tabular>
+            {[...methods.keys()].map(methodName => (
+              <Menu.Item
+                key={methodName}
+                name={methodName}
+                active={selectedMethod === methodName}
+                onClick={onMenuItemClicked}
+              >
+                {_(`.graph.${methodName}.name`)}
+              </Menu.Item>
+            ))}
+          </Menu>
+        )}
+        <Segment attached={isNarrowScreen ? false : "bottom"}>
+          {React.createElement(methods.get(selectedMethod), props)}
+        </Segment>
       </Segment>
     </>
   );
