@@ -5,7 +5,8 @@ module.exports = {
     contests: "Contests",
     submissions: "Submissions",
     members: "Members",
-    discussion: "Discussion"
+    discussion: "Discussion",
+    graph_editor: "Graph Editor"
   },
   header: {
     user: {
