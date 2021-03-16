@@ -136,15 +136,16 @@ class ParameterManager {
   }
 }
 
+const reducer = (state, action) => {
+  let newState = cloneDeep(state);
+  newState[action.type](action);
+  return newState;
+};
+
 let AlgorithmControl: React.FC<AlgorithmControlProps> = props => {
   const _ = useLocalizer("graph_editor");
 
   // States
-  const reducer = (state, action) => {
-    let newState = cloneDeep(state);
-    newState[action.type](action);
-    return newState;
-  };
   const [runner, runnerDispatch] = useReducer<Reducer<AlgorithmRunner, any>>(
     reducer,
     new AlgorithmRunner(props.setDisplayedGraph)
