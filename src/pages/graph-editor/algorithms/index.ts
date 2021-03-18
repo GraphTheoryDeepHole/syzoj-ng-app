@@ -34,16 +34,16 @@ const algorithms = new Map<string, () => GraphAlgorithm>([
   ["Dijkstra", () => new Dijkstra()],
   ["Ford", () => new Ford()],
   ["SalesmanProblem", () => new SalesmanPath()],
-  ["SalesmanCheaperAlgorithm", () => new SalesmanCheaperAlgo()]
-  // ["mf_ff", () => new FordFulkerson()],
-  // ["mf_ek", () => new EdmondsKarp()],
-  // ["mf_dinic", () => new Dinic()],
-  // ["mcf_classic", () => new MinCostFlow()],
-  // ["mcf_zkw", () => new ZkwMCF()],
-  // ["mbm_hungarian", () => new HungarianDFS()],
-  // ["mwbm_km", () => new KuhnMunkres()],
-  // ["mm_gabow", () => new Gabow()],
-  // ["pt_dmp", () => new DMP()]
+  ["SalesmanCheaperAlgorithm", () => new SalesmanCheaperAlgo()],
+  ["mf_ff", () => new FordFulkerson()],
+  ["mf_ek", () => new EdmondsKarp()],
+  ["mf_dinic", () => new Dinic()],
+  ["mcf_classic", () => new MinCostFlow()],
+  ["mcf_zkw", () => new ZkwMCF()],
+  ["mbm_hungarian", () => new HungarianDFS()],
+  ["mwbm_km", () => new KuhnMunkres()],
+  ["mm_gabow", () => new Gabow()],
+  ["pt_dmp", () => new DMP()]
 ]);
 
 const newAlgorithm = name => algorithms.get(name)?.();
