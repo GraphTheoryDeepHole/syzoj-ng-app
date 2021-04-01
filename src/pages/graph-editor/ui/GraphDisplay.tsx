@@ -12,6 +12,7 @@ import CanvasGraphRenderer, {
 import legends from "../algorithms/legends.js";
 import headerStyle from "@/pages/graph-editor/ui/HeaderIconSizePatcher";
 import { useLocalizer } from "@/utils/hooks";
+import MarkdownContent from "@/markdown/MarkdownContent";
 
 interface GraphDisplayProp {
   algorithmName: string;
@@ -97,7 +98,7 @@ let GraphDisplay: React.FC<GraphDisplayProp> = props => {
             <Card.Content>
               <Card.Header>图例</Card.Header>
               <Card.Description>
-                <pre>{legends[algorithmName]}</pre>
+                <MarkdownContent content={legends[algorithmName]} />
               </Card.Description>
             </Card.Content>
           </Card>
