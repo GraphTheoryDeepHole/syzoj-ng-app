@@ -1,5 +1,5 @@
 import { GraphAlgorithm, ParameterDescriptor, parseRangedInt, Step } from "../../GraphAlgorithm";
-import { EdgeList, Graph, Node } from "../../GraphStructure";
+import { Graph, Node, NodeEdgeList } from "../../GraphStructure";
 import { Queue } from "../../utils/DataStructure";
 import { NetworkFlowBase, _Edge, v } from "./Common";
 import { EdgeRenderHint, NodeRenderHint } from "@/pages/graph-editor/ui/CanvasGraphRenderer";
@@ -28,6 +28,17 @@ class EdmondsKarp extends GraphAlgorithm {
 
   nodeRenderPatcher(): Partial<NodeRenderHint> {
     return {
+      fillingColor: node => {
+        switch (node.datum.tag) {
+          case 1: // in queue
+            return "#3333ff";
+          case 2: // checking
+            return "#dddd00";
+          case 3: // checked
+            return "#33ff33";
+        }
+        return "#dddddd";
+      },
       floatingData: node => node.id.toString()
     };
   }
@@ -47,47 +58,64 @@ class EdmondsKarp extends GraphAlgorithm {
   private n: number = 0;
   private S: number;
   private T: number;
+  private delta: number = 0;
   private maxflow: number = 0;
 
   private pre: number[] = [];
   private eid: number[] = [];
   private flw: number[] = [];
+  private tag: number[] = [];
 
   clear(buf: any[], val: any = -1, cnt: number = this.n) {
     for (let _ = 0; _ < cnt; ++_) buf[_] = val;
   }
 
-  getStep(lineId: number): Step {
+  getStep(stepId: number, clearMark: boolean = false): Step {
     return {
-      graph: new EdgeList(this.n, this.E.edges()),
-      codePosition: new Map<string, number>([["pseudo", lineId]]),
-      extraData: [["$maxflow$", "number", this.maxflow]]
+      graph: new NodeEdgeList(
+        Array.from({ length: this.n }, (_, id) => ({ id, datum: { tag: this.tag[id] } })),
+        this.E.edges(clearMark)
+      ),
+      codePosition: new Map<string, number>([["pseudo", stepId + 2]]),
+      extraData: [
+        ["$maxflow$", "number", this.maxflow],
+        ["$\\delta$", "number", this.delta]
+      ]
     };
   }
 
   mark() {
+    this.E.clearEdgeMark();
     for (let pos = this.T; pos !== this.S; pos = this.pre[pos]) this.E.edge[this.eid[pos]].mark = true;
   }
 
-  flip(): number {
-    let res = this.flw[this.T];
+  flip() {
     for (let pos = this.T; pos !== this.S; pos = this.pre[pos]) {
-      this.E.edge[this.eid[pos]].flow -= res;
-      this.E.edge[this.eid[pos] ^ 1].flow += res;
+      this.E.edge[this.eid[pos]].flow -= this.delta;
+      this.E.edge[this.eid[pos] ^ 1].flow += this.delta;
     }
-    return res;
   }
 
-  bfs(): boolean {
+  *bfs() {
     this.que.clear();
-    this.clear(this.eid), this.clear(this.pre), this.clear(this.flw, Infinity);
+    this.clear(this.eid), this.clear(this.pre);
+    this.clear(this.flw, Infinity);
+    this.clear(this.tag, 0);
 
     this.que.push(this.S);
+    this.tag[this.S] = 1;
+    yield this.getStep(1);
+
     while (!this.que.empty()) {
       let pos = this.que.front();
+      this.tag[pos] = 2;
       this.que.pop();
+      yield this.getStep(1);
+
       if (pos === this.T) {
+        this.clear(this.tag, 0);
         this.mark();
+        yield this.getStep(1);
         return true;
       }
       let e: _Edge;
@@ -95,11 +123,18 @@ class EdmondsKarp extends GraphAlgorithm {
         e = this.E.edge[i];
         if (this.pre[e.to] === -1 && e.flow > 0) {
           this.que.push(e.to);
+          e.mark = true;
+          this.tag[e.to] = 1;
+          yield this.getStep(1);
+
           this.pre[e.to] = pos;
           this.eid[e.to] = i;
           this.flw[e.to] = Math.min(this.flw[pos], e.flow);
         }
       }
+
+      this.tag[pos] = 3;
+      yield this.getStep(1);
     }
 
     return false;
@@ -110,17 +145,17 @@ class EdmondsKarp extends GraphAlgorithm {
     this.n = this.V.length;
     this.E = new NetworkFlowBase(G, this.n);
     (this.S = Spos), (this.T = Tpos);
-    let delta = 0;
-    this.maxflow = 0;
-    yield this.getStep(19); // inited
-    while (this.bfs()) {
-      yield this.getStep(20); // found augmenting path
-      delta = this.flip();
-      this.maxflow += delta;
-      yield this.getStep(23); // augmented
+    this.delta = this.maxflow = 0;
+    while (yield* this.bfs()) {
+      this.delta = this.flw[this.T];
+      this.maxflow += this.delta;
+      yield this.getStep(2);
+      this.flip();
+      yield this.getStep(3, true);
+      this.delta = 0;
     }
+    yield this.getStep(4, true);
     //console.log(`algo EdmondsKarp : {flow: ${flow}}`);
-    yield this.getStep(24); // return
     return { flow: this.maxflow };
   }
 }

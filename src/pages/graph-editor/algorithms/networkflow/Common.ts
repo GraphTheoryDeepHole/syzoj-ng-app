@@ -29,14 +29,18 @@ export class NetworkFlowBase {
     });
   }
 
-  edges(): Edge[] {
+  clearEdgeMark() {
+    this.edge.forEach(e => (e.mark = false));
+  }
+
+  edges(clearMark: boolean = true): Edge[] {
     this._edges.forEach((e, i) =>
       Object.assign(e.datum, {
         used: this.edge[i * 2 + 1].flow,
         mark: this.edge[i * 2].mark ? 1 : this.edge[i * 2 + 1].mark ? -1 : 0
       })
     );
-    this.edge.forEach(e => (e.mark = false));
+    if (clearMark) this.clearEdgeMark();
     return this._edges;
   }
 }
