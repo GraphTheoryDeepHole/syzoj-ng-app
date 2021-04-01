@@ -37,7 +37,7 @@ let L = 1;
 let Afc = { flow: 1, cost: 6 };
 
 test("MinCostFlow", () => {
-  let algo = new MinCostFlow().run(G, S, T);
+  let algo = new MinCostFlow().run(G, S, T, L);
   let step: any;
 
   let resG: Graph;
@@ -61,7 +61,7 @@ test("MinCostFlow", () => {
 });
 
 test("ZkwMCF", () => {
-  let algo = new ZkwMCF().run(G, S, T);
+  let algo = new ZkwMCF().run(G, S, T, L);
   let step: any;
 
   let resG: Graph;
