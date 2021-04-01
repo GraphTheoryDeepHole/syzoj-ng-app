@@ -1,5 +1,14 @@
 module.exports = {
-  mf_ff: "",
+  mf_ff:
+    '<font color="#dddddd">灰色</font>点 $\\color{#dddddd}\\bullet$：[DFS] 未访问；  \n' +
+    '<font color="#3333ff">蓝色</font>点 $\\color{#3333ff}\\bullet$：[DFS] 已访问，不在栈中；  \n' +
+    '<font color="#dddd00">黄色</font>点 $\\color{#dddd00}\\bullet$：[DFS] 当前节点；  \n' +
+    '<font color="#33ff33">绿色</font>点 $\\color{#33ff33}\\bullet$：[DFS] 已访问，在栈中；  \n' +
+    "**加粗**边：在增广路中；  \n" +
+    '<font color="#33ff33">绿色</font>边 $\\color{#33ff33}\\rightarrow$：**正向**出现在增广路中；  \n' +
+    '<font color="#ff3333">红色</font>边 $\\color{#ff3333}\\rightarrow$：**反向**出现在增广路中；  \n' +
+    '<font color="#dddddd">灰色</font>边 $\\color{#dddddd}\\rightarrow$：不在增广路中；   \n' +
+    "边数据 $(c,f)$：$c$ 为容量，$f$ 为流量。",
   mf_ek:
     '<font color="#dddddd">灰色</font>点 $\\color{#dddddd}\\bullet$：[BFS] 未访问节点；  \n' +
     '<font color="#3333ff">蓝色</font>点 $\\color{#3333ff}\\bullet$：[BFS] 已访问，在队中；  \n' +
