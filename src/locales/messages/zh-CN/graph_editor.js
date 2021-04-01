@@ -198,7 +198,8 @@ module.exports = {
       para: {}
     },
     code_type: {
-      pseudo: "伪代码"
+      pseudo: "伪代码",
+      pseudo_en: "Pseudocode"
     }
   }
 };

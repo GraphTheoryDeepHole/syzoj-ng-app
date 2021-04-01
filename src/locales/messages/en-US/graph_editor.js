@@ -198,7 +198,8 @@ module.exports = {
       para: {}
     },
     code_type: {
-      pseudo: "Pseudocode"
+      pseudo: "Pseudocode(zh-CN)",
+      pseudo_en: "Pseudocode"
     }
   }
 };
