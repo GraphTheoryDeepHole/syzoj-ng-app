@@ -104,6 +104,7 @@ class EdmondsKarp extends GraphAlgorithm {
 
     this.que.push(this.S);
     this.tag[this.S] = 1;
+    this.pre[this.S] = 0;
     yield this.getStep(1);
 
     while (!this.que.empty()) {
@@ -122,14 +123,13 @@ class EdmondsKarp extends GraphAlgorithm {
       for (let i = this.E.head[pos]; i !== -1; i = e.next) {
         e = this.E.edge[i];
         if (this.pre[e.to] === -1 && e.flow > 0) {
-          this.que.push(e.to);
           e.mark = true;
+          this.que.push(e.to);
           this.tag[e.to] = 1;
-          yield this.getStep(1);
-
           this.pre[e.to] = pos;
           this.eid[e.to] = i;
           this.flw[e.to] = Math.min(this.flw[pos], e.flow);
+          yield this.getStep(1);
         }
       }
 
