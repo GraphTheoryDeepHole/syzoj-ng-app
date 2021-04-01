@@ -1,8 +1,8 @@
 import { MinCostFlow } from "./MinCostFlow";
 import { ZkwMCF } from "./ZkwMCF";
-import { Graph } from "../../GraphStructure";
+import { EdgeList, Graph } from "../../GraphStructure";
 
-import { G, S, T, Afc } from "./data/Large.data";
+//import { G, S, T, Afc } from "./data/Large.data";
 
 // let E = [
 //   [0,1,2,0],
@@ -23,18 +23,18 @@ import { G, S, T, Afc } from "./data/Large.data";
 // let L = Infinity;
 // let A = {flow: 3, cost: 15}
 
-// let E = [
-//   [0, 1, 1, 2],
-//   [0, 2, 4, 6],
-//   [1, 2, 1, 2],
-//   [1, 3, 4, 6],
-//   [2, 3, 1, 2]
-// ].map(([s, t, f, c]) => ({ source: s, target: t, datum: { flow: f, cost: c } }));
-// let G = new EdgeList(4, E);
-// let S = 0;
-// let T = 3;
-// let L = 1;
-// let A = {flow: 1, cost: 6};
+let E = [
+  [0, 1, 1, 2],
+  [0, 2, 4, 6],
+  [1, 2, 1, 2],
+  [1, 3, 4, 6],
+  [2, 3, 1, 2]
+].map(([s, t, f, c]) => ({ source: s, target: t, datum: { flow: f, cost: c } }));
+let G = new EdgeList(4, E);
+let S = 0;
+let T = 3;
+let L = 1;
+let Afc = { flow: 1, cost: 6 };
 
 test("MinCostFlow", () => {
   let algo = new MinCostFlow().run(G, S, T);
